@@ -1,0 +1,698 @@
+{
+  "name": "웹 스크래핑 자동화",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "75fa953b-822b-4013-ae24-36cb7032c5c3",
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        80,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "datapopcorn@gmail.com",
+        "subject": "=[{{ $now.minus(7, 'days').format('yyyy-MM-dd') }}~{{ $now.minus(1, 'days').format('yyyy-MM-dd') }}] Yes24 종합 베스트",
+        "message": "=최근 7일간의 종합 베스트 입니다.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "id": "e2090d67-abab-4060-90c2-c13cf3480623",
+      "name": "Send CSV via e-mail",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1808,
+        352
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "68630b73-9884-4615-84c8-93f790c1810e"
+    },
+    {
+      "parameters": {
+        "url": "https://www.yes24.com/Product/Category/BestSeller?categoryNumber=001&pageNumber=1&pageSize=24",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "b11821fd-c469-4b3c-bd3d-c198bbc188d6",
+      "name": "Fetch website content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        304,
+        432
+      ],
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# 웹 스크래핑 자동화\n\n1. TRIGGER : 매주 일요일 아침 9시에 실행.\n2. TASK : 베스트셀러 영역 부분을 가져온다.\n3. TARGET : 구글 시트에 적재 \n\n+후속) 구글 시트에 저장된 내용을 바탕으로 질의응답하기.",
+        "height": 297,
+        "width": 579
+      },
+      "id": "19259193-1980-460b-96c2-dd3ebdfe66a8",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "books",
+        "options": {}
+      },
+      "id": "0dbc4125-fb05-4b8a-a030-5dc7379f589d",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        752,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "books",
+              "cssSelector": "#yesBestList > li",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24411156-093e-4775-a244-b690f2ae1cb0",
+      "name": "Extract all books from the page1",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        528,
+        432
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "사용자의 질문에 답을 해주는 유용한 비서입니다.\n친절하게 답변을 해줍니다.\n최대한 불렛포인트로 답변해주세요."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        288,
+        912
+      ],
+      "id": "f3114013-f8ea-4b60-a6ec-577ffc64c220",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "# TRIGGER\n- 매주 1회",
+        "height": 420,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        320
+      ],
+      "id": "b2c020f8-9dba-47fb-ab92-455ba51cd32a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# TASK\n- TARGET",
+        "height": 340,
+        "width": 1220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        320
+      ],
+      "id": "5b72c1e2-52b6-46b4-bc34-c81a5e6a5dae",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET",
+        "height": 400,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        288
+      ],
+      "id": "3159f458-c0d6-4e12-9dfc-74fee430bd67",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8",
+          "mode": "list",
+          "cachedResultName": "Yes24 BestSeller",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "bestSeller",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "standard_range",
+              "displayName": "standard_range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ranking",
+              "displayName": "ranking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "goods_no",
+              "displayName": "goods_no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "goods_url",
+              "displayName": "goods_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author",
+              "displayName": "author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "publisher",
+              "displayName": "publisher",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pub_date",
+              "displayName": "pub_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e56449b0-4427-4efa-a1c1-93a02686faad",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1600,
+        528
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "books",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "div.item_info > div.info_row.info_name > a.gd_name"
+            },
+            {
+              "key": "price",
+              "cssSelector": "div.item_info > div.info_row.info_price > strong > em"
+            },
+            {
+              "key": "ranking",
+              "cssSelector": "div.item_img > div > div > em"
+            },
+            {
+              "key": "author",
+              "cssSelector": ".item_info .info_row.info_pubGrp .info_auth a"
+            },
+            {
+              "key": "Publisher",
+              "cssSelector": ".item_info .info_row.info_pubGrp .info_pub a"
+            },
+            {
+              "key": "Publication Date",
+              "cssSelector": ".item_info .info_row.info_pubGrp .info_date"
+            },
+            {
+              "key": "goods_no",
+              "cssSelector": "div.item_img a.lnk_img:first-of-type",
+              "returnValue": "attribute",
+              "attribute": "href"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "07733a5c-b770-437f-88ad-cc717cc48176",
+      "name": "Extract individual book price",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        944,
+        432
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f3f917f7-242a-42bd-82ea-a160a0351ea7",
+      "name": "Convert to CSV File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        1600,
+        352
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        912
+      ],
+      "id": "e0ef5564-0712-463d-a57e-8f5fcde05310",
+      "name": "When chat message received",
+      "webhookId": "dae060ff-e945-4d6f-8564-8239a78d8e3e"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        1120
+      ],
+      "id": "50404fd8-7412-45fc-8ba3-f530bd04391e",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8",
+          "mode": "list",
+          "cachedResultName": "Yes24 BestSeller",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "bestSeller",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14XvsktecN18XAOPV-kBf1cZVxlgnBkxUOVcnI1i2dR8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        400,
+        1120
+      ],
+      "id": "a63e3d20-b623-4f5c-963e-9abedfbc01a2",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "content": "![](https://i.imgur.com/FRVlLFJ.png)",
+        "height": 560,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        752
+      ],
+      "id": "3179abd1-ed7f-4be6-ad95-339c068cb0d5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "랭킹, 책제목, 저자, 가격, 판매지수, 태그",
+        "height": 80,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        864,
+        320
+      ],
+      "id": "64acc019-181e-4026-b3e3-b1b3c5658db9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9f6e1bd-059e-4be7-9c83-71e41e095efd",
+              "name": "standard_range",
+              "value": "={{ $now.minus(7,'days').format('yyyy.MM.dd') }}~{{ $now.format('yyyy.MM.dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "e10efe23-a5dc-489e-9130-8c3b39dd897d",
+              "name": "ranking",
+              "value": "={{ $json.ranking }}",
+              "type": "string"
+            },
+            {
+              "id": "b1ce29f2-7007-41d4-9c5f-fb796b59e006",
+              "name": "goods_no",
+              "value": "={{ $json.goods_no.split('/')[3] }}",
+              "type": "string"
+            },
+            {
+              "id": "0dee923c-4fbd-49c9-bd70-df726f21844d",
+              "name": "image_url",
+              "value": "==IMAGE(\"https://image.yes24.com/goods/{{ $json.goods_no.split('/')[3] }}\")",
+              "type": "string"
+            },
+            {
+              "id": "4313ff8c-d25b-44b3-a13c-ffda930623b0",
+              "name": "goods_url",
+              "value": "=https://www.yes24.com/product/goods/{{ $json.goods_no.split('/')[3] }}",
+              "type": "string"
+            },
+            {
+              "id": "f46364d1-e9e0-4924-b06b-098c9bf80197",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e262a11b-2ff6-42d2-bd4d-fd12ec8f2d63",
+              "name": "price",
+              "value": "={{ $json.price }}",
+              "type": "string"
+            },
+            {
+              "id": "65ba00ce-3df7-480b-90e2-d43cfa8cdd2a",
+              "name": "author",
+              "value": "={{ $json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "c266f3da-4c2c-4786-bcb3-620bd4cd24e9",
+              "name": "publisher",
+              "value": "={{ $json.Publisher }}",
+              "type": "string"
+            },
+            {
+              "id": "11c06e6c-ed59-46f5-b434-110c0887adfa",
+              "name": "pub_date",
+              "value": "={{ $json[\"Publication Date\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        432
+      ],
+      "id": "69ae1e83-c25b-4550-b420-61ac7ef35939",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        608
+      ],
+      "id": "2d08d304-8e37-4736-b24a-5f1229dda766",
+      "name": "Sun(9AM)"
+    }
+  ],
+  "connections": {
+    "When clicking \"Test workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Fetch website content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch website content": {
+      "main": [
+        [
+          {
+            "node": "Extract all books from the page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Extract individual book price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract all books from the page1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract individual book price": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to CSV File": {
+      "main": [
+        [
+          {
+            "node": "Send CSV via e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to CSV File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sun(9AM)": {
+      "main": [
+        [
+          {
+            "node": "Fetch website content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
