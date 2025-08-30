@@ -1,0 +1,405 @@
+{
+  "name": "이메일 TTS",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4o-mini-2024-07-18",
+        "options": {}
+      },
+      "id": "dc068909-ff9e-48e6-80d7-0308b6d30a78",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "mailbox": "achim",
+        "options": {
+          "customEmailConfig": "[\"UNSEEN\"]"
+        }
+      },
+      "id": "7efdabac-d989-4d1f-a0ef-30209565b92c",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        48,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## API 가이드 [text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)\n## 목소리와 프롬프트 가이드 [openai.fm](https://www.openai.fm/)",
+        "height": 100,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        352
+      ],
+      "id": "d2a54684-3be7-4ded-b053-655207333a93",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Your Slack credential is missing required Oauth Scopes\nAdd the following scope(s) to your Slack App: files:write",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        688
+      ],
+      "id": "91a5e65e-1065-4095-a388-9e1c74eba703",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "binaryPropertyName": "podcast",
+        "options": {
+          "channelId": "C07PH5BRN1X",
+          "fileName": "audio.mp3",
+          "initialComment": "={{ $('테스트 1개').item.json.subject }}\n---\n{{ $('뉴스레터 요약 AI Agent').item.json.output }}",
+          "title": "=Achime Newsletter TTS ({{ $('특정 발신자만 필터').item.json.date.toDateTime().format('yyyy-MM-dd') }})"
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1728,
+        480
+      ],
+      "id": "3b0d7b7e-22df-406a-9ac6-fad6948ff44f",
+      "name": "Upload File",
+      "webhookId": "d1de5aa6-f3c0-498c-9414-de8526f9318f"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# 이메일 TTS\n## 학습목표\n- 원하는 조건의 이메일만 필터하고 본문만 추출할 수 있다.\n- Text-To-Speach 로 변환할 수 있다.\n- 슬랙에 파일을 업로드 할 수 있다.",
+        "height": 280,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3fe7c828-3d8a-4640-a102-947227606552",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## TRIGGER (해당 워크플로우가 실행되는 조건)\n- 특정 메일함에 \"읽지 않은\" 상태의 메일이 존재하면",
+        "height": 360,
+        "width": 180,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        304
+      ],
+      "id": "a4e62018-2acb-44ff-8041-0f750a46e9f1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## TASK (해당 워크플로우가 동작하는 역할)",
+        "height": 360,
+        "width": 1400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        304
+      ],
+      "id": "3c633e93-1996-4cb7-bac7-a2c119f72ee4",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## TARGET (최종 도착지)\n- 슬랙에 업로드",
+        "height": 360,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        304
+      ],
+      "id": "2c74eec0-4871-49c8-be1c-973a64dd8853",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3161af8c-8c14-42d8-9d22-c5ba285e285f",
+              "name": "contents",
+              "value": "={{ $json.contents.join('\\n\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "fecc6b4f-623a-487b-b194-b95bfb6a6956",
+              "name": "length",
+              "value": "={{ $json.contents.toJsonString().length }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        480
+      ],
+      "id": "61d70bec-9bee-4a13-8d33-ef785dea9a15",
+      "name": "Contents 모으기"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "textHtml",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "contents",
+              "cssSelector": "=div.stb-text-box > table.stb-text-box-inner > tbody > tr > td",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        }
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        704,
+        480
+      ],
+      "id": "a105bc51-1056-408d-87aa-c4ee1661030c",
+      "name": "Contents 추출"
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "id": "d5964b3e-bcef-4ffb-8d68-7df26668434c",
+      "name": "테스트 1개",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        480,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "6edc2bef-3b34-493e-b4ba-a520eab0b0b4",
+              "leftValue": "={{ $json.from }}",
+              "rightValue": "longblack",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "4ad46f7c-e964-414f-beef-5e8ded738ba8",
+              "leftValue": "={{ $json.from }}",
+              "rightValue": "ep9",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "0a8a0a3c-44d5-4f3a-9988-015559c78652",
+              "leftValue": "={{ $json.from }}",
+              "rightValue": "achim",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "547875e4-4939-4df5-b871-f6723ebcf024",
+      "name": "특정 발신자만 필터",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.contents }}",
+        "options": {
+          "systemMessage": "=당신은 따뜻하고 친근한 분위기의 팟캐스트 내레이터입니다.\n\n사용자가 입력한 긴 뉴스레터 본문을 **최대 3,000자 이내**로 요약해 주세요.  \n딱딱하거나 보고서 같은 느낌이 아닌, 마치 친구에게 이야기하듯 자연스럽고 편안한 톤으로 풀어주면 됩니다.\n\n요약 시 다음 원칙을 따라 주세요:\n- 뉴스레터의 주요 흐름과 핵심 메시지를 놓치지 말고 자연스럽게 전달하세요.\n- 너무 단순하거나 건조한 Bullet 요약은 피하고, 이야기하듯 문단 중심으로 구성하세요.\n- \"오늘은 이런 이야기를 나눠볼게요\", \"들어보면 생각보다 흥미로운 이야기예요\" 등 팟캐스트에 어울리는 말투를 사용하세요.\n- 숫자, 인용, 구체적 사례는 가능한 살려 주세요.\n- 전체 길이는 반드시 **3,000자 이내**로 제한합니다.\n\n이 요약을 듣는 사람은 마치 팟캐스트 한 에피소드를 듣는 것처럼 편하게 내용을 이해할 수 있어야 합니다."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1152,
+        480
+      ],
+      "id": "b48e7864-16ef-4927-a697-b4628c356d6b",
+      "name": "뉴스레터 요약 AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "model": "=gpt-4o-mini-tts",
+        "input": "={{ $json.output }}",
+        "voice": "=coral",
+        "options": {
+          "response_format": "mp3",
+          "speed": 1.4,
+          "binaryPropertyOutput": "=podcast"
+        }
+      },
+      "id": "79a9222e-4fac-4576-94e0-59a4291a6473",
+      "name": "TTS (팟캐스트 버전)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        1504,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "뉴스레터 요약 AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "특정 발신자만 필터",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contents 모으기": {
+      "main": [
+        [
+          {
+            "node": "뉴스레터 요약 AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contents 추출": {
+      "main": [
+        [
+          {
+            "node": "Contents 모으기",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "테스트 1개": {
+      "main": [
+        [
+          {
+            "node": "Contents 추출",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "특정 발신자만 필터": {
+      "main": [
+        [
+          {
+            "node": "테스트 1개",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "뉴스레터 요약 AI Agent": {
+      "main": [
+        [
+          {
+            "node": "TTS (팟캐스트 버전)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS (팟캐스트 버전)": {
+      "main": [
+        [
+          {
+            "node": "Upload File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": []
+}
