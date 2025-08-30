@@ -1,0 +1,316 @@
+{
+  "name": "Google Calendar Node",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# (트리거) 이벤트의 변화(생성, 시작, 종료, 취소, 업데이트)",
+        "height": 580,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "895347e6-d6b3-4f9a-92c4-525b54ddba4e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 이벤트 생성",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        144
+      ],
+      "id": "c41b9488-886b-4948-a283-e0c429ac1227",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 이벤트 가져오기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        144
+      ],
+      "id": "cc86166f-ed61-44e6-92a6-d47e11e0231b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 이벤트 삭제",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        144
+      ],
+      "id": "3b56126b-e704-4d8c-8e1e-e71332721427",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## 업데이트",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        144
+      ],
+      "id": "be2b8088-a921-40ee-901a-d662f06cd1d6",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## 이벤트 가져오기(전체)",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        144
+      ],
+      "id": "58a0638a-822c-460a-b254-7afbe77ce306",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "triggerOn": "eventCancelled",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        464
+      ],
+      "id": "2066e7b5-b92c-4288-8cf7-bcd15e83048f",
+      "name": "Google Calendar Trigger"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "ec196bbf-29dc-44a2-8ad0-c9beb17504c3",
+      "name": "Create"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Event",
+        "height": 100,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        32
+      ],
+      "id": "84c98dac-9dfa-4419-b7be-1e145c07bbd6",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        224
+      ],
+      "id": "923e740c-d605-47c2-8d57-f13e4c8e6df9",
+      "name": "Delete"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        224
+      ],
+      "id": "ceff17ab-3f65-4a13-8d0b-7a1134420d63",
+      "name": "Get"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1328,
+        224
+      ],
+      "id": "08822722-3b1f-4454-9d53-ef1af5bfa3ba",
+      "name": "Get All"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1600,
+        224
+      ],
+      "id": "d0b34568-4f14-48f3-842f-ecbb1bf80f10",
+      "name": "Update"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        608
+      ],
+      "id": "0aa66433-5f43-4f3d-9d30-2f45dc04537c",
+      "name": "Availability"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Calendar",
+        "height": 100,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        400
+      ],
+      "id": "1e5bfc41-ba0c-4368-9475-f6d910f039de",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## 이벤트 가용여부",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        528
+      ],
+      "id": "e3f1330a-1d39-4852-8fc8-ced44fc0a906",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Google Calendar Node",
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9960e8f9-1bd0-42ae-b659-a563543a77b0",
+      "name": "Sticky Note9"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
