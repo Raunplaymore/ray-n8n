@@ -1,0 +1,1472 @@
+{
+  "name": "Core Nodes",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        128
+      ],
+      "id": "4947dcdb-207b-4d3c-a3bd-3fbe7aa49daf",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        784,
+        128
+      ],
+      "id": "ff112f51-fa8a-4e9c-b58c-640d7ab2bb49",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        -112
+      ],
+      "id": "d4a0df15-3161-4756-a28a-fb931379395c",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60272891-602d-4b48-b312-4c6f12fdd24c",
+              "name": "email",
+              "value": "={{ $json.id }}@email.com",
+              "type": "string"
+            },
+            {
+              "id": "137ca611-4292-4250-b3ee-e03b5468d56d",
+              "name": "email_with_blank",
+              "value": "={{ $json.id }}@email.com ",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        128
+      ],
+      "id": "d7cd0187-43a4-4649-a210-247568e21b15",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "\"edit\"을 더미값을 넣을 수 있습니다. 그리고 \"pin\"으로 고정하면 새로고침해도 계속해서 데이터를 쓸수가 있어요.",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        32
+      ],
+      "id": "622bc441-45be-401a-9cd3-382361d18a9c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "데이터를 split 기능을 합니다. 이중중첩되어 있는 LIST일때 사용합니다.",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        32
+      ],
+      "id": "79559647-04b9-42cc-bf96-04d276c18bb8",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "일부 컬럼을 추가,삭제,수정할때 사용합니다. 기존 컬럼을 그대로 가져오려면 include 옵션을 켜주세요.",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        32
+      ],
+      "id": "1343e051-0523-4d8a-86a6-5e01fe8547dd",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "Split의 역 기능입니다. 다시 Group을 해주는 건데 모든 컬럼을 Group할수도 있지만 특정 컬럼만도 가능합니다. items -> item으로 변화되는 것에 주목하세요.",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        -224
+      ],
+      "id": "190d28bd-fdc5-4cec-9f2b-f9b55626535c",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rowCount = $input.all().length;\n\nreturn [\n  {\n    json: {\n      rowCount: rowCount\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        688
+      ],
+      "id": "04a26282-3cb1-4740-a869-00d7b39f9f5f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b256dc98-3f39-4eab-9ab6-ac4bbb5836f1",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "최지우",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2048,
+        -144
+      ],
+      "id": "4f21cb8f-c9e0-45c7-afe7-dbd039229e01",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        128
+      ],
+      "id": "cf40c3b0-0f78-4b11-a543-3c83f5f6c500",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2928,
+        128
+      ],
+      "id": "353f5a81-1784-403e-8851-f1c5ea78493a",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "average",
+              "field": "age"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        384
+      ],
+      "id": "3c04355d-124d-4643-8742-d2d5fb1ab943",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3968,
+        128
+      ],
+      "id": "fd34df7f-88ae-4133-8a19-cb1805964194",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2320,
+        128
+      ],
+      "id": "5ef700f7-5709-41e0-870e-7a911ea92638",
+      "name": "Merge",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1d085c64-095f-411c-bd9d-f629f09a4f41",
+              "leftValue": "={{ $json.age }}",
+              "rightValue": 15,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        128
+      ],
+      "id": "ab6bf5e8-0e73-45fa-b89b-9e966591f9fa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "커스텀한 조작이 필요할 때 사용.\n- 자바스크립트, 파이썬 내장 함수 지원\n- 외부 라이브러리 사용X",
+        "height": 240,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        592
+      ],
+      "id": "b02cc7f5-4c51-43d3-82ce-be6e5af2c38c",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        4208,
+        384
+      ],
+      "id": "36753e95-bfe9-4e45-bdef-c1ef2f5e2539",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b81789b-3f82-4bc6-9260-b74bf400eace",
+      "name": "Sort",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3536,
+        192
+      ],
+      "id": "898398ab-7191-4927-90dd-db6e14ab4180",
+      "name": "Wait",
+      "webhookId": "e8fcd6e2-d394-4afe-ae22-344319584d4d"
+    },
+    {
+      "parameters": {
+        "content": "집계함수 사용\n(COUNT, SUM, AVG, MAX, MIN, CONCAT, APPEND)",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        304
+      ],
+      "id": "395d4a52-f65e-4815-99f9-7cd866d65232",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "조건절\nTrue / False",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        48
+      ],
+      "id": "aa84dfa7-c427-4b6e-b910-b1debfbb0018",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "조건절\nTrue / False",
+        "height": 240,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        -224
+      ],
+      "id": "20b77eed-1632-4e2b-8dee-ccfa10a7d78b",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "중복을 제거합니다",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        32
+      ],
+      "id": "d7f24dbc-ea08-41a7-9f1f-1fc6fd8b2e4d",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "여러 Input들을 합칠 수 있습니다.",
+        "height": 240,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        48
+      ],
+      "id": "c7008f34-3e6e-4eb4-a205-ea861073bb1d",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "갯수제한Limit\n- First, Last",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2848,
+        48
+      ],
+      "id": "42f2cbc6-2e72-4891-8dbf-5c8acd5d314c",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "정렬Sort\n- 오름차순, 내림차순\n- 랜덤",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        48
+      ],
+      "id": "77330d01-f9b4-426e-9727-d325eb0af705",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {},
+      "id": "05ddf3c6-dd81-4e68-8d57-7d7db4792532",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        4496,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "파일변환\n- Convert to CSV\n- Convert to HTML\n- Convert to ICS\n- Convert to JSON\n- Convert to ODS\n- Convert to RTF\n- Convert to Text File\n- Convert to XLS\n- Convert to XLSX\n- Move Base64 String to File",
+        "height": 260,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3776,
+        48
+      ],
+      "id": "32586f17-d1cc-4717-ad4e-fdb276288746",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "대기Wait\n- 시간, 특정 조건까지 일시 대기",
+        "height": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        48
+      ],
+      "id": "678e4a37-ff17-4322-b3ae-804bd585f511",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "여러개의 파일을 압축(zip,Gzip)\n- 반대도 있음",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        48
+      ],
+      "id": "7124b92e-6575-4313-8917-9697d68b96f6",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "파일에서 데이터 추출 \n- Extract From CSV\n- Extract From HTML\n- Extract From JSON\n- Extract From ICS\n- Extract From ODS\n- Extract From PDF\n- Extract From RTF\n- Extract From Text File\n- Extract From XLS\n- Extract From XLSX\n- Move File to Base64 String",
+        "height": 280,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4000,
+        336
+      ],
+      "id": "0202f29b-a722-41b5-9eb0-784802c9dc6a",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "errorMessage": "I'm Error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        4496,
+        128
+      ],
+      "id": "abbcb2f6-3b37-4f5e-8d0a-b1d6c9c6e5b4",
+      "name": "Stop and Error",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "(명시적)아무 동작도 하지 않음",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4448,
+        336
+      ],
+      "id": "e62cf71e-ab58-4172-b991-eec8b4f6c46b",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "content": "에러를 의도적으로 발생.\nRaise Error",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4448,
+        48
+      ],
+      "id": "06f976bb-6391-48fc-b720-e448d324f738",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "operation": "compress",
+        "fileName": "data.zip"
+      },
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        4208,
+        128
+      ],
+      "id": "fc378ec0-1335-4b3d-9df2-98c263c3291c",
+      "name": "Compression"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3216,
+        144
+      ],
+      "id": "0f4e31d7-764e-436f-b515-0ca00ca68f33",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "배치loop\n- Items를 차례대로 하나씩 보내주는 역할",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3168,
+        48
+      ],
+      "id": "c4271235-828a-453d-8f2e-c20e06748560",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "mode": "jsonToxml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        3856,
+        -176
+      ],
+      "id": "8c2b6010-0512-4cb7-ad9b-188d057113be",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "content": "XML변환",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3808,
+        -240
+      ],
+      "id": "b62f8d7f-d68e-44be-85ab-e2c6ee411fed",
+      "name": "Sticky Note26"
+    },
+    {
+      "parameters": {
+        "keys": {
+          "key": [
+            {
+              "currentKey": "name",
+              "newKey": "student_name"
+            }
+          ]
+        },
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-base.renameKeys",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        -144
+      ],
+      "id": "817fcf8f-cd14-4bd6-86d7-c7a2cbc1791e",
+      "name": "Rename Keys"
+    },
+    {
+      "parameters": {
+        "content": "컬럼명 변경",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        -224
+      ],
+      "id": "00c6ece1-7a15-4258-8e22-f769fdd5f981",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "value": "={{ $json.name }}",
+        "dataPropertyName": "hash_name"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        -144
+      ],
+      "id": "249a4e11-aa4b-4c64-82bb-b64d40d13abf",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>My HTML document</title>\n</head>\n<body>\n  <div class=\"container\">\n    <h1><{{ $json.data[0].name }}/h1>\n    <h2>{{ $json.data[0].grade }} {{ $json.data[0].email }}</h2>\n    <p>{{ $json.data[0].subjects }}</p>\n  </div>\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        368
+      ],
+      "id": "4780b7df-1e97-4450-94ca-b377dce04b3f",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "content": "암호화",
+        "height": 240,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        -224
+      ],
+      "id": "92eef7af-c24f-498f-b44e-1cb82fbf2bf6",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "content": "HTML",
+        "height": 240,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        304
+      ],
+      "id": "287812b4-4d20-4d30-9f5e-7ac2e2796461",
+      "name": "Sticky Note28"
+    },
+    {
+      "parameters": {
+        "content": "Markdown",
+        "height": 240,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        304
+      ],
+      "id": "b05562b5-6b2d-4a94-9c72-97c656d6d299",
+      "name": "Sticky Note29"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        368
+      ],
+      "id": "dce15ed7-0054-42cb-84ca-beaa97596c7a",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Core Node\n\n## Instructions\n- \"Test Workflow\"를 실행해보세요.\n- 노드를 하나씩 클릭해보면서 노드들의 역할을 이해해봅시다.",
+        "height": 280,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -320
+      ],
+      "id": "6c546f02-fcde-4304-8eba-1d91d2ddd7b8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        784,
+        368
+      ],
+      "id": "9f9d991b-0f9b-4f7a-a8ae-f9054fb9a410",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "content": "날짜 & 시간을 조작하는 노드.\n(현재날짜, 시간계산, 변환, 추출 등)",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        288
+      ],
+      "id": "51bf717c-2542-4e49-b38e-5e23e524c578",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "formTitle": "n8n 계정 신청서",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "placeholder": "example@gmail.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        1392
+      ],
+      "id": "99ba6993-570c-4875-a893-5c563c467722",
+      "name": "On form submission",
+      "webhookId": "2e4d3b66-9771-446b-88d3-b400a2c5aa56"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger",
+        "height": 80,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        1056
+      ],
+      "id": "321a5e72-bff3-41e9-9428-68d0e3800885",
+      "name": "Sticky Note31"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $fromAI('after', 'The earliest datetime we want to look for events for') }}",
+          "timeMax": "={{ $fromAI('before', 'The latest datetime we want to look for events for') }}",
+          "singleEvents": true,
+          "query": "={{ $fromAI('query', 'The search query to look for in the calendar. Leave empty if no search query is needed') }}"
+        }
+      },
+      "id": "4ffc55e1-496b-4ffa-9fdf-37dab0e9c5cf",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9e07c944-1743-49f4-9d85-c8838fc6a5ff",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        1568
+      ],
+      "webhookId": "a889d2ae-2159-402f-b326-5f61e90f602e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You're a helpful assistant that helps the user answer questions about their calendar.\n\nToday is {{ $now.format('cccc') }} the {{ $now.format('yyyy-MM-dd HH:mm') }}."
+        }
+      },
+      "id": "b5c083d2-53b4-43db-b29e-0925225f9ced",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        656,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\nDon't have **Google Calendar**? Simply exchange this with the **Microsoft Outlook** or other tools",
+        "height": 253,
+        "width": 226,
+        "color": 7
+      },
+      "id": "2ec13c88-3bf1-4c77-9888-bba90cec38e4",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "056c90f8-2906-40c0-a939-aba812348396",
+      "name": "OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        624,
+        1776
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "823abb7a-43e0-4a15-a7c5-a19941d698f0",
+      "name": "Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "path": "MEME",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        464,
+        1184
+      ],
+      "id": "49278862-9558-4c5a-93d1-d31c3d8266a7",
+      "name": "Webhook",
+      "webhookId": "97cea2c8-017a-4d9c-8287-d5d714230d5b"
+    },
+    {
+      "parameters": {
+        "respondWith": "redirect",
+        "redirectURL": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjJjY2FycjA0cGM5Y3pxbGZleG1xOTBkNXhybDMzYnBqMnIydnFiMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MZocLC5dJprPTcrm65/giphy.gif",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        1184
+      ],
+      "id": "999fbb31-f1c9-4680-9439-30f34bfecea9",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "becb9a3a-23df-41db-80d8-3f847ec8239f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ac050954-67f7-4558-a978-c5623f3a695a",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c315396b-64db-4814-8404-7752aa5e537b",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "db888b72-f96c-4eda-8896-fa11bca7ba8c",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "27ff8117-a787-49df-aee7-0cc8e5651899",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2000,
+        368
+      ],
+      "id": "775e929f-3c27-4041-93ee-5ab674c6b871",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "두 개 이상의 조건을 사용할 때(다양한 Branch 설정가능)",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        304
+      ],
+      "id": "f52814ae-0d2d-443b-8476-628f4f26f892",
+      "name": "Sticky Note24"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Compression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rename Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compression": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "When clicking ‘Test workflow’": [
+      {
+        "json": {
+          "data": [
+            {
+              "id": 1,
+              "name": "김철수",
+              "age": 15,
+              "grade": "9학년",
+              "subjects": [
+                "국어",
+                "수학",
+                "영어"
+              ]
+            },
+            {
+              "id": 2,
+              "name": "이영희",
+              "age": 16,
+              "grade": "10학년",
+              "subjects": [
+                "사회",
+                "과학",
+                "미술"
+              ]
+            },
+            {
+              "id": 3,
+              "name": "박민수",
+              "age": 14,
+              "grade": "8학년",
+              "subjects": [
+                "체육",
+                "음악",
+                "수학"
+              ]
+            },
+            {
+              "id": 4,
+              "name": "최지우",
+              "age": 17,
+              "grade": "11학년",
+              "subjects": [
+                "영어",
+                "물리",
+                "화학"
+              ]
+            },
+            {
+              "id": 5,
+              "name": "정하나",
+              "age": 15,
+              "grade": "9학년",
+              "subjects": [
+                "역사",
+                "지리",
+                "컴퓨터"
+              ]
+            },
+            {
+              "id": 5,
+              "name": "정하나",
+              "age": 15,
+              "grade": "9학년",
+              "subjects": [
+                "역사",
+                "지리",
+                "컴퓨터"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
