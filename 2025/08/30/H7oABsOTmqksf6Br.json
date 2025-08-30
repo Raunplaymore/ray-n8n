@@ -1,0 +1,572 @@
+{
+  "name": "Extract And Decode Google News RSS URLs to Clean Article Links",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=AI&hl=ko&gl=KR&ceid=KR:ko",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "id": "33231072-9b09-4dee-b537-9eab0d68fd77",
+      "name": "Reading Google News RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        320,
+        464
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8418826b-d618-4f24-b2c9-3c7f45386b49",
+              "name": "title",
+              "value": "={{ $('When Executed by Another Workflow').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "c51f320e-4fb8-4bd4-8e36-9330e251936e",
+              "name": "google_news_url",
+              "type": "string",
+              "value": "={{ JSON.parse(JSON.parse($json.data.split('\\n\\n')[1])[0][2])[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eff1dec0-3cdd-468d-b5cc-93fddca78a23",
+      "name": "Decoded url",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1024,
+        880
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://news.google.com/_/DotsSplashUi/data/batchexecute",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Referer",
+              "value": "https://www.google.com/"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "f.req",
+              "value": "={{ $json.f_req }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "190539b4-198a-4209-9351-1c5f88fff69c",
+      "name": "Call decoding URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        784,
+        880
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n    const gn_art_id = item.json.base64Str;\n    const timestamp = item.json.timestamp;\n    const signature = item.json.signature;\n\n    const articlesReq = [\n        'Fbv4je',\n        `[\"garturlreq\",[[\"X\",\"X\",[\"X\",\"X\"],null,null,1,1,\"US:en\",null,1,null,null,null,null,null,0,1],\"X\",\"X\",1,[1,1,1],1,1,null,0,0,null,0],\"${gn_art_id}\",${timestamp},\"${signature}\"]`,\n    ];\n\n    return {\n        json: {\n            f_req: JSON.stringify([[articlesReq]])  // Questo verrà usato nel nodo HTTP Request\n        }\n    };\n});"
+      },
+      "id": "93bd929b-3d3a-4ea5-a1eb-eb2131fe0bf6",
+      "name": "Prepare decoding variables",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        544,
+        880
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {}
+      },
+      "id": "7d5b17d9-554b-43c2-a955-307cb052d894",
+      "name": "Get encoded news URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        784,
+        464
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "## Get Google News\n\nChange the language parameters on ISO639-1 standard \n\n1. hl=it\n2. gl=IT\n3. ceid=IT:it",
+        "height": 400,
+        "width": 220
+      },
+      "id": "68762044-5640-4765-85ed-39013cc7b449",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Limit result\n\nI suggest limiting the results to a maximum of 3 because the entire workflow makes a lot of HTTP requests",
+        "height": 400,
+        "width": 220
+      },
+      "id": "1817d9fb-b199-4431-8df1-4537df61b2de",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## INFO\n\nDisclaimer:\nYou can add a cron trigger but... don't do too often: Google could block your ip.\n\nThis workflow works until works: the decoding procedure is hardcoded and based on reverse engineering. Requests and responses are not documented by Google.\n\n\n",
+        "height": 820,
+        "width": 220,
+        "color": 5
+      },
+      "id": "fd967237-63a4-46b0-9435-77655a9e5f8f",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Get encoded content\n\nHere we retrieve HTML content",
+        "height": 400,
+        "width": 220,
+        "color": 3
+      },
+      "id": "a8f8bd32-f820-4b2c-815c-e68e2187106b",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5a11795-2bd1-412f-a215-f7402bece002",
+              "name": "signature",
+              "type": "string",
+              "value": "={{ $json.signature }}"
+            },
+            {
+              "id": "33267283-3ac8-4d65-9a01-c7f154a7d061",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $json.timestamp }}"
+            },
+            {
+              "id": "bff8f19a-30d6-4307-87da-9b98b26cee8b",
+              "name": "base64Str",
+              "type": "string",
+              "value": "={{ $('When Executed by Another Workflow').item.json.guid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "20942b21-01bf-4462-ad1d-d4f1bafecacb",
+      "name": "Map needed keys",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        288,
+        880
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "signature",
+              "cssSelector": "div",
+              "returnValue": "attribute",
+              "attribute": "data-n-a-sg"
+            },
+            {
+              "key": "timestamp",
+              "cssSelector": "div",
+              "returnValue": "attribute",
+              "attribute": "data-n-a-ts"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f580bdd-54a4-4cf2-a67b-7d46646c256e",
+      "name": "Extract decoding keys",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        1024,
+        464
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "## Decoding Keys\n\nThe HTML content extracted contains the necessary variables for decoding:\n\n+ signature\n+ timestamp\n+ base64string (already in the URL)",
+        "height": 400,
+        "width": 220
+      },
+      "id": "1f641cf3-6a8b-48a5-8e4a-4fd96cfa8ee1",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Clean output\n\nMapping variables for easy utilization",
+        "height": 400,
+        "width": 220
+      },
+      "id": "df190425-6112-454b-9bdc-59f3d9d5bd48",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Preparing Request\n\nDecoding the request requires specific body content. Here, we build it using the decoding keys.",
+        "height": 400,
+        "width": 220,
+        "color": 3
+      },
+      "id": "ccff7dcb-9d8c-4566-a7a6-458f3e23cd16",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## This is decoding step\n\nSending a request to a specific Google decoding URL",
+        "height": 400,
+        "width": 220,
+        "color": 3
+      },
+      "id": "b5ceb661-c46f-42af-8fd6-71b32f19eb09",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Cleaning URL\n\nGoogle adds some unwanted and random characters at the beginning of the URL",
+        "height": 400,
+        "width": 220
+      },
+      "id": "d861d2de-413d-43c5-95fd-e02a8efdd87a",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## OUTPUT\n\nA lot of requests are made before getting clean News URLs.\n\nYou can add an HttpRequest and get News text with jina.ai, extract by using HTML node, or a custom node like https://www.npmjs.com/package/n8n-nodes-webpage-content-extractor\n\n",
+        "height": 820,
+        "width": 220,
+        "color": 4
+      },
+      "id": "55ca4c02-b6ad-4b3e-83c0-cf9238dfe80e",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "bd9341fa-b1b4-4fbc-bdfd-3c7541be520a",
+      "name": "Aggregate results in a single object",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        1264,
+        608
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "b33d30bc-abd1-4ea0-a5ed-41238345160f",
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        544,
+        400
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        560
+      ],
+      "id": "a306f581-aa8a-41f1-af3f-7db54f06e42e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Extract And Decode Google News RSS URLs to Clean Article Links\n## [Source](https://n8nworkflows.xyz/workflows/extract-and-decode-google-news-rss-urls-to-clean-article-links-3150)",
+        "height": 200,
+        "width": 1400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "eb25f9a1-9726-414f-9b4b-317e0c74ff44",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Map needed keys": {
+      "main": [
+        [
+          {
+            "node": "Prepare decoding variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call decoding URL": {
+      "main": [
+        [
+          {
+            "node": "Decoded url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get encoded news URL": {
+      "main": [
+        [
+          {
+            "node": "Extract decoding keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract decoding keys": {
+      "main": [
+        [
+          {
+            "node": "Map needed keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reading Google News RSS": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare decoding variables": {
+      "main": [
+        [
+          {
+            "node": "Call decoding URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get encoded news URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Aggregate results in a single object": [
+      {
+        "json": {
+          "data": [
+            {
+              "google_news_url": "https://www.chosun.com/economy/tech_it/2025/04/08/PWKD2YRLOVB2VHECNM3ACENFBQ/"
+            },
+            {
+              "google_news_url": "https://www.aitimes.com/news/articleView.html?idxno=169434"
+            },
+            {
+              "google_news_url": "https://www.hellot.net/news/article.html?no=100051"
+            },
+            {
+              "google_news_url": "https://www.etnews.com/20250408000407"
+            },
+            {
+              "google_news_url": "https://www.joongang.co.kr/article/25327019"
+            }
+          ]
+        }
+      }
+    ],
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "title": "AI 포털 뤼튼 “감정 교류 개인화 AI와 리워드 서비스로 올해 1000만 이용자 달성” - 조선일보",
+          "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQMUpod3p2YThTSWROVGxrX0tGMnRobjZGdThLMHRiTzhGbFpjTjVyMmNPeENJUmwydEFMajZvNnY2aVcybE00VURzeHJHMVpXNk9ma2Z2eDUxT2JUZnVtZk8wT0VtWmJuMm14WVNBYlZjOUhCOUwxZDNjNldvRGpxdkFSSdIBlwFBVV95cUxPMGl3OExXWWllUkhqVHRMQ1UzNHVGN3BaRXEtaTk2TTRYMU1HOVVpckpjS0lKRE1ybEFRU040WHE3MUhnMlFGRENkZmlSeU5jLVdrOVRVZVc3dFFjNGs0TXdadEx4OFFpMW1yOTNtWlgtR3FMc0otV1RRaDNqWHc5V2ZhbWc4SkhFRnN6NHItUENGLVZ3OUFj?oc=5",
+          "pubDate": "Tue, 08 Apr 2025 07:06:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMigwFBVV95cUxQMUpod3p2YThTSWROVGxrX0tGMnRobjZGdThLMHRiTzhGbFpjTjVyMmNPeENJUmwydEFMajZvNnY2aVcybE00VURzeHJHMVpXNk9ma2Z2eDUxT2JUZnVtZk8wT0VtWmJuMm14WVNBYlZjOUhCOUwxZDNjNldvRGpxdkFSSdIBlwFBVV95cUxPMGl3OExXWWllUkhqVHRMQ1UzNHVGN3BaRXEtaTk2TTRYMU1HOVVpckpjS0lKRE1ybEFRU040WHE3MUhnMlFGRENkZmlSeU5jLVdrOVRVZVc3dFFjNGs0TXdadEx4OFFpMW1yOTNtWlgtR3FMc0otV1RRaDNqWHc5V2ZhbWc4SkhFRnN6NHItUENGLVZ3OUFj?oc=5\" target=\"_blank\">AI 포털 뤼튼 “감정 교류 개인화 AI와 리워드 서비스로 올해 1000만 이용자 달성”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font>",
+          "contentSnippet": "AI 포털 뤼튼 “감정 교류 개인화 AI와 리워드 서비스로 올해 1000만 이용자 달성”  조선일보",
+          "guid": "CBMigwFBVV95cUxQMUpod3p2YThTSWROVGxrX0tGMnRobjZGdThLMHRiTzhGbFpjTjVyMmNPeENJUmwydEFMajZvNnY2aVcybE00VURzeHJHMVpXNk9ma2Z2eDUxT2JUZnVtZk8wT0VtWmJuMm14WVNBYlZjOUhCOUwxZDNjNldvRGpxdkFSSdIBlwFBVV95cUxPMGl3OExXWWllUkhqVHRMQ1UzNHVGN3BaRXEtaTk2TTRYMU1HOVVpckpjS0lKRE1ybEFRU040WHE3MUhnMlFGRENkZmlSeU5jLVdrOVRVZVc3dFFjNGs0TXdadEx4OFFpMW1yOTNtWlgtR3FMc0otV1RRaDNqWHc5V2ZhbWc4SkhFRnN6NHItUENGLVZ3OUFj",
+          "isoDate": "2025-04-08T07:06:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "스탠포드 AI 인덱스 \"중국, '양보다 질'로 미국 AI 모델 바짝 추격\" - AI타임스",
+          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9xU1haZWlTRDlNc1R6aG5VWjFxRnFvZzZOTUEzc0U3QmVKVHo0UDN6V0ZVMW8yM0RUNE9MOUs0SU9jYng5VTJLN0liZVRkcDVEV1pmbWdnTDA2MzZ4bUxoenVKYW9RU1YyX2c?oc=5",
+          "pubDate": "Tue, 08 Apr 2025 06:38:31 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiakFVX3lxTE9xU1haZWlTRDlNc1R6aG5VWjFxRnFvZzZOTUEzc0U3QmVKVHo0UDN6V0ZVMW8yM0RUNE9MOUs0SU9jYng5VTJLN0liZVRkcDVEV1pmbWdnTDA2MzZ4bUxoenVKYW9RU1YyX2c?oc=5\" target=\"_blank\">스탠포드 AI 인덱스 \"중국, '양보다 질'로 미국 AI 모델 바짝 추격\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">AI타임스</font>",
+          "contentSnippet": "스탠포드 AI 인덱스 \"중국, '양보다 질'로 미국 AI 모델 바짝 추격\"  AI타임스",
+          "guid": "CBMiakFVX3lxTE9xU1haZWlTRDlNc1R6aG5VWjFxRnFvZzZOTUEzc0U3QmVKVHo0UDN6V0ZVMW8yM0RUNE9MOUs0SU9jYng5VTJLN0liZVRkcDVEV1pmbWdnTDA2MzZ4bUxoenVKYW9RU1YyX2c",
+          "isoDate": "2025-04-08T06:38:31.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "'1인 1 AI시대' 선포한 뤼튼 3.0, 생활형 AI로 일상 파고든다 - 헬로티",
+          "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5yNmM1ZGdFZEpDWUpxbkdZbGNyUE9wZU1YeXZmYU1Wc2FFa09ob2ptd0xNek5yUHcwaGZLam5NQndjcDFQa0ZzRUVxSzQ5Z0JlYWljWU9pczhxVWh0cXVn?oc=5",
+          "pubDate": "Tue, 08 Apr 2025 07:00:12 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiX0FVX3lxTE5yNmM1ZGdFZEpDWUpxbkdZbGNyUE9wZU1YeXZmYU1Wc2FFa09ob2ptd0xNek5yUHcwaGZLam5NQndjcDFQa0ZzRUVxSzQ5Z0JlYWljWU9pczhxVWh0cXVn?oc=5\" target=\"_blank\">'1인 1 AI시대' 선포한 뤼튼 3.0, 생활형 AI로 일상 파고든다</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">헬로티</font>",
+          "contentSnippet": "'1인 1 AI시대' 선포한 뤼튼 3.0, 생활형 AI로 일상 파고든다  헬로티",
+          "guid": "CBMiX0FVX3lxTE5yNmM1ZGdFZEpDWUpxbkdZbGNyUE9wZU1YeXZmYU1Wc2FFa09ob2ptd0xNek5yUHcwaGZLam5NQndjcDFQa0ZzRUVxSzQ5Z0JlYWljWU9pczhxVWh0cXVn",
+          "isoDate": "2025-04-08T07:00:12.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "“韓 AI 선진국 위해 'AI기술'보다 데이터 확보가 필요” - 전자신문",
+          "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBIcGxnOS10SllkY0dLY2FwSXJDam1lRVJFWEZyWWhIcXo1cl9SMnYyRTRDRDZkUkZSbTY1VkU1aUpZc3Q4dEhhRkwzNkY2dw?oc=5",
+          "pubDate": "Tue, 08 Apr 2025 06:09:21 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiTkFVX3lxTFBIcGxnOS10SllkY0dLY2FwSXJDam1lRVJFWEZyWWhIcXo1cl9SMnYyRTRDRDZkUkZSbTY1VkU1aUpZc3Q4dEhhRkwzNkY2dw?oc=5\" target=\"_blank\">“韓 AI 선진국 위해 'AI기술'보다 데이터 확보가 필요”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">전자신문</font>",
+          "contentSnippet": "“韓 AI 선진국 위해 'AI기술'보다 데이터 확보가 필요”  전자신문",
+          "guid": "CBMiTkFVX3lxTFBIcGxnOS10SllkY0dLY2FwSXJDam1lRVJFWEZyWWhIcXo1cl9SMnYyRTRDRDZkUkZSbTY1VkU1aUpZc3Q4dEhhRkwzNkY2dw",
+          "isoDate": "2025-04-08T06:09:21.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "[팩플] 미중 AI격차 좁혀졌다...LG AI 엑사원 3.5 주목할만한 모델 선정 - 중앙일보",
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBVd1RvZ2hiLVh3WWFuMEh2Z1JIUzc0cXNMRl9aTDlBdERUS01XWmpSN2FSWmt3alVaRGpYSEhzc2s4ZGdvdmxmTmlHaFlTanFKN3pkRXFB?oc=5",
+          "pubDate": "Tue, 08 Apr 2025 07:51:32 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiVkFVX3lxTFBVd1RvZ2hiLVh3WWFuMEh2Z1JIUzc0cXNMRl9aTDlBdERUS01XWmpSN2FSWmt3alVaRGpYSEhzc2s4ZGdvdmxmTmlHaFlTanFKN3pkRXFB?oc=5\" target=\"_blank\">[팩플] 미중 AI격차 좁혀졌다...LG AI 엑사원 3.5 주목할만한 모델 선정</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">중앙일보</font>",
+          "contentSnippet": "[팩플] 미중 AI격차 좁혀졌다...LG AI 엑사원 3.5 주목할만한 모델 선정  중앙일보",
+          "guid": "CBMiVkFVX3lxTFBVd1RvZ2hiLVh3WWFuMEh2Z1JIUzc0cXNMRl9aTDlBdERUS01XWmpSN2FSWmt3alVaRGpYSEhzc2s4ZGdvdmxmTmlHaFlTanFKN3pkRXFB",
+          "isoDate": "2025-04-08T07:51:32.000Z"
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T09:02:25.071Z",
+      "updatedAt": "2025-08-30T09:02:25.071Z",
+      "id": "0GDqwZPxOybnJAIZ",
+      "name": "news"
+    }
+  ]
+}
