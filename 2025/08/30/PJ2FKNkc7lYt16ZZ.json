@@ -1,0 +1,503 @@
+{
+  "name": "Google Drive Node",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# (트리거) 파일이 업데이트 되었을 때",
+        "height": 240,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "fbeb549b-b81e-45e4-adbe-247082546b2e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 파일 다운로드",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        144
+      ],
+      "id": "2b2171ca-c7b9-44d1-8e47-851fab4d8683",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 공유",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        144
+      ],
+      "id": "203b1054-e4e1-47fa-99e9-eb2ee3986a3d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 파일 업로드",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        144
+      ],
+      "id": "dbb00dbb-3818-40c6-9259-66ae28c576ab",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : file",
+        "height": 100,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "0508073d-44b6-4287-bad4-f594c88708dd",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## 이동",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        144
+      ],
+      "id": "2ce9b232-746a-440d-af92-7938080abd23",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## 검색(파일,폴더)",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        560
+      ],
+      "id": "5c55c54e-56a1-41ae-88b6-244cfd8e6863",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        560
+      ],
+      "id": "2bfd6611-a285-48b7-a8ec-e9d624dc3bf0",
+      "name": "Changes in Folder"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        272
+      ],
+      "id": "ce458ec7-7428-46f9-9cf6-8fa1f15b16d7",
+      "name": "File Update"
+    },
+    {
+      "parameters": {
+        "content": "# (트리거) 폴더에 내용이 업데이트 되었을 때(업로드)",
+        "height": 260,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        448
+      ],
+      "id": "8b3f98ad-bac4-4a79-b862-9f3eb2d46257",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## 삭제",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        144
+      ],
+      "id": "fe9cf9d0-4dbd-4c75-81d1-58924820d773",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        768,
+        224
+      ],
+      "id": "613e9790-33c3-4481-b694-8123d9876317",
+      "name": "Upload"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "d9f899be-5c7a-4d63-98ab-25c4a7e01822",
+      "name": "Download"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "permissionsUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        224
+      ],
+      "id": "a0cc9e9a-1ed9-4115-9b76-106e6629edcb",
+      "name": "Share"
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1328,
+        224
+      ],
+      "id": "b37bb8ae-812a-4598-a79f-4f48d9268bf0",
+      "name": "Delete"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        224
+      ],
+      "id": "4f8cc4c1-2453-4be3-af46-54a809224ae0",
+      "name": "Move"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        640
+      ],
+      "id": "92392fc3-2825-49e4-ab92-70c4ff7eb353",
+      "name": "Search"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Folder",
+        "height": 100,
+        "width": 780,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        432
+      ],
+      "id": "0cfdec69-e8f7-421f-88e7-a36433d73703",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : FileFolder",
+        "height": 100,
+        "width": 520,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        432
+      ],
+      "id": "50b3e78e-87f3-4bd5-95f1-d27fc6d3fedd",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## 폴더 생성",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        560
+      ],
+      "id": "29b3a447-4344-447d-bbaf-0004ce872ced",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        640
+      ],
+      "id": "f1918b03-a13c-4236-99cc-367d29eb6945",
+      "name": "Create Folder"
+    },
+    {
+      "parameters": {
+        "content": "## 폴더 삭제",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        560
+      ],
+      "id": "d1c62fc8-b865-415f-a245-b48e9859b7e1",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "deleteFolder",
+        "folderNoRootId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1328,
+        640
+      ],
+      "id": "a0f005b3-1da6-4e1b-9d80-08343598b89a",
+      "name": "Delete Folder"
+    },
+    {
+      "parameters": {
+        "content": "## 폴더 공유",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        560
+      ],
+      "id": "0b52270e-a9ba-4cae-967e-7bb1db709b85",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "authentication": "oAuth2",
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "permissionsUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        640
+      ],
+      "id": "bdd60d10-cab5-4c19-925b-d43cf67d48d8",
+      "name": "Delete Folder1"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Google Drive Node",
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a02d843e-26ec-4a0e-8cdc-dfb377e8edbc",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
