@@ -1,0 +1,425 @@
+{
+  "name": "Google Gmail Node",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        272
+      ],
+      "id": "08c6569c-f876-40b7-b7e8-5857967c9894",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# (트리거) 메일이 왔을 때",
+        "height": 240,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "35b00b01-5f85-4c3a-b6cb-bb6d2ecdccd1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 모든 메시지 가져오기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        144
+      ],
+      "id": "b5fb764a-62b7-42d5-b883-8ad0f3530394",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 메일 발송",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        144
+      ],
+      "id": "63d4c2dd-f0d8-468b-8218-ec92107bac99",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 라벨 붙이기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        144
+      ],
+      "id": "8858df51-3868-498c-9537-e9c14d7eace1",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## 메시지 하나만",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        144
+      ],
+      "id": "245bc3ca-1c48-493d-a654-91844f73f9be",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Messge",
+        "height": 100,
+        "width": 1060,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "bb12843e-fc4a-4a7f-986f-faffab295f9b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        224
+      ],
+      "id": "a1cf40e1-874b-4336-b966-6127a6d9b445",
+      "name": "Send Email",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "65aa1e69-82f2-44c9-8655-7f9f41bb37d1",
+      "name": "Get All",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "operation": "get"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        224
+      ],
+      "id": "836eae88-305c-483e-a09e-f5f529cae0eb",
+      "name": "Get One",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1328,
+        224
+      ],
+      "id": "18ecfb26-a30f-43e2-8884-2a7568ae69b8",
+      "name": "Add Label",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        672
+      ],
+      "id": "9216f3d6-e55c-48b9-b69e-6ad82e171e03",
+      "name": "Reply",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Thread",
+        "height": 100,
+        "width": 1060,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        448
+      ],
+      "id": "6a5af778-fa0c-49ad-9ae9-69a9d2addf57",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## 모든 쓰레드(답글) 가져오기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        592
+      ],
+      "id": "b0e154e7-87b4-4c9b-8995-c4758fcd26d6",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## 답변하기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        592
+      ],
+      "id": "8604c3b7-e4b9-462b-b075-eaacbc5d7321",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## 라벨 붙이기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        592
+      ],
+      "id": "2e5dfbb4-bf96-46b3-8132-0a3c7ff33a44",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## 라벨 빼기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        592
+      ],
+      "id": "2e2a1a35-a6d1-4f84-b7d6-1573e361f96d",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        672
+      ],
+      "id": "6fb181af-596d-403d-9851-94e1b387f793",
+      "name": "Get All Thread",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Labels",
+        "height": 100,
+        "width": 1060,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        880
+      ],
+      "id": "a7d3fdc6-ed72-4552-a733-994fbbff48c0",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## 모든 라벨 가져오기",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        1024
+      ],
+      "id": "b8310c9e-d53a-4e35-9328-70986a8cc3ee",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## 라벨생성",
+        "height": 240,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        1024
+      ],
+      "id": "3befc652-7833-4b5e-ae91-9f381edf2d3a",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "resource": "label"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        1104
+      ],
+      "id": "020cde3d-f34a-4ab8-be8d-55c5c1f5f180",
+      "name": "Get All Labels",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        1104
+      ],
+      "id": "a374b3cf-3fe2-427c-af41-86f171fe2ffc",
+      "name": "Create Label",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        672
+      ],
+      "id": "e469e0ea-655b-439f-bb13-0b3217563b77",
+      "name": "Thread Add Label",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "removeLabels"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1328,
+        672
+      ],
+      "id": "b8e3e2ae-b661-4259-853c-691638122c8a",
+      "name": "Thread Remove Label",
+      "webhookId": "e9a1c5f9-3f38-4eff-b240-0dd5ea4efa22"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Google Gmail Node",
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e5bb55b3-9b53-48a2-8e8a-884f21887b03",
+      "name": "Sticky Note17"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
