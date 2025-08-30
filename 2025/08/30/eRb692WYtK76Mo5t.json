@@ -1,0 +1,912 @@
+{
+  "name": "구글 헤드라인 뉴스 수집기",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
+      },
+      "id": "c62f2dc1-7f2e-4245-a723-c0b88aa880b6",
+      "name": "Google Headline News",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 5개만 수집",
+        "height": 260,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        240
+      ],
+      "id": "5c44f616-718b-4a1f-9713-931ec6e5e1e7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## URL 디코드\nnews.google -> 원본 뉴스 URL",
+        "height": 260,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        192
+      ],
+      "id": "0402f366-1bca-4dfd-8793-642ad82acf64",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "maxItems": 5,
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        320,
+        352
+      ],
+      "id": "896f5d8a-1e9a-4426-ab73-31e8ec30e6bf",
+      "name": "Limit",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Yq4dhPhPjzEs12Qq",
+          "mode": "list",
+          "cachedResultName": "GoogleNews_AI_Article_Content_Flow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        272
+      ],
+      "id": "cb026c0e-766e-44d6-a659-bb5b9701161a",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        352
+      ],
+      "id": "07be0cf0-2b93-46cf-a014-d08416bbd7f9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C07PH5BRN1X",
+          "mode": "list",
+          "cachedResultName": "automation-n8n"
+        },
+        "text": "=<{{ $json.url }}|{{ $json.title }}>",
+        "otherOptions": {
+          "unfurl_media": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "84399ab0-fa1d-4eb1-8004-93693f9da5d5",
+      "name": "Slack",
+      "webhookId": "82266d98-3202-4f48-9828-e9e7aab831c0"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n\n# 구글 헤드라인 뉴스 수집기",
+        "height": 200,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "eab105ad-6e5f-423e-8a90-76d7235e5db5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# TRIGGER\nRSS - 뉴스가 올라올 때마다 실행",
+        "height": 260,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "5b439cab-f071-46b3-8c71-e3263bfeb7d0",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/blocks/{{ $json.id }}/children",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"children\": [\n    {\n      \"object\": \"block\",\n      \"type\": \"image\",\n      \"image\": {\n        \"type\": \"external\",\n        \"external\": {\n          \"url\": \"{{ $('Extract Image & Category').item.json.image }}\"\n        }\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1872,
+        448
+      ],
+      "id": "9a6bd2a4-0576-44a0-a881-138be78ea9ed",
+      "name": "Add Main Image",
+      "retryOnFail": true,
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "1ea2a185-e5ce-8015-aff3-d43cb6052497",
+          "mode": "list",
+          "cachedResultName": "Google RSS News - AI",
+          "cachedResultUrl": "https://www.notion.so/1ea2a185e5ce8015aff3d43cb6052497"
+        },
+        "title": "={{ $('Arrange Fields').item.json.title }}",
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "URL|url",
+              "urlValue": "={{ $('Arrange Fields').item.json.url }}"
+            },
+            {
+              "key": "태그|multi_select",
+              "multiSelectValue": "={{ $json.section || $json.category || \"일반\" }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $('Arrange Fields').item.json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        448
+      ],
+      "id": "1a773f78-9baa-4b25-b2d7-8374b5533036",
+      "name": "Add Notion Page"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "category",
+              "cssSelector": "meta[name=\"og:category\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "image",
+              "cssSelector": "meta[property=\"og:image\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "section",
+              "cssSelector": "meta[name=\"article:section\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        448
+      ],
+      "id": "21f1211e-ba6a-43ca-9525-3dbe773c18d3",
+      "name": "Extract Image & Category"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        448
+      ],
+      "id": "3b9f527f-e2d2-4680-8ce4-f6367d1c90c4",
+      "name": "Get News"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3980575-30fc-429c-be68-1c2c17bb0a4d",
+              "name": "title",
+              "value": "={{ $('Execute Workflow').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "19ff5740-7fa9-4a46-9e64-482d3c835997",
+              "name": "url",
+              "value": "={{ $('Execute Workflow').item.json.google_news_url }}",
+              "type": "string"
+            },
+            {
+              "id": "d6736308-6aff-45e9-9ab1-083e11f105e6",
+              "name": "content",
+              "value": "={{ $json.contentSnippet }}",
+              "type": "string"
+            },
+            {
+              "id": "fd6235c3-5486-4f0c-8829-84a286f8980a",
+              "name": "isoDate",
+              "value": "={{ $json.isoDate.toDateTime() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        352
+      ],
+      "id": "0e18fcfb-fce2-4748-8dc5-c57c276652ea",
+      "name": "Arrange Fields"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET(1)\n- 슬랙에 발송",
+        "height": 260,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        144
+      ],
+      "id": "4b02b3f7-5197-48ee-8640-bb46b3ef77b6",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET(2)\n- 노션에 한줄씩 저장\n- 메인 이미지 블록 추가",
+        "height": 280,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        320
+      ],
+      "id": "d40b8342-ff7a-460c-b972-2f389c5b4072",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### 구글 주요 뉴스URL\n- https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko\n\n### 특정 키워드 뉴스URL\n- https://news.google.com/rss/search?q=키워드입력&hl=ko&gl=KR&ceid=KR%3Ako",
+        "width": 660
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        528
+      ],
+      "id": "27963869-1d18-4f97-ab16-11c991c3d1ca",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
+      },
+      "id": "8095ccef-e906-4781-99ec-405ecbe50a21",
+      "name": "Google Headline News1",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1008
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C07PH5BRN1X",
+          "mode": "list",
+          "cachedResultName": "automation-n8n"
+        },
+        "text": "=<{{ $json.link }}|{{ $json.title }}>",
+        "otherOptions": {
+          "unfurl_media": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        880
+      ],
+      "id": "8dcb8aea-ff29-40b3-af95-b261595875c9",
+      "name": "Slack1",
+      "webhookId": "82266d98-3202-4f48-9828-e9e7aab831c0"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET(1)\n- 슬랙에 발송",
+        "height": 260,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        784
+      ],
+      "id": "a4fc6cf5-1d36-4a3e-81bb-57278b51dce2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "1ea2a185-e5ce-8015-aff3-d43cb6052497",
+          "mode": "list",
+          "cachedResultName": "Google RSS News - AI",
+          "cachedResultUrl": "https://www.notion.so/1ea2a185e5ce8015aff3d43cb6052497"
+        },
+        "title": "={{ $json.title }}",
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "URL|url",
+              "urlValue": "={{ $json.link }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.contentSnippet }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        1168
+      ],
+      "id": "3ee1fcc7-8ed0-4bc3-af39-74d26bf0d372",
+      "name": "Add Notion Page1"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET(2)\n- 노션에 한줄씩 저장\n- 메인 이미지 블록 추가",
+        "height": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        1040
+      ],
+      "id": "b08a6626-3072-431e-a210-b002d12b514c",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## SIMPLE VERSION\n- 뉴스를 슬랙, 노션으로",
+        "height": 580,
+        "width": 580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        768
+      ],
+      "id": "af630dbc-a1a8-41bb-8073-a849b22ecad4",
+      "name": "Sticky Note9"
+    }
+  ],
+  "connections": {
+    "Google Headline News": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Arrange Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Notion Page": {
+      "main": [
+        [
+          {
+            "node": "Add Main Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image & Category": {
+      "main": [
+        [
+          {
+            "node": "Add Notion Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get News": {
+      "main": [
+        [
+          {
+            "node": "Extract Image & Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arrange Fields": {
+      "main": [
+        [
+          {
+            "node": "Get News",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Headline News1": {
+      "main": [
+        [
+          {
+            "node": "Slack1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add Notion Page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Google Headline News": [
+      {
+        "json": {
+          "title": "국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑] - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:51:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ?oc=5\" target=\"_blank\">국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE5LR1JkbWxseEs5YmZJVGNsSUFKNmtmWGVOT0dITnpJMXFBS1gyUnFmZ25pc0ppbnVVSDBzMlY0SThsUDFkNWQ3a1NZNFgtUFRnamlUZmZsaWFzUdIBX0FVX3lxTE9FMEU3eGQtWGVGNzAxYkN6Ri1tQmVDV21PaVktdVlXRklKWVpRXzhXbTlQdlJRcjJNdDl0aUhLWFlJZzNHRG1xRHhCQjgzc282TTZhVlRmOTBNMlQ1X1lv?oc=5\" target=\"_blank\">[단독]김문수 “비대위 해체” 거론에···현 국힘 지도부 측 “전국위 권한” 반박</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMieEFVX3lxTE94WmVUSXlvMHVvcUx0MmUtSllqS2VSU0dEWUVzdHZqVlhDNDNaWmlyYnBnOGRGcUlIMFAwS3p6STMydElTV1A0MkxtSTdxX3BnVFFkTjFSNlprY0hMM1I3RWR0QzVPZkhGWGdiZ25Xd014NDlib1VDd9IBeEFVX3lxTE9iMThNZ0pyekJ2WGJBQjRCYU0waUZnV0k1MUtGZTY3enNPN0UwTzFkNWs0S0JhMmFIT0VHWE5qZ2I5MngwZUh4Q2F1YjByaC00Yi00a1FUUm43cFl2U21xMTZTVFpNYVozdzVIeXdsZlAydnc3bFZMbw?oc=5\" target=\"_blank\">김문수 측 \"단일화 약속 변함 없어‥후보 부당하게 압박해 문제\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiakFVX3lxTFBmYnBPMThlOUY1c05GRlZhODhzWHpJUEE5bVVjOEhJallOTEYxZUYtZDJibnMybEUzeDlHdmZLa0VjcWFoM0Rsc25UTjNlSk9YY19naWlkeTg1aGhuY1V2Nlp3b2VfZEpiN1E?oc=5\" target=\"_blank\">'대선 후보 교체' 파상공세에도 버티는 '꼿꼿문수' 왜?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE10YTBqVzBOQW5iVDFiMDgxU1hiU3FnX2xDdnlyTmR6d0FMU3htZENqOWsxSDlRaV91OHpKb09SdDh0MFRyVUU5U3A1U29lYm1qZnRESG9BZ2VQUWxPMXfSAXZBVV95cUxPUWQ0QzR2V3BnLXhkbFVOaEFqOUQ0Wjl6WDZtcEl1TXUyTEh0UFozS1haOGFFUmpvaGE5dGVWeDhBSFhjOHM1aFB5OW5kempPbW5HeEZHdDk4Q04tTk82amlYT3pLVm9MUWdLMldHUXFiVTRmNUVR?oc=5\" target=\"_blank\">[말말말] 조갑제 \"통뼈 김문수 만만히 본 듯\" 한동훈 \"이렇게 될 줄 몰랐나\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li></ol>",
+          "contentSnippet": "국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑]  한겨레\n[단독]김문수 “비대위 해체” 거론에···현 국힘 지도부 측 “전국위 권한” 반박  경향신문\n김문수 측 \"단일화 약속 변함 없어‥후보 부당하게 압박해 문제\"  MBC 뉴스\n'대선 후보 교체' 파상공세에도 버티는 '꼿꼿문수' 왜?  한국일보\n[말말말] 조갑제 \"통뼈 김문수 만만히 본 듯\" 한동훈 \"이렇게 될 줄 몰랐나\"  YTN",
+          "guid": "CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ",
+          "isoDate": "2025-05-07T01:51:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신” - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:42:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu?oc=5\" target=\"_blank\">국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiakFVX3lxTE4zT1phQ1VXY1Vrb294dmtvZ0xRZm03TmRRbE5hdm1iUV9uOWl0TUduR1RmeXExTEEwTjNUX0JaYzdsTGkwVHRxUEltN01NN1RQa0VxUUltRTMtS3BFazNEeWVlSWZuM0hkR3c?oc=5\" target=\"_blank\">\"사기당했다\" \"쿠데타다\"… 단일화 놓고 국민의힘 종일 '난타전'</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMid0FVX3lxTFBfLUpUT05jZ2owVTRyZUwxUTcwNmdNaXNJX2xGT0ZKd0FaVHl0YmtIRHlJamVBWWVpZXNuVWlQSkhMYm1aazkzU1YzQmh6eWN0cTN4Vi10bGcwcTVtRTJVSndiNkZnUjRncUdhOG1XNXNma3VsbUJV0gFmQVVfeXFMUGNKTVdiS2FQZW5GOTFFM3Fmb2FBVFpOdTV1UWJwdTMzS3lVMzB0X0lsaGxqRl82WEZYTkR5a2R6WUtLb05LZ2VtVHIwank0Zjg2OUdJYi1IX0hWbDBvbm9RNEJLeXB3?oc=5\" target=\"_blank\">금배지 스스로 뗀 ‘재야 같은 의원’, 전광훈과 창당 ‘아스팔트 보수’로</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">동아일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTE1rS093ZHZsUzNZRDlwc1RhR0Y3YnJIMm41bE9Ycnd6WDlvZjlScmpoVzJsa0F5aEVkSkpTZVNDYUxiLWJadDB1bWlTY2ZCOWZvTEk5Qk5MWFdDdkE?oc=5\" target=\"_blank\">민주·국힘 전직 경기도지사 맞대결 구도… 경기도 표심 흔들 [6·3 RE:빌딩]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경기일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMieEFVX3lxTFBEdTNnWG1ZNWpRaEphVUV4aUVReWZEMWFfR2JabWRZcXVOcTFFcWgyQl9wb0IyN2tCRzNvYkFfSC14eE1Rb3RRMFB1X05tNW1zZEd0dW8xeXlDSk9idXl2eVg0c25SYUVHams5Z3B0UTZqaTE5NG9KSdIBeEFVX3lxTE84aUR0VkhwSUdvM1BEU3g3S1B4bEJJdUQ3WldKNDRXdGF6RTBxaW81UGxMQ1Z1ZERMTGZTQ2l2eWphS2hfM20xNU05V2pVV25sbm8yeGlMcGxOWmNGYkd1SkZJeUVpcF9rM0hYdFo3ZDhDRlBFUWNRaA?oc=5\" target=\"_blank\">국민의힘 지도부 \"김문수 후보 의총 참석 정식 요청할 것\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li></ol>",
+          "contentSnippet": "국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신”  한겨레\n\"사기당했다\" \"쿠데타다\"… 단일화 놓고 국민의힘 종일 '난타전'  한국일보\n금배지 스스로 뗀 ‘재야 같은 의원’, 전광훈과 창당 ‘아스팔트 보수’로  동아일보\n민주·국힘 전직 경기도지사 맞대결 구도… 경기도 표심 흔들 [6·3 RE:빌딩]  경기일보\n국민의힘 지도부 \"김문수 후보 의총 참석 정식 요청할 것\"  MBC 뉴스",
+          "guid": "CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu",
+          "isoDate": "2025-05-07T01:42:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\" - 조선일보",
+          "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:07:30 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3?oc=5\" target=\"_blank\">최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE1hcXdocXk2eFZmeFl2NFhMblR2WWp4SFBGM2NIWjVvazVzQko2X3cxSXU4U1JHMEFva0VtUVJITEYtVTJRT3V0ZnZqdUc2U0h4YmNFMkx0N0VGMElWX2fSAXZBVV95cUxNNEN3TW9NTzU0Q1haUmM3VjJfbFd4UjUzVzhZbVdsUnNLelNsekJzNUtWbGxEcDdRUjZwN19mcTNjeDBzTGRFUG5EV2dYSnlHYnhvYlhJRUltTFRDY2QyYTRtNzdmenZvV0llN3dHa2FiZ2JpOWJ3?oc=5\" target=\"_blank\">[현장영상+] 최태원 \"불편 초래해 사과...위약금 면제는 법적 문제 검토 필요\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE1oaXAtWEs0NGNBaXBJVlR1d2dwWHVZc05mU0ZZM0ZDclZfcEFzTUhRZTFaVGdmNTZ6ZktRUC1DWjdzMm42Y1dld2c1ZUJrZEpkU1hNTmVSS2ltelhNRVlKTV9nTy1ReUVwMmR1eG8wMWdQREpx0gF0QVVfeXFMTVlucWJCYWxZZFBzbVlNa2VCazJYN2tMUVBSeHhRYWJwNFpSbVlZT2hBczk0cUFKaHg0eFhCa0l0dWxONDNuR2E5ODJTU2tNUEdpWVZMYjlUME9LUXBna2RncG5MSmlKdW96cWtsSVVWSmdELWM?oc=5\" target=\"_blank\">최태원, SKT 해킹사태에 대국민 사과‥위약금 면제는 이사회 논의</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE5BYVpjZEtfVE0wbVYwLWFGQXN0T3JUX1ZueV9XRUMxbW9zY2R6V0hZTmVUR0QzWnQ2U3BSUlBEZHdpZkV6RGNvaWhsNzhzNlRmaDFtbmhESXFld9IBVEFVX3lxTE54NC0tYW94Z1RGSlE3clc2NkhBbVphQmUyY0h0UURscll3U3RsbjZHclRhbGZKdWVBa2hRTHR6QVBCSEh2bFZYMEU5TEpDek1fVjh6aw?oc=5\" target=\"_blank\">최태원 \"유심 교체 안 했다…위약금 면제는 내 결정 영역 아냐\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE95eHp3VDJpQlA3QU4wSFZqUmtOaVY4UmtoNHprb2xpQzR1c1pkX3BTY0I5eUlLNWZLRUhFR3JSZVhJR0psRm9aUVNKaGczU2c0dXM4QXd2V1hTd9IBX0FVX3lxTE50ME8xNTltWFVRMDQ2RDVQWTBaSVV1ZDZOYm9UQWFGXzdtSTZIR3ZLSU9MdVBlZGg5NWgtbXpySjgtZTlSaW53anl2R2YtcFVUOUd3dHRVQ1U0RG1OOGJV?oc=5\" target=\"_blank\">[속보]최태원 “SKT 사이버 침해 사고 SK그룹 대표해 사과”···위약금 면제엔 “논의 중”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li></ol>",
+          "contentSnippet": "최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\"  조선일보\n[현장영상+] 최태원 \"불편 초래해 사과...위약금 면제는 법적 문제 검토 필요\"  YTN\n최태원, SKT 해킹사태에 대국민 사과‥위약금 면제는 이사회 논의  MBC 뉴스\n최태원 \"유심 교체 안 했다…위약금 면제는 내 결정 영역 아냐\"  한국경제\n[속보]최태원 “SKT 사이버 침해 사고 SK그룹 대표해 사과”···위약금 면제엔 “논의 중”  경향신문",
+          "guid": "CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3",
+          "isoDate": "2025-05-07T01:07:30.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발 - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:29:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR?oc=5\" target=\"_blank\">‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE5RMlJnbHRnaWx3Q1ZaR0FRTGV6M05fbkpNT1dhWExQT2t0X1p3V3ZhN0FWd1M5TDBHSkFIbVZnUUZLd0xLSzdKdUFzdVByTktlbkZfX3ZpZEp0N0ZKcFd4V3p0RFRoRjFrT2JFRTV6WTJJelpj0gF0QVVfeXFMTUM5ekF6eThxT3VkWGkxTFFKd1lZZjFEaDM5UGs5bUMxakVBSE5CTFpJSTcwSEdOSHdyZUtRcG5iZFRIazBjVnRhUHZUazh4VGZ2ZG92aWtwNlpyR1otZzZfT1lVcmt2Y0FpdXpiNFRLWDdydXU?oc=5\" target=\"_blank\">'핵보유국' 인도·파키스탄, 6년 만에 군사충돌‥서로 미사일공격</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE44eHNadjlWaVdZSldEZUx0SkJocmpUSXlEekFiT0NFZk9lN0tLUXZTMFZYRUhseHNhRmpQeFR5X1FSXy1CSXVLQzVnTHlIdmh0Yno0UllvSEJ2d9IBX0FVX3lxTE5zUXcyVE04N05GaVZrSVZFSFJaRU1nRUZzcmszTWQwSWVxb1RuSnQyNzNoaEtJOTdFczlnclVvZld6Z3pmcVJmMGdTMUQteHFTUWtSdkVOVmozVG1QejhB?oc=5\" target=\"_blank\">인도, 카슈미르 등 파키스탄 9곳 공격···파키스탄 “보복 공격”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMingFBVV95cUxPUFZZdG1pTkgzYVcyVkdMd3REX3RwdGt0OUd1alFyU2tGTkplYmFqTWpiVXNQYmZ4eGNGSnFxeklqTGF3Njcwdlk0M0tMVmdSTlpFQnF3cTFGUnhmLW5oeUJRWk5DY1EwVjRHaEJUVkNwbDhPYnNyRXpBZ1JxdjM2aHZYNl9oRFZJY3ZORDNwLXdMQW9WeXA3NnVjSGdOZ9IBsgFBVV95cUxOeU5jUWtWZ0c4dmptZFVuME50YnRSQTVVVTZCUHJDZHZ3ZVRxV3BHR0ZvM2pjVGVjWUh1S3FXLWs1WUxRcVJNcXNXUUVtZk5HVHRvd0dyd0hxdDdzUEkxRzM2RlFlOVM5TVBuencyZ3l6TGE4N3VVRTdrcFRycEY1YXRxRjAwYkhlR1NXNmNIOTJ5Nk1IekVpa3E0d1BIS2E2Q2t3bzVjZWhTbGptOEt2Z1p3?oc=5\" target=\"_blank\">밤하늘에 갑자기 폭발 구름이 ‘펑’…인도 미사일 공격 현장 보니</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTE5wMUs5TEExb0ZCb0VOR3R1cTcwaExFbGdCZTYyVjQtMDlWMEZzU1VlNDAtcDAwUFBsU1FsTVJUaTBoYUc4OGlxTkJPcUp0MkZwby1TQmdlTmVfZFnSAWBBVV95cUxOWFhvUjdhbUY0cFJ1aV83SkRGcGkyTldwVEthbWdIdDh2RG5XcDZzajlBbFhyYVgweFpxZWdfdElqYkYyRGhrZFdYTHJsSFhmbHJReHY3WlJmbDRyR3dmS0w?oc=5\" target=\"_blank\">인도-파키스탄 군사충돌에 대한항공 인천∼두바이 항로 우회운항</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">연합뉴스</font></li></ol>",
+          "contentSnippet": "‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발  한겨레\n'핵보유국' 인도·파키스탄, 6년 만에 군사충돌‥서로 미사일공격  MBC 뉴스\n인도, 카슈미르 등 파키스탄 9곳 공격···파키스탄 “보복 공격”  경향신문\n밤하늘에 갑자기 폭발 구름이 ‘펑’…인도 미사일 공격 현장 보니  조선일보\n인도-파키스탄 군사충돌에 대한항공 인천∼두바이 항로 우회운항  연합뉴스",
+          "guid": "CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR",
+          "isoDate": "2025-05-07T01:29:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송 - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:00:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR?oc=5\" target=\"_blank\">‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font>",
+          "contentSnippet": "‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송  매일경제",
+          "guid": "CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR",
+          "isoDate": "2025-05-07T01:00:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제 - 조선일보",
+          "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:16:09 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n?oc=5\" target=\"_blank\">제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE9YaHh1M1BkaEFJdjlfUVBrMUw1M0h1bnFfek9XTUU2Tml5WUwtMnVUWU9GY2ItSmx5aWdNYnluVTFlZkFhcUQ2M3Q5LUdCTWRsWUEwbGFiN3JRSllQYmxSLTVkNzVrZ9IBbkFVX3lxTFBCT2NOM3dZLWNJTF9XMkRMaVE5U1R6RW1Xa2Z3VFdDVU5vamo2Y0lBQmh2YjZzSlEteUNZZXVhZGRicVdwWmZkNkE1NG9pS1pHcmpTZENkQ2JSa1hacndtUUUxYlNPQzBXLWhTMVJB?oc=5\" target=\"_blank\">\"인간 샤넬\" 극찬 쏟아진 제니 의상, 330시간 공들여 탄생했다</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">머니투데이</font></li><li><a href=\"https://news.google.com/rss/articles/CBMipwJBVV95cUxQQjVSaEtoaVFKVFZJck9YakkxNXk5YVZ5WElDQWg1dUdnSmhpTm9CcF9Hbm5nT2ZBU3JqMFBMdU9Jc0QyeV8yV0lTM1hBT1BXTG9fSnNMVFQtOEptOEc4U3V0bDJubnNTT1N3M1FmR1NfM2dRUEx1ZUNBWHRxX0ppZjJTSkRfYmh3SVlqUUV0cXU3Q2JpZXpYUkthbC1GV2F6Y0JtaWhEd3BTT25ma0RIcXZORTFZSzdHeWY3R1RnSlgxZTBCaDJoVDdZdVNqdVNYT3BpbGpsbWlUZjJNaWdPRkdrUVlOUDdXeXI0YWE5Q3RGa0hjd3FHV1ZBdlhxU3puR01GcTROMk0wUWx2UFRyakVQTXE3emJfcDZ5eTh5aDc1ZXBZUW5Z?oc=5\" target=\"_blank\">분위기 있는 수트로 완성한 로제표 2025 멧 갈라</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">Vogue korea</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE04YWFWVUlTZGR5NDdLZW9EcWdtQ3lSMHoxUllYTnhSSzU3bUNWNm5vN2JpbEg5NzVFcUlYclBnd1NlQUEwLTJPaTcxbEFlLXRZM3FXM3JFQ3Nhd9IBVEFVX3lxTE9wcE9nS0c5YTNvWTZUYUJYaUF5NmhuUFpkTmpqMGlrYm1qaUdzX2pHandwZ2FLOURmNTFrUzlTM0VxZ3loRnphdk1hemhqSEFhc29wVw?oc=5\" target=\"_blank\">리사, 루이비통 스타킹만 신고 '파격'…제니·로제도 '눈길'</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE9Wckc5N2E3YzlDbF96Sm5obUFzSE5CRDg4LTVndVl1OWhNSEdKZUtBMEt4TFBoREpJd1RfVnlMX0M3ZGpzWU9hc2JrT1JzYm92SEk5SjFkTTNGTDAyTlloc29oYmZwV2RDelA4XzlzVXhaY2tT0gF0QVVfeXFMTUJ4dVRaTVJjNTFQdlhWTk94T0kwdmdlZmJiRXRYSVYtNFVDNXlxX1gtM0dQQ00tNmJjR2UwV2FFTUFiT0JSeEp5blE0a283NU9wWTJzakdjdTZvODRMQV9pVUp4ZlR1MGRlWUNIQWdzMDNnNVg?oc=5\" target=\"_blank\">3년 연속 멧 갈라 빛낸 제니, 2025년 X최다 언급 셀럽 등극</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li></ol>",
+          "contentSnippet": "제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제  조선일보\n\"인간 샤넬\" 극찬 쏟아진 제니 의상, 330시간 공들여 탄생했다  머니투데이\n분위기 있는 수트로 완성한 로제표 2025 멧 갈라  Vogue korea\n리사, 루이비통 스타킹만 신고 '파격'…제니·로제도 '눈길'  한국경제\n3년 연속 멧 갈라 빛낸 제니, 2025년 X최다 언급 셀럽 등극  MBC 뉴스",
+          "guid": "CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n",
+          "isoDate": "2025-05-07T01:16:09.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연 - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 02:24:25 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ?oc=5\" target=\"_blank\">‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font>",
+          "contentSnippet": "‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연  매일경제",
+          "guid": "CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ",
+          "isoDate": "2025-05-07T02:24:25.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’) - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:58:32 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ?oc=5\" target=\"_blank\">정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’)</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiYEFVX3lxTE00aDNHY19YaHJtMktLeW5vSTF5N1VYUzNjMFFfZDk5MG52Z25WMXhmaGZ6Smp2bVhyZmVBNGlYVkVtdkRrb2tYM3hzQ2dHYXJaZm1oZ0NQZTNlS256ejdXSw?oc=5\" target=\"_blank\">＂형의 조언에 영향을 받았어요 ㄴ 그땐 잘 듣고 있나 싶었는데;;＂ 김준수의 영향을 받은 정동원의 부캐 'JD1'!</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">동아일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMibkFVX3lxTE9LeGFhdEJaOTRIRVlDS1lzMnRYcl9lUFhxM2t0R0dEaGc0STRkZ3MzVzdEUnFNSjJDWWlaUUszdmUzOGdNNlY3X3hWcXpPQld4WTBNWkszRlNhQ3hlQWJEczhUalJTZjVYRDlpdllR?oc=5\" target=\"_blank\">'4인용식탁' 정동원, 부캐 JD1 탄생 비하인드 공개</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">국제뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMibkFVX3lxTE5NODZOWDRZVGlzUXh2amhncTlZMTF5WEZBUGkzRzdHd2ticmdxQmxZR2szbUloTC1qRDAzVzUyczdaenlQRFk2VnpKVnQ2QS0xTm5vdmFlNzFBTURUUk1ENXdZbFJ1dXZCZnNDdjRn?oc=5\" target=\"_blank\">'소속사 대표' 김준수, 차별 의혹 터졌다…\"매출 낮다고\" 폭로 (4인용)[전일야화]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">ZUM 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiYEFVX3lxTFAzQmRCMjZSWVFOQnhWWHk0R21Dcmt1VzJoNzV0ZGRkVTdjYTVjYjRNZlRWTTZuZndvUG9IdzBYMV90Y1NVZkhIalRPMDk4bVRfdzh0ZlVwNG9BS2VLU3RrOQ?oc=5\" target=\"_blank\">'4인용식탁' 김준수 \"정동원, 남달라…세금에 대해 질문\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">iMBC 연예</font></li></ol>",
+          "contentSnippet": "정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’)  매일경제\n＂형의 조언에 영향을 받았어요 ㄴ 그땐 잘 듣고 있나 싶었는데;;＂ 김준수의 영향을 받은 정동원의 부캐 'JD1'!  동아일보\n'4인용식탁' 정동원, 부캐 JD1 탄생 비하인드 공개  국제뉴스\n'소속사 대표' 김준수, 차별 의혹 터졌다…\"매출 낮다고\" 폭로 (4인용)[전일야화]  ZUM 뉴스\n'4인용식탁' 김준수 \"정동원, 남달라…세금에 대해 질문\"  iMBC 연예",
+          "guid": "CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ",
+          "isoDate": "2025-05-07T00:58:32.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "이정후, 시카고 컵스 상대로 시즌 4호포 폭발 - 경향신문",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:01:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z?oc=5\" target=\"_blank\">이정후, 시카고 컵스 상대로 시즌 4호포 폭발</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiiwFBVV95cUxQUmhJNGV3azhoenlsTmVHRzduS0YyUDFvQVhkM1lpSWZweTJjZVgzYU5zU0lJc2x2bHZtdU0tSXlaNlAydmZwMndTbU5Ddk05cXhwb0xjTlh6ekR2WXZwYkFpRG1JZTU0WTdzbTJkaV9vT2VydUtZRk9ZdzZZX1NWY0lQalZxQW4zdUx30gGfAUFVX3lxTE83U3E4N1pwR21ZSTBzZElZa211MzJnM3pfeGktb1MxeWt5R1dUak5SU3NUcTcxLVR1VkcwS2JJLWYydlJJRkZ3M2E1OW52UUxKX1hzVXpEckpKUDBRaGFOa2FaQkdSRDZrY0xjZEVoaWZvSFd1THhwRGRqem1odWVOaGZUa2FWcWZkcVBSVzEwNEJXTENJSXoxV19BNDBGYw?oc=5\" target=\"_blank\">이정후, MLB 시즌 4호포... 22경기만</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiVkFVX3lxTE0ySWR0MENCbFcydWJtRlhvQTNtbVNlbGlvWGdEbE1WY1RKWFhKTm00NHZQajNpTUV3OGZxU1pfY1V1T1kwSWJzTXV6dEFEeHA0TzNKZlZn?oc=5\" target=\"_blank\">이정후, 4호포 폭발! 타구 속도 170㎞ 총알 타구→맞는 순간 홈런 직감</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">네이트 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE5TQ1UtT25CRkFBdl90dldFZVNXNkpWMVBQNVNNSlpuQ2ttSXJUSFJLRHR1cWJZWXprRTdhMGRCWkwyWng2WE1na2Z6UmNvdmhtUU1GSmJhWUd5UWw1TnfSAXZBVV95cUxNdTdkdXVxZDR6alN6M1Jxdl9FR0ZxZDZnVjZIc1JnTGotZWozNlhYQ2hFSUN0VHVTQXFXcGl5TW1HbUFCS0R4bkJMckZ0WjlKdzRESXgzZWdnMlE3V2NXNnlLdzNsXzEzdk9TU0gtRnZvM25rUVVB?oc=5\" target=\"_blank\">이정후, 22경기 만에 시즌 4호 홈런포</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE54Z2lFLUV4Rmx6ellHZFJVaEVDak42RFRHVHRGSl8zTjN1UXBPeVdVWWY5cDg5djFtOTg3andPZVo5MnQ4dkY2N203TzVWOUo5ODVYaS02SGVTRl9YeHhOQllfYlRtdw?oc=5\" target=\"_blank\">컵스전 앞두고 동료와 얘기 나누는 이정후</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">뉴시스</font></li></ol>",
+          "contentSnippet": "이정후, 시카고 컵스 상대로 시즌 4호포 폭발  경향신문\n이정후, MLB 시즌 4호포... 22경기만  조선일보\n이정후, 4호포 폭발! 타구 속도 170㎞ 총알 타구→맞는 순간 홈런 직감  네이트 뉴스\n이정후, 22경기 만에 시즌 4호 홈런포  YTN\n컵스전 앞두고 동료와 얘기 나누는 이정후  뉴시스",
+          "guid": "CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z",
+          "isoDate": "2025-05-07T01:01:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "SK바사, '조류독감 백신' 개발 \"질병청 사업선정\" - 바이오스펙테이터",
+          "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:43:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw?oc=5\" target=\"_blank\">SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">바이오스펙테이터</font></li><li><a href=\"https://news.google.com/rss/articles/CBMihwFBVV95cUxPUmJCYkR6djlmSmxXUG92RFlpOFo1SEYxd0g5bVNuek81YnpMbHpmMWVtX2dXYzc1NU01MVIzNlpRNXhaT1p6NmM2S1lmOU5qNDBsQzI3NmZsSzR6YWlCMjQ0QVdOY3BLdVpXVTJQcWVlMkVRN19ad25ROXhleVRaZl9Wcmx1RmvSAZsBQVVfeXFMTWxjWTlsSmxWaE4zdGZCLXFNSU43NGZQWjQwV0s3TW9GUHBEemtOTVFzWU1jOXRIUVJybUswT0hQOG9fQ2tBcmVWOUVkYlNSTmZveWo5MzdIQ1BZb0JZMWRyd2VGTEtma09vRFlmU29rb3VzOGt4TVo4NkVJN1o3aTQ2YU1RYmdPYlZnUHVNMzFPUHZRR2ljLXNsdWc?oc=5\" target=\"_blank\">SK바이오사이언스·질병청, 조류인플루엔자 백신 개발 착수 - 조선비즈</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">Chosunbiz</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiVEFVX3lxTE1sWkpNaHZqdGFRelZVWklSMTBjR0xyWDF6SmVhakNjdHR0VnBjekRoOGxVQTRqNjFEa1Zuc0lEcUpvRGROV3RrUTl2RDdFSFR0N0hfSQ?oc=5\" target=\"_blank\">[BioS]SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">이투데이</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTFBXNE9oRVhDUUZUWlFVNnAyeDVzQUdlMWJCMWhXRldZQ1lpT0l0aEowZVJvU0F5RmFlQzQ2NjRKRzAyRGpNNUFDNTNtSUNUZHVqbVlHREEwTWM5MUU?oc=5\" target=\"_blank\">SK 바이오사이언스-질병청, 차세대 조류독감 백신 개발 착수</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경기일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXEFVX3lxTE4xcy1zSlo5S0Zqb0NzeWJVYlFUOXlVRl9NWUlJd05uckY0ak1zTVJuXzdnTmVuTHRjNURkLVdQaDNsTHNJeDVrY3hvZVEtZnZFSjVKbzZCc3pocFRw?oc=5\" target=\"_blank\">SK바이오사이언스, 질병청과 '조류독감 백신' 개발 착수</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">뉴스1</font></li></ol>",
+          "contentSnippet": "SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"  바이오스펙테이터\nSK바이오사이언스·질병청, 조류인플루엔자 백신 개발 착수 - 조선비즈  Chosunbiz\n[BioS]SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"  이투데이\nSK 바이오사이언스-질병청, 차세대 조류독감 백신 개발 착수  경기일보\nSK바이오사이언스, 질병청과 '조류독감 백신' 개발 착수  뉴스1",
+          "guid": "CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw",
+          "isoDate": "2025-05-07T01:43:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼] - 헬스인뉴스",
+          "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:29:09 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U?oc=5\" target=\"_blank\">노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">헬스인뉴스</font>",
+          "contentSnippet": "노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼]  헬스인뉴스",
+          "guid": "CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U",
+          "isoDate": "2025-05-07T00:29:09.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면? - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:30:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw?oc=5\" target=\"_blank\">출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font>",
+          "contentSnippet": "출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면?  한겨레",
+          "guid": "CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw",
+          "isoDate": "2025-05-07T01:30:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래? - 코메디닷컴",
+          "link": "https://news.google.com/rss/articles/CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:29:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw?oc=5\" target=\"_blank\">“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">코메디닷컴</font>",
+          "contentSnippet": "“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래?  코메디닷컴",
+          "guid": "CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw",
+          "isoDate": "2025-05-07T00:29:00.000Z"
+        }
+      }
+    ],
+    "Google Headline News1": [
+      {
+        "json": {
+          "title": "국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑] - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:51:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ?oc=5\" target=\"_blank\">국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE5LR1JkbWxseEs5YmZJVGNsSUFKNmtmWGVOT0dITnpJMXFBS1gyUnFmZ25pc0ppbnVVSDBzMlY0SThsUDFkNWQ3a1NZNFgtUFRnamlUZmZsaWFzUdIBX0FVX3lxTE9FMEU3eGQtWGVGNzAxYkN6Ri1tQmVDV21PaVktdVlXRklKWVpRXzhXbTlQdlJRcjJNdDl0aUhLWFlJZzNHRG1xRHhCQjgzc282TTZhVlRmOTBNMlQ1X1lv?oc=5\" target=\"_blank\">[단독]김문수 “비대위 해체” 거론에···현 국힘 지도부 측 “전국위 권한” 반박</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMieEFVX3lxTE94WmVUSXlvMHVvcUx0MmUtSllqS2VSU0dEWUVzdHZqVlhDNDNaWmlyYnBnOGRGcUlIMFAwS3p6STMydElTV1A0MkxtSTdxX3BnVFFkTjFSNlprY0hMM1I3RWR0QzVPZkhGWGdiZ25Xd014NDlib1VDd9IBeEFVX3lxTE9iMThNZ0pyekJ2WGJBQjRCYU0waUZnV0k1MUtGZTY3enNPN0UwTzFkNWs0S0JhMmFIT0VHWE5qZ2I5MngwZUh4Q2F1YjByaC00Yi00a1FUUm43cFl2U21xMTZTVFpNYVozdzVIeXdsZlAydnc3bFZMbw?oc=5\" target=\"_blank\">김문수 측 \"단일화 약속 변함 없어‥후보 부당하게 압박해 문제\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiakFVX3lxTFBmYnBPMThlOUY1c05GRlZhODhzWHpJUEE5bVVjOEhJallOTEYxZUYtZDJibnMybEUzeDlHdmZLa0VjcWFoM0Rsc25UTjNlSk9YY19naWlkeTg1aGhuY1V2Nlp3b2VfZEpiN1E?oc=5\" target=\"_blank\">'대선 후보 교체' 파상공세에도 버티는 '꼿꼿문수' 왜?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE10YTBqVzBOQW5iVDFiMDgxU1hiU3FnX2xDdnlyTmR6d0FMU3htZENqOWsxSDlRaV91OHpKb09SdDh0MFRyVUU5U3A1U29lYm1qZnRESG9BZ2VQUWxPMXfSAXZBVV95cUxPUWQ0QzR2V3BnLXhkbFVOaEFqOUQ0Wjl6WDZtcEl1TXUyTEh0UFozS1haOGFFUmpvaGE5dGVWeDhBSFhjOHM1aFB5OW5kempPbW5HeEZHdDk4Q04tTk82amlYT3pLVm9MUWdLMldHUXFiVTRmNUVR?oc=5\" target=\"_blank\">[말말말] 조갑제 \"통뼈 김문수 만만히 본 듯\" 한동훈 \"이렇게 될 줄 몰랐나\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li></ol>",
+          "contentSnippet": "국힘 “파산” 걸린 단일화 시계…김문수 나흘 버티면 생기는 일 [뉴스뷰리핑]  한겨레\n[단독]김문수 “비대위 해체” 거론에···현 국힘 지도부 측 “전국위 권한” 반박  경향신문\n김문수 측 \"단일화 약속 변함 없어‥후보 부당하게 압박해 문제\"  MBC 뉴스\n'대선 후보 교체' 파상공세에도 버티는 '꼿꼿문수' 왜?  한국일보\n[말말말] 조갑제 \"통뼈 김문수 만만히 본 듯\" 한동훈 \"이렇게 될 줄 몰랐나\"  YTN",
+          "guid": "CBMiZkFVX3lxTE0xa3FFZG5PVGNOXzRJZk5RdnZZeEIxRHR3bXltQ0ZJWi1lRTF1VXdSNnFzbW9NX2lDNjlRMDIyUmdPRGt1dlZCMnJxbVA5QlNqNVNoR1lsNW43SUhsOXRqUzRkelctUQ",
+          "isoDate": "2025-05-07T01:51:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신” - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:42:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu?oc=5\" target=\"_blank\">국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiakFVX3lxTE4zT1phQ1VXY1Vrb294dmtvZ0xRZm03TmRRbE5hdm1iUV9uOWl0TUduR1RmeXExTEEwTjNUX0JaYzdsTGkwVHRxUEltN01NN1RQa0VxUUltRTMtS3BFazNEeWVlSWZuM0hkR3c?oc=5\" target=\"_blank\">\"사기당했다\" \"쿠데타다\"… 단일화 놓고 국민의힘 종일 '난타전'</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMid0FVX3lxTFBfLUpUT05jZ2owVTRyZUwxUTcwNmdNaXNJX2xGT0ZKd0FaVHl0YmtIRHlJamVBWWVpZXNuVWlQSkhMYm1aazkzU1YzQmh6eWN0cTN4Vi10bGcwcTVtRTJVSndiNkZnUjRncUdhOG1XNXNma3VsbUJV0gFmQVVfeXFMUGNKTVdiS2FQZW5GOTFFM3Fmb2FBVFpOdTV1UWJwdTMzS3lVMzB0X0lsaGxqRl82WEZYTkR5a2R6WUtLb05LZ2VtVHIwank0Zjg2OUdJYi1IX0hWbDBvbm9RNEJLeXB3?oc=5\" target=\"_blank\">금배지 스스로 뗀 ‘재야 같은 의원’, 전광훈과 창당 ‘아스팔트 보수’로</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">동아일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTE1rS093ZHZsUzNZRDlwc1RhR0Y3YnJIMm41bE9Ycnd6WDlvZjlScmpoVzJsa0F5aEVkSkpTZVNDYUxiLWJadDB1bWlTY2ZCOWZvTEk5Qk5MWFdDdkE?oc=5\" target=\"_blank\">민주·국힘 전직 경기도지사 맞대결 구도… 경기도 표심 흔들 [6·3 RE:빌딩]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경기일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMieEFVX3lxTFBEdTNnWG1ZNWpRaEphVUV4aUVReWZEMWFfR2JabWRZcXVOcTFFcWgyQl9wb0IyN2tCRzNvYkFfSC14eE1Rb3RRMFB1X05tNW1zZEd0dW8xeXlDSk9idXl2eVg0c25SYUVHams5Z3B0UTZqaTE5NG9KSdIBeEFVX3lxTE84aUR0VkhwSUdvM1BEU3g3S1B4bEJJdUQ3WldKNDRXdGF6RTBxaW81UGxMQ1Z1ZERMTGZTQ2l2eWphS2hfM20xNU05V2pVV25sbm8yeGlMcGxOWmNGYkd1SkZJeUVpcF9rM0hYdFo3ZDhDRlBFUWNRaA?oc=5\" target=\"_blank\">국민의힘 지도부 \"김문수 후보 의총 참석 정식 요청할 것\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li></ol>",
+          "contentSnippet": "국힘 전직의원 209명 “김문수 교체 시도, 국민·당원에 대한 배신”  한겨레\n\"사기당했다\" \"쿠데타다\"… 단일화 놓고 국민의힘 종일 '난타전'  한국일보\n금배지 스스로 뗀 ‘재야 같은 의원’, 전광훈과 창당 ‘아스팔트 보수’로  동아일보\n민주·국힘 전직 경기도지사 맞대결 구도… 경기도 표심 흔들 [6·3 RE:빌딩]  경기일보\n국민의힘 지도부 \"김문수 후보 의총 참석 정식 요청할 것\"  MBC 뉴스",
+          "guid": "CBMidEFVX3lxTFBmUU9EWndtcU1GMnNTclhibG9SMnZJakoyNllxNnJncEpVRWJwWHZoTWNqSDBFdTE4d2IxaVRZUmk4ck9KQ2dGT0Q2ODVzNGpmUlZGZjBnSkJpUjI2Z1d0WlQtUk51eTlhRTJHdTRpR0k2VVlu",
+          "isoDate": "2025-05-07T01:42:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\" - 조선일보",
+          "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:07:30 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3?oc=5\" target=\"_blank\">최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE1hcXdocXk2eFZmeFl2NFhMblR2WWp4SFBGM2NIWjVvazVzQko2X3cxSXU4U1JHMEFva0VtUVJITEYtVTJRT3V0ZnZqdUc2U0h4YmNFMkx0N0VGMElWX2fSAXZBVV95cUxNNEN3TW9NTzU0Q1haUmM3VjJfbFd4UjUzVzhZbVdsUnNLelNsekJzNUtWbGxEcDdRUjZwN19mcTNjeDBzTGRFUG5EV2dYSnlHYnhvYlhJRUltTFRDY2QyYTRtNzdmenZvV0llN3dHa2FiZ2JpOWJ3?oc=5\" target=\"_blank\">[현장영상+] 최태원 \"불편 초래해 사과...위약금 면제는 법적 문제 검토 필요\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE1oaXAtWEs0NGNBaXBJVlR1d2dwWHVZc05mU0ZZM0ZDclZfcEFzTUhRZTFaVGdmNTZ6ZktRUC1DWjdzMm42Y1dld2c1ZUJrZEpkU1hNTmVSS2ltelhNRVlKTV9nTy1ReUVwMmR1eG8wMWdQREpx0gF0QVVfeXFMTVlucWJCYWxZZFBzbVlNa2VCazJYN2tMUVBSeHhRYWJwNFpSbVlZT2hBczk0cUFKaHg0eFhCa0l0dWxONDNuR2E5ODJTU2tNUEdpWVZMYjlUME9LUXBna2RncG5MSmlKdW96cWtsSVVWSmdELWM?oc=5\" target=\"_blank\">최태원, SKT 해킹사태에 대국민 사과‥위약금 면제는 이사회 논의</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE5BYVpjZEtfVE0wbVYwLWFGQXN0T3JUX1ZueV9XRUMxbW9zY2R6V0hZTmVUR0QzWnQ2U3BSUlBEZHdpZkV6RGNvaWhsNzhzNlRmaDFtbmhESXFld9IBVEFVX3lxTE54NC0tYW94Z1RGSlE3clc2NkhBbVphQmUyY0h0UURscll3U3RsbjZHclRhbGZKdWVBa2hRTHR6QVBCSEh2bFZYMEU5TEpDek1fVjh6aw?oc=5\" target=\"_blank\">최태원 \"유심 교체 안 했다…위약금 면제는 내 결정 영역 아냐\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE95eHp3VDJpQlA3QU4wSFZqUmtOaVY4UmtoNHprb2xpQzR1c1pkX3BTY0I5eUlLNWZLRUhFR3JSZVhJR0psRm9aUVNKaGczU2c0dXM4QXd2V1hTd9IBX0FVX3lxTE50ME8xNTltWFVRMDQ2RDVQWTBaSVV1ZDZOYm9UQWFGXzdtSTZIR3ZLSU9MdVBlZGg5NWgtbXpySjgtZTlSaW53anl2R2YtcFVUOUd3dHRVQ1U0RG1OOGJV?oc=5\" target=\"_blank\">[속보]최태원 “SKT 사이버 침해 사고 SK그룹 대표해 사과”···위약금 면제엔 “논의 중”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li></ol>",
+          "contentSnippet": "최태원 회장 “SKT 해킹으로 불편 겪은 모든 분께 사과… 일련의 대응 미흡\"  조선일보\n[현장영상+] 최태원 \"불편 초래해 사과...위약금 면제는 법적 문제 검토 필요\"  YTN\n최태원, SKT 해킹사태에 대국민 사과‥위약금 면제는 이사회 논의  MBC 뉴스\n최태원 \"유심 교체 안 했다…위약금 면제는 내 결정 영역 아냐\"  한국경제\n[속보]최태원 “SKT 사이버 침해 사고 SK그룹 대표해 사과”···위약금 면제엔 “논의 중”  경향신문",
+          "guid": "CBMijwFBVV95cUxOOF9selVrZTJLcFNrajZ4d1l2NnFWTmk3dDVjTU5mNUpDbHg4d0FxTGJuY1BOSjhlMmlQTXFSeGQ0SnQ0R1N0SnY4eE5PbEFncDduUFhGM3hqMTYwTTNEa0VzeE0tYVpac0xxdm5rQjVOemZabHd2MmN6VEJ0WUlXajBseC1pdldsdW5SSjBUc9IBowFBVV95cUxQMTFIelVXenYwQXR6VDR1QnZjV3gtdWJLcE0zY3JUQ2dCZnRkQVRvTEhIekFsVEd4cC1WbXdiQWpRVlc0cDVrbXEwQXNRR3ZWclBVdV82c2ExWllROXdhd1BfVnRzNjlDT1lYcnl5Qll1WXVwYmVsZHN1NE14NERYUGlrNGZIemdHeWVKdHdFME9UN2wzX0ZxclRfWDNZSHotYUZ3",
+          "isoDate": "2025-05-07T01:07:30.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발 - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:29:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR?oc=5\" target=\"_blank\">‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE5RMlJnbHRnaWx3Q1ZaR0FRTGV6M05fbkpNT1dhWExQT2t0X1p3V3ZhN0FWd1M5TDBHSkFIbVZnUUZLd0xLSzdKdUFzdVByTktlbkZfX3ZpZEp0N0ZKcFd4V3p0RFRoRjFrT2JFRTV6WTJJelpj0gF0QVVfeXFMTUM5ekF6eThxT3VkWGkxTFFKd1lZZjFEaDM5UGs5bUMxakVBSE5CTFpJSTcwSEdOSHdyZUtRcG5iZFRIazBjVnRhUHZUazh4VGZ2ZG92aWtwNlpyR1otZzZfT1lVcmt2Y0FpdXpiNFRLWDdydXU?oc=5\" target=\"_blank\">'핵보유국' 인도·파키스탄, 6년 만에 군사충돌‥서로 미사일공격</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE44eHNadjlWaVdZSldEZUx0SkJocmpUSXlEekFiT0NFZk9lN0tLUXZTMFZYRUhseHNhRmpQeFR5X1FSXy1CSXVLQzVnTHlIdmh0Yno0UllvSEJ2d9IBX0FVX3lxTE5zUXcyVE04N05GaVZrSVZFSFJaRU1nRUZzcmszTWQwSWVxb1RuSnQyNzNoaEtJOTdFczlnclVvZld6Z3pmcVJmMGdTMUQteHFTUWtSdkVOVmozVG1QejhB?oc=5\" target=\"_blank\">인도, 카슈미르 등 파키스탄 9곳 공격···파키스탄 “보복 공격”</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMingFBVV95cUxPUFZZdG1pTkgzYVcyVkdMd3REX3RwdGt0OUd1alFyU2tGTkplYmFqTWpiVXNQYmZ4eGNGSnFxeklqTGF3Njcwdlk0M0tMVmdSTlpFQnF3cTFGUnhmLW5oeUJRWk5DY1EwVjRHaEJUVkNwbDhPYnNyRXpBZ1JxdjM2aHZYNl9oRFZJY3ZORDNwLXdMQW9WeXA3NnVjSGdOZ9IBsgFBVV95cUxOeU5jUWtWZ0c4dmptZFVuME50YnRSQTVVVTZCUHJDZHZ3ZVRxV3BHR0ZvM2pjVGVjWUh1S3FXLWs1WUxRcVJNcXNXUUVtZk5HVHRvd0dyd0hxdDdzUEkxRzM2RlFlOVM5TVBuencyZ3l6TGE4N3VVRTdrcFRycEY1YXRxRjAwYkhlR1NXNmNIOTJ5Nk1IekVpa3E0d1BIS2E2Q2t3bzVjZWhTbGptOEt2Z1p3?oc=5\" target=\"_blank\">밤하늘에 갑자기 폭발 구름이 ‘펑’…인도 미사일 공격 현장 보니</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTE5wMUs5TEExb0ZCb0VOR3R1cTcwaExFbGdCZTYyVjQtMDlWMEZzU1VlNDAtcDAwUFBsU1FsTVJUaTBoYUc4OGlxTkJPcUp0MkZwby1TQmdlTmVfZFnSAWBBVV95cUxOWFhvUjdhbUY0cFJ1aV83SkRGcGkyTldwVEthbWdIdDh2RG5XcDZzajlBbFhyYVgweFpxZWdfdElqYkYyRGhrZFdYTHJsSFhmbHJReHY3WlJmbDRyR3dmS0w?oc=5\" target=\"_blank\">인도-파키스탄 군사충돌에 대한항공 인천∼두바이 항로 우회운항</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">연합뉴스</font></li></ol>",
+          "contentSnippet": "‘핵 보유’ 인도-파키스탄 무력충돌…카슈미르 테러 갈등 폭발  한겨레\n'핵보유국' 인도·파키스탄, 6년 만에 군사충돌‥서로 미사일공격  MBC 뉴스\n인도, 카슈미르 등 파키스탄 9곳 공격···파키스탄 “보복 공격”  경향신문\n밤하늘에 갑자기 폭발 구름이 ‘펑’…인도 미사일 공격 현장 보니  조선일보\n인도-파키스탄 군사충돌에 대한항공 인천∼두바이 항로 우회운항  연합뉴스",
+          "guid": "CBMiggFBVV95cUxPdk42cmpUYk8zMkVnQ0s3dVJqV1U2RGFEQUxMbUpla2RZbWhVd2M0emM1VU9TSnJLYXRvUEVyeTdpM0hQOG1PR2dZb1I3WGZ5d1U1bURNbDBwSnVPZWdpeGtaWmJDaVp5UVRMbmdPWC1lX3JPS1AtSHptY0dmc00zLXBR",
+          "isoDate": "2025-05-07T01:29:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송 - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:00:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR?oc=5\" target=\"_blank\">‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font>",
+          "contentSnippet": "‘헬씨디어 퍼펙트 이뮨’ 개그우먼 김미려와 SK스토아서 부모님 건강 챙기는 유쾌한 방송  매일경제",
+          "guid": "CBMiVkFVX3lxTFBTdGQ5VlcxQ1EzWkpIblZkTzRoanNqdWZtMzdOT0ZRV3MzUnI5V29UWGs4azZ4dTNESVpSNTBoRkZmZU5ndnU1YkdfajhKTWdDbS1pOHlR",
+          "isoDate": "2025-05-07T01:00:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제 - 조선일보",
+          "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:16:09 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n?oc=5\" target=\"_blank\">제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE9YaHh1M1BkaEFJdjlfUVBrMUw1M0h1bnFfek9XTUU2Tml5WUwtMnVUWU9GY2ItSmx5aWdNYnluVTFlZkFhcUQ2M3Q5LUdCTWRsWUEwbGFiN3JRSllQYmxSLTVkNzVrZ9IBbkFVX3lxTFBCT2NOM3dZLWNJTF9XMkRMaVE5U1R6RW1Xa2Z3VFdDVU5vamo2Y0lBQmh2YjZzSlEteUNZZXVhZGRicVdwWmZkNkE1NG9pS1pHcmpTZENkQ2JSa1hacndtUUUxYlNPQzBXLWhTMVJB?oc=5\" target=\"_blank\">\"인간 샤넬\" 극찬 쏟아진 제니 의상, 330시간 공들여 탄생했다</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">머니투데이</font></li><li><a href=\"https://news.google.com/rss/articles/CBMipwJBVV95cUxQQjVSaEtoaVFKVFZJck9YakkxNXk5YVZ5WElDQWg1dUdnSmhpTm9CcF9Hbm5nT2ZBU3JqMFBMdU9Jc0QyeV8yV0lTM1hBT1BXTG9fSnNMVFQtOEptOEc4U3V0bDJubnNTT1N3M1FmR1NfM2dRUEx1ZUNBWHRxX0ppZjJTSkRfYmh3SVlqUUV0cXU3Q2JpZXpYUkthbC1GV2F6Y0JtaWhEd3BTT25ma0RIcXZORTFZSzdHeWY3R1RnSlgxZTBCaDJoVDdZdVNqdVNYT3BpbGpsbWlUZjJNaWdPRkdrUVlOUDdXeXI0YWE5Q3RGa0hjd3FHV1ZBdlhxU3puR01GcTROMk0wUWx2UFRyakVQTXE3emJfcDZ5eTh5aDc1ZXBZUW5Z?oc=5\" target=\"_blank\">분위기 있는 수트로 완성한 로제표 2025 멧 갈라</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">Vogue korea</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTE04YWFWVUlTZGR5NDdLZW9EcWdtQ3lSMHoxUllYTnhSSzU3bUNWNm5vN2JpbEg5NzVFcUlYclBnd1NlQUEwLTJPaTcxbEFlLXRZM3FXM3JFQ3Nhd9IBVEFVX3lxTE9wcE9nS0c5YTNvWTZUYUJYaUF5NmhuUFpkTmpqMGlrYm1qaUdzX2pHandwZ2FLOURmNTFrUzlTM0VxZ3loRnphdk1hemhqSEFhc29wVw?oc=5\" target=\"_blank\">리사, 루이비통 스타킹만 신고 '파격'…제니·로제도 '눈길'</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한국경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMidEFVX3lxTE9Wckc5N2E3YzlDbF96Sm5obUFzSE5CRDg4LTVndVl1OWhNSEdKZUtBMEt4TFBoREpJd1RfVnlMX0M3ZGpzWU9hc2JrT1JzYm92SEk5SjFkTTNGTDAyTlloc29oYmZwV2RDelA4XzlzVXhaY2tT0gF0QVVfeXFMTUJ4dVRaTVJjNTFQdlhWTk94T0kwdmdlZmJiRXRYSVYtNFVDNXlxX1gtM0dQQ00tNmJjR2UwV2FFTUFiT0JSeEp5blE0a283NU9wWTJzakdjdTZvODRMQV9pVUp4ZlR1MGRlWUNIQWdzMDNnNVg?oc=5\" target=\"_blank\">3년 연속 멧 갈라 빛낸 제니, 2025년 X최다 언급 셀럽 등극</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">MBC 뉴스</font></li></ol>",
+          "contentSnippet": "제니 ‘샤넬 룩’, 리사 ‘하의 실종’… 뉴욕 멧 갈라 참석한 블랙핑크 화제  조선일보\n\"인간 샤넬\" 극찬 쏟아진 제니 의상, 330시간 공들여 탄생했다  머니투데이\n분위기 있는 수트로 완성한 로제표 2025 멧 갈라  Vogue korea\n리사, 루이비통 스타킹만 신고 '파격'…제니·로제도 '눈길'  한국경제\n3년 연속 멧 갈라 빛낸 제니, 2025년 X최다 언급 셀럽 등극  MBC 뉴스",
+          "guid": "CBMingFBVV95cUxQSlI3bWlPODRKQ2loZjlNNkxCZDNtQnBGY3dPSWFzMGdJS0VubnNLbGp4blVkWlhMQmhuNXVmNUVQTU16ZUp5d2I5UG93M2FpVzltYmhpS3BxYVE1RUM2Z0xJQWNxZUl1Ym41aWV1TTBrdGZjTUxadjFQcG5DOHdPRFJPdUVJNTVMTGVfaHExeWw4cm9xZkhhNVpQS3NyQdIBsgFBVV95cUxPc1dXWWtLeXh5d1VEeTBtNEVwZlVmeklnTFpTVGlodHRDcTR0NjRRYWVPdWZsX2Z6SzVhYUROck5uMGdBajRrRV9HdUZtWVdnUkhUZEk5TVBDTEJUTHRsMl9abHBSQTRtcGlsRkRWMXhIZHRITURwOS1EaFVZcjZtcm5CQnBhTE1EOTlJQnB5d3dmbEpDdDZWNEQ2TkJzeXdDdEU3M3g3YzY2S2YyZlRoSk1n",
+          "isoDate": "2025-05-07T01:16:09.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연 - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 02:24:25 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ?oc=5\" target=\"_blank\">‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font>",
+          "contentSnippet": "‘알라딘’ 김준수·강홍석, 오늘(7일) ‘아는 형수’ 출연  매일경제",
+          "guid": "CBMiZkFVX3lxTE5uOTIzVlZOVVRHMzNWUkJJbjI0WHRxYVNfWkdNTXQ3djF1dTYwR3VrZzNMUVZrQVAtRDRCNEdNS0tMYjdPdzdOQW1ObUNLdFo3bjRBMzNMYm55QTVBTDlFQ20yelRGQQ",
+          "isoDate": "2025-05-07T02:24:25.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’) - 매일경제",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:58:32 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ?oc=5\" target=\"_blank\">정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’)</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">매일경제</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiYEFVX3lxTE00aDNHY19YaHJtMktLeW5vSTF5N1VYUzNjMFFfZDk5MG52Z25WMXhmaGZ6Smp2bVhyZmVBNGlYVkVtdkRrb2tYM3hzQ2dHYXJaZm1oZ0NQZTNlS256ejdXSw?oc=5\" target=\"_blank\">＂형의 조언에 영향을 받았어요 ㄴ 그땐 잘 듣고 있나 싶었는데;;＂ 김준수의 영향을 받은 정동원의 부캐 'JD1'!</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">동아일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMibkFVX3lxTE9LeGFhdEJaOTRIRVlDS1lzMnRYcl9lUFhxM2t0R0dEaGc0STRkZ3MzVzdEUnFNSjJDWWlaUUszdmUzOGdNNlY3X3hWcXpPQld4WTBNWkszRlNhQ3hlQWJEczhUalJTZjVYRDlpdllR?oc=5\" target=\"_blank\">'4인용식탁' 정동원, 부캐 JD1 탄생 비하인드 공개</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">국제뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMibkFVX3lxTE5NODZOWDRZVGlzUXh2amhncTlZMTF5WEZBUGkzRzdHd2ticmdxQmxZR2szbUloTC1qRDAzVzUyczdaenlQRFk2VnpKVnQ2QS0xTm5vdmFlNzFBTURUUk1ENXdZbFJ1dXZCZnNDdjRn?oc=5\" target=\"_blank\">'소속사 대표' 김준수, 차별 의혹 터졌다…\"매출 낮다고\" 폭로 (4인용)[전일야화]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">ZUM 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiYEFVX3lxTFAzQmRCMjZSWVFOQnhWWHk0R21Dcmt1VzJoNzV0ZGRkVTdjYTVjYjRNZlRWTTZuZndvUG9IdzBYMV90Y1NVZkhIalRPMDk4bVRfdzh0ZlVwNG9BS2VLU3RrOQ?oc=5\" target=\"_blank\">'4인용식탁' 김준수 \"정동원, 남달라…세금에 대해 질문\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">iMBC 연예</font></li></ol>",
+          "contentSnippet": "정동원, 김준수와 21살 차 뛰어넘은 돈독한 우정(‘4인용 식탁’)  매일경제\n＂형의 조언에 영향을 받았어요 ㄴ 그땐 잘 듣고 있나 싶었는데;;＂ 김준수의 영향을 받은 정동원의 부캐 'JD1'!  동아일보\n'4인용식탁' 정동원, 부캐 JD1 탄생 비하인드 공개  국제뉴스\n'소속사 대표' 김준수, 차별 의혹 터졌다…\"매출 낮다고\" 폭로 (4인용)[전일야화]  ZUM 뉴스\n'4인용식탁' 김준수 \"정동원, 남달라…세금에 대해 질문\"  iMBC 연예",
+          "guid": "CBMiZkFVX3lxTE1CNWROWWVPQ2VwOG5HNGptSEdhd2xKN2NiT25NWW4xa2E5WFJPZXg5WG0wdEc1LWdvcUNmYWZPNndidVlEWXVHT2d0aVhFVEV2enRrUlR3WGt2ZkYyUkVSR0VXdVlrQQ",
+          "isoDate": "2025-05-07T00:58:32.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "이정후, 시카고 컵스 상대로 시즌 4호포 폭발 - 경향신문",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:01:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z?oc=5\" target=\"_blank\">이정후, 시카고 컵스 상대로 시즌 4호포 폭발</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경향신문</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiiwFBVV95cUxQUmhJNGV3azhoenlsTmVHRzduS0YyUDFvQVhkM1lpSWZweTJjZVgzYU5zU0lJc2x2bHZtdU0tSXlaNlAydmZwMndTbU5Ddk05cXhwb0xjTlh6ekR2WXZwYkFpRG1JZTU0WTdzbTJkaV9vT2VydUtZRk9ZdzZZX1NWY0lQalZxQW4zdUx30gGfAUFVX3lxTE83U3E4N1pwR21ZSTBzZElZa211MzJnM3pfeGktb1MxeWt5R1dUak5SU3NUcTcxLVR1VkcwS2JJLWYydlJJRkZ3M2E1OW52UUxKX1hzVXpEckpKUDBRaGFOa2FaQkdSRDZrY0xjZEVoaWZvSFd1THhwRGRqem1odWVOaGZUa2FWcWZkcVBSVzEwNEJXTENJSXoxV19BNDBGYw?oc=5\" target=\"_blank\">이정후, MLB 시즌 4호포... 22경기만</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">조선일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiVkFVX3lxTE0ySWR0MENCbFcydWJtRlhvQTNtbVNlbGlvWGdEbE1WY1RKWFhKTm00NHZQajNpTUV3OGZxU1pfY1V1T1kwSWJzTXV6dEFEeHA0TzNKZlZn?oc=5\" target=\"_blank\">이정후, 4호포 폭발! 타구 속도 170㎞ 총알 타구→맞는 순간 홈런 직감</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">네이트 뉴스</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXkFVX3lxTE5TQ1UtT25CRkFBdl90dldFZVNXNkpWMVBQNVNNSlpuQ2ttSXJUSFJLRHR1cWJZWXprRTdhMGRCWkwyWng2WE1na2Z6UmNvdmhtUU1GSmJhWUd5UWw1TnfSAXZBVV95cUxNdTdkdXVxZDR6alN6M1Jxdl9FR0ZxZDZnVjZIc1JnTGotZWozNlhYQ2hFSUN0VHVTQXFXcGl5TW1HbUFCS0R4bkJMckZ0WjlKdzRESXgzZWdnMlE3V2NXNnlLdzNsXzEzdk9TU0gtRnZvM25rUVVB?oc=5\" target=\"_blank\">이정후, 22경기 만에 시즌 4호 홈런포</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">YTN</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE54Z2lFLUV4Rmx6ellHZFJVaEVDak42RFRHVHRGSl8zTjN1UXBPeVdVWWY5cDg5djFtOTg3andPZVo5MnQ4dkY2N203TzVWOUo5ODVYaS02SGVTRl9YeHhOQllfYlRtdw?oc=5\" target=\"_blank\">컵스전 앞두고 동료와 얘기 나누는 이정후</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">뉴시스</font></li></ol>",
+          "contentSnippet": "이정후, 시카고 컵스 상대로 시즌 4호포 폭발  경향신문\n이정후, MLB 시즌 4호포... 22경기만  조선일보\n이정후, 4호포 폭발! 타구 속도 170㎞ 총알 타구→맞는 순간 홈런 직감  네이트 뉴스\n이정후, 22경기 만에 시즌 4호 홈런포  YTN\n컵스전 앞두고 동료와 얘기 나누는 이정후  뉴시스",
+          "guid": "CBMiWkFVX3lxTFBTNzFJRWxyNWU1ZEVfWGE0T1R6ZGtmcWZHQjlCYjNHNUkwUC1ZbWNGaVF4ZDdWN0loY2FfX2tXZzhJclp0c3J5c2RfVmlkZ3duRnZ4aGVYb1BGQdIBX0FVX3lxTE5RQ1puN1VjSXdxMnprbWdLYzc0NzZmWFFIRV9meDVzaUpEM01OakUtM3VqY0xuMUpGS3JHbnMxOHpUU2JQdllSLVRYWGMwUVVmZUlndnU5c0hrTEo5Qk1Z",
+          "isoDate": "2025-05-07T01:01:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "SK바사, '조류독감 백신' 개발 \"질병청 사업선정\" - 바이오스펙테이터",
+          "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:43:00 GMT",
+          "content": "<ol><li><a href=\"https://news.google.com/rss/articles/CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw?oc=5\" target=\"_blank\">SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">바이오스펙테이터</font></li><li><a href=\"https://news.google.com/rss/articles/CBMihwFBVV95cUxPUmJCYkR6djlmSmxXUG92RFlpOFo1SEYxd0g5bVNuek81YnpMbHpmMWVtX2dXYzc1NU01MVIzNlpRNXhaT1p6NmM2S1lmOU5qNDBsQzI3NmZsSzR6YWlCMjQ0QVdOY3BLdVpXVTJQcWVlMkVRN19ad25ROXhleVRaZl9Wcmx1RmvSAZsBQVVfeXFMTWxjWTlsSmxWaE4zdGZCLXFNSU43NGZQWjQwV0s3TW9GUHBEemtOTVFzWU1jOXRIUVJybUswT0hQOG9fQ2tBcmVWOUVkYlNSTmZveWo5MzdIQ1BZb0JZMWRyd2VGTEtma09vRFlmU29rb3VzOGt4TVo4NkVJN1o3aTQ2YU1RYmdPYlZnUHVNMzFPUHZRR2ljLXNsdWc?oc=5\" target=\"_blank\">SK바이오사이언스·질병청, 조류인플루엔자 백신 개발 착수 - 조선비즈</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">Chosunbiz</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiVEFVX3lxTE1sWkpNaHZqdGFRelZVWklSMTBjR0xyWDF6SmVhakNjdHR0VnBjekRoOGxVQTRqNjFEa1Zuc0lEcUpvRGROV3RrUTl2RDdFSFR0N0hfSQ?oc=5\" target=\"_blank\">[BioS]SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">이투데이</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiW0FVX3lxTFBXNE9oRVhDUUZUWlFVNnAyeDVzQUdlMWJCMWhXRldZQ1lpT0l0aEowZVJvU0F5RmFlQzQ2NjRKRzAyRGpNNUFDNTNtSUNUZHVqbVlHREEwTWM5MUU?oc=5\" target=\"_blank\">SK 바이오사이언스-질병청, 차세대 조류독감 백신 개발 착수</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">경기일보</font></li><li><a href=\"https://news.google.com/rss/articles/CBMiXEFVX3lxTE4xcy1zSlo5S0Zqb0NzeWJVYlFUOXlVRl9NWUlJd05uckY0ak1zTVJuXzdnTmVuTHRjNURkLVdQaDNsTHNJeDVrY3hvZVEtZnZFSjVKbzZCc3pocFRw?oc=5\" target=\"_blank\">SK바이오사이언스, 질병청과 '조류독감 백신' 개발 착수</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">뉴스1</font></li></ol>",
+          "contentSnippet": "SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"  바이오스펙테이터\nSK바이오사이언스·질병청, 조류인플루엔자 백신 개발 착수 - 조선비즈  Chosunbiz\n[BioS]SK바사, '조류독감 백신' 개발 \"질병청 사업선정\"  이투데이\nSK 바이오사이언스-질병청, 차세대 조류독감 백신 개발 착수  경기일보\nSK바이오사이언스, 질병청과 '조류독감 백신' 개발 착수  뉴스1",
+          "guid": "CBMiV0FVX3lxTE5BbGhOZGxsdGtCb0NsWUs0eFRMYXgzVzVMZWgwTHdpejk1QXhjSXpUcTJ4VldZcFVKZjZ2ZXQ3WWpHMTVIQ2hkSGw3U09DRzhvRENNR3Zrdw",
+          "isoDate": "2025-05-07T01:43:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼] - 헬스인뉴스",
+          "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:29:09 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U?oc=5\" target=\"_blank\">노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼]</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">헬스인뉴스</font>",
+          "contentSnippet": "노안수술, 라식과 렌즈 뭐가 좋을까? [김준헌 원장 칼럼]  헬스인뉴스",
+          "guid": "CBMif0FVX3lxTFBBQVl0OTgwRHkxR05IdFJtd2xzQWIta2w3NnR4MjFIZkRQNjV5MklReW5jb2dJZWR3OTVuSzFhMWY2Um9GSUJnSGtOcW5DOHBUWkxuX2IxZTk5Wk82a2hOUTRjUFJtLUs4c2gxcUVrRjJxQkdpVVR1NWJGYjJJM1U",
+          "isoDate": "2025-05-07T00:29:09.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면? - 한겨레",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw?oc=5",
+          "pubDate": "Wed, 07 May 2025 01:30:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw?oc=5\" target=\"_blank\">출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">한겨레</font>",
+          "contentSnippet": "출산의 고통보다 높은 ‘통증 척도’…대상 포진 대비하려면?  한겨레",
+          "guid": "CBMiZkFVX3lxTE9BSVRtX0p3S285Q0RUcFBSc1RFdXNUbGlGZ1EtZ251dlY2UjZlNVVVM040ekZoQkI4N1BlRkFVbzBhMzdfVWhrem8zdGY3bnJZNTZwbEpsRk5UdS1lRllTbHQ2Rk9ldw",
+          "isoDate": "2025-05-07T01:30:00.000Z"
+        }
+      },
+      {
+        "json": {
+          "title": "“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래? - 코메디닷컴",
+          "link": "https://news.google.com/rss/articles/CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw?oc=5",
+          "pubDate": "Wed, 07 May 2025 00:29:00 GMT",
+          "content": "<a href=\"https://news.google.com/rss/articles/CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw?oc=5\" target=\"_blank\">“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래?</a>&nbsp;&nbsp;<font color=\"#6f6f6f\">코메디닷컴</font>",
+          "contentSnippet": "“혈당관리에 ‘이것’ 딱 좋아”, 백지연의 내돈내산 아이템, 뭐길래?  코메디닷컴",
+          "guid": "CBMiQkFVX3lxTE90NE1POWlPSW1PbDVCTjJlWWVEcFBobVc4VXppRUpLS3AtWWlaM05VRUJaYUVmcFZ3d21YRjRBbHh1dw",
+          "isoDate": "2025-05-07T00:29:00.000Z"
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": []
+}
