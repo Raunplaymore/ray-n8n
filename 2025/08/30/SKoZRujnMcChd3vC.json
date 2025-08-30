@@ -1,0 +1,1813 @@
+{
+  "name": "Notion node",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Page\n- Create: 새로운 노션 페이지를 생성\n- Search: 노션 페이지를 검색\n- Get: 특정 노션 페이지의 정보를 가져옴\n- Archive: 노션 페이지를 삭제\n",
+        "height": 286,
+        "width": 1108,
+        "color": 6
+      },
+      "id": "75246b09-6b32-4fb9-96d0-76acbb39ed72",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "https://www.notion.so/datapopcorn/Notion-Node-WIP-1522a185e5ce806ca4adf3e721420d16?pvs=4",
+          "mode": "url"
+        },
+        "title": "새로운 노션 페이지",
+        "simple": false,
+        "options": {}
+      },
+      "name": "Create Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        784,
+        224
+      ],
+      "id": "8d02c3b4-c8cf-4348-9a41-6cd17effe21e"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "text": "안녕하세요 내 이름은 김성우",
+        "simple": false,
+        "options": {}
+      },
+      "name": "Search Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        992,
+        224
+      ],
+      "id": "1f54879d-e05c-4309-8e65-dcef3a3fa55a"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "pageId": "https://www.notion.so/datapopcorn/Notion-Node-WIP-1522a185e5ce806ca4adf3e721420d16?pvs=4",
+        "simple": false
+      },
+      "name": "Get Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        224
+      ],
+      "id": "13ce66de-b8f5-40c3-9175-ad004d789d16"
+    },
+    {
+      "parameters": {
+        "content": "### Database\n- Get: 특정 데이터베이스의 정보를 가져옴\n- Get Many: 존재하는 모든 데이터베이스 목록의 정보를 가져옴\n- Search: 특정 키워드 기반으로 데이터베이스 목록의 정보를 가져옴",
+        "height": 306,
+        "width": 988,
+        "color": 6
+      },
+      "id": "55ce6be0-e0a5-4b4a-a712-aa44b569cb70",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "databaseId": {
+          "__rl": true,
+          "value": "c57de158-49c9-4751-a2df-e83f7f8a5a87",
+          "mode": "list",
+          "cachedResultName": "가이드 모음집",
+          "cachedResultUrl": "https://www.notion.so/c57de15849c94751a2dfe83f7f8a5a87"
+        }
+      },
+      "id": "c3134669-5717-411d-a088-822031279b49",
+      "name": "Get Database",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "https://www.notion.so/datapopcorn/1b82a185e5ce817d85e5c9f49ed05ee7?pvs=4",
+          "mode": "url"
+        },
+        "simple": false
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1392,
+        224
+      ],
+      "id": "3a651faa-e243-4be3-8595-ec878079f7f5",
+      "name": "Archive Page"
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "operation": "search",
+        "text": "가이드",
+        "options": {}
+      },
+      "id": "508d5917-9400-4f79-8794-c1d2900fb648",
+      "name": "Search Database",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "operation": "getAll"
+      },
+      "id": "9aad6718-811a-4aa5-b333-18afadd0e5fb",
+      "name": "Get Many Database",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Database Page\n- Create: 데이터베이스 내에 값 추가\n- Get Many: 데이터베이스 내의 값 가져옴\n- Update: ",
+        "height": 306,
+        "width": 988,
+        "color": 6
+      },
+      "id": "0f16409f-d94b-426f-a72f-6e7ce575477f",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "c57de158-49c9-4751-a2df-e83f7f8a5a87",
+          "mode": "list",
+          "cachedResultName": "가이드 모음집",
+          "cachedResultUrl": "https://www.notion.so/c57de15849c94751a2dfe83f7f8a5a87"
+        },
+        "title": "test",
+        "options": {}
+      },
+      "id": "2a240cc6-0875-4c2b-98d2-7f64eed26d7a",
+      "name": "Create Database Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "c57de158-49c9-4751-a2df-e83f7f8a5a87",
+          "mode": "list",
+          "cachedResultName": "가이드 모음집",
+          "cachedResultUrl": "https://www.notion.so/c57de15849c94751a2dfe83f7f8a5a87"
+        },
+        "options": {}
+      },
+      "id": "2104ffde-387f-4486-a9a8-4d6c8e737154",
+      "name": "Get Database Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### User\n- Get: 특정 유저의 정보를 가져옴\n- Get Many: 모든 유저의 정보를 가져옴",
+        "height": 306,
+        "width": 668,
+        "color": 6
+      },
+      "id": "967e0829-78db-45da-8319-6c0fc3f7cc32",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "userId": "d89f5c9b-dfed-4fc1-8108-1ff4c1a2de04"
+      },
+      "id": "6cb0a7ee-bbdd-4e77-87b3-8fb77395aa63",
+      "name": "Get User",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        1552
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "getAll"
+      },
+      "id": "2877912b-7e5b-4fbd-83ae-a9450a915356",
+      "name": "Get Many User",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        1552
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Block\n- Append: 특정 페이지 내에 Block을 추가\n- Get: 특정 페이지 내에 Block 목록을 가져옴",
+        "height": 306,
+        "width": 688,
+        "color": 6
+      },
+      "id": "b076b945-ff10-4a9e-a585-abad9c3addbf",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "https://www.notion.so/datapopcorn/Notion-Node-WIP-1522a185e5ce806ca4adf3e721420d16?pvs=4",
+          "mode": "url"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "Heading1 제목입니다."
+            }
+          ]
+        }
+      },
+      "id": "3ad74176-009e-477a-9e80-727dceaa0f51",
+      "name": "Append Block",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "operation": "getAll",
+        "blockId": {
+          "__rl": true,
+          "value": "https://www.notion.so/datapopcorn/Notion-Node-WIP-1522a185e5ce806ca4adf3e721420d16?pvs=4",
+          "mode": "url"
+        }
+      },
+      "id": "03592175-fe85-46be-8a4a-a5d3940d6447",
+      "name": "Get Block",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "simple": false,
+        "options": {}
+      },
+      "id": "5a815eae-56fb-4109-8116-86fc0df742ba",
+      "name": "Update Database Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# (트리거) 노션페이지에 변화가 생겼을 때",
+        "height": 360,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        208
+      ],
+      "id": "b74a5f7e-bc81-4dd3-b4c9-24155ce55ae8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        384
+      ],
+      "id": "e6032d7a-a63f-4d45-a650-e07d3b06fedf",
+      "name": "Notion Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Page",
+        "height": 100,
+        "width": 1100,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "62360fa5-333c-498e-914f-213b5461c578",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Database",
+        "height": 100,
+        "width": 1000,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        448
+      ],
+      "id": "8bc1fe8f-0424-418a-876b-009e2c8f0c03",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : Block",
+        "height": 100,
+        "width": 680,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        1328
+      ],
+      "id": "3ebd8c29-8230-47a4-9f5e-3cdc6c69192f",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : User",
+        "height": 100,
+        "width": 660,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        1328
+      ],
+      "id": "bccdc658-b620-45db-b37d-8a1b298fd522",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# Resource : DatabasePage",
+        "height": 100,
+        "width": 980,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        880
+      ],
+      "id": "c39a16d9-e8ab-4043-a1d1-5ab0b5d15b30",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# (웹훅트리거)노션 웹훅 출시(2025.03)\n- https://developers.notion.com/reference/webhooks",
+        "height": 320,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        592
+      ],
+      "id": "7671ffce-ba13-476e-a24f-18806d29900a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "path": "f367a5a1-05c7-4817-824e-3787fbe6f2d9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        160,
+        752
+      ],
+      "id": "457096a1-38b9-4340-b935-6f1e9d4eed85",
+      "name": "Webhook",
+      "webhookId": "f367a5a1-05c7-4817-824e-3787fbe6f2d9"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Notion Node",
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2747820a-6755-4258-896c-d12ed7a1bd9f",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "Get Database Page": {
+      "main": [
+        [
+          {
+            "node": "Update Database Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Get Many Database": [
+      {
+        "json": {
+          "id": "10f2a185-e5ce-803c-97d7-dc96bef30982",
+          "name": "개발자도, 비개발자도! 로우코드 자동화 툴 n8n 완전정복 가이드 🚀",
+          "url": "https://www.notion.so/10f2a185e5ce803c97d7dc96bef30982"
+        }
+      },
+      {
+        "json": {
+          "id": "1b32a185-e5ce-80aa-a85a-cfbe25d94a06",
+          "name": "워크플로우 아이디어 리스트",
+          "url": "https://www.notion.so/1b32a185e5ce80aaa85acfbe25d94a06"
+        }
+      },
+      {
+        "json": {
+          "id": "1312a185-e5ce-80d2-9510-f7666f034b98",
+          "name": "자동화 워크플로우 공유",
+          "url": "https://www.notion.so/1312a185e5ce80d29510f7666f034b98"
+        }
+      },
+      {
+        "json": {
+          "id": "c57de158-49c9-4751-a2df-e83f7f8a5a87",
+          "name": "가이드 모음집",
+          "url": "https://www.notion.so/c57de15849c94751a2dfe83f7f8a5a87"
+        }
+      },
+      {
+        "json": {
+          "id": "1152a185-e5ce-80eb-bc52-dc35437c01fd",
+          "name": "자주 사용하는 앱 리스트업",
+          "url": "https://www.notion.so/1152a185e5ce80ebbc52dc35437c01fd"
+        }
+      },
+      {
+        "json": {
+          "id": "13e2a185-e5ce-800c-a31b-dda12e956b82",
+          "name": "트러블슈팅",
+          "url": "https://www.notion.so/13e2a185e5ce800ca31bdda12e956b82"
+        }
+      }
+    ],
+    "Get Many User": [
+      {
+        "json": {
+          "object": "user",
+          "id": "d89f5c9b-dfed-4fc1-8108-1ff4c1a2de04",
+          "name": "data.popcorn ",
+          "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLIwJrlWx4Zu5woikMdoAlbkCs7HLRc-JklLlA0Vj_DBCYoA0A=s100",
+          "type": "person",
+          "person": {
+            "email": "datapopcorn@gmail.com"
+          }
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463",
+          "name": "김성우",
+          "avatar_url": "https://lh5.googleusercontent.com/-uKb2O9pYpyo/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclbLVIm_BsVdkN8F8I4mZrfG13jEg/photo.jpg",
+          "type": "person",
+          "person": {
+            "email": "tjddn5242@gmail.com"
+          }
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "e902a21e-b8f8-4ca8-86eb-79ebc9f7d416",
+          "name": "Make",
+          "avatar_url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/542d08c6-d64f-4793-b2aa-357329a401a3/Make-App-Icon-Square.png",
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "6aef6ba6-9b8d-4911-adb2-7c8713855517",
+          "name": "n8n-bot",
+          "avatar_url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/ee0f341a-289c-4b8b-9153-0542496f6ef9/d58ebaee-f7e8-4bb6-85f8-53137eb76f04.png",
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "e9698c38-7a4f-4793-ad33-77b680354073",
+          "name": "n8n-OAuth",
+          "avatar_url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/4846338a-ad2b-45c7-8d3b-3857cc026c01/dc20efae-bf26-4c23-bba3-3977c46fcb68.png",
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "1c7c94e1-c033-4fa0-a700-5a8167f0ded3",
+          "name": "n8n integration",
+          "avatar_url": null,
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "171d872b-594c-81b1-8ba6-0027e9fb3a75",
+          "name": "Softr",
+          "avatar_url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/c4d16bfe-4594-430f-b04a-18d6eb7013c2/1d52f681-d088-4ae1-8bce-45b1545d8803.png",
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "1a22a185-e5ce-8157-87a1-0027868b10d4",
+          "name": "latpeed-integration",
+          "avatar_url": "https://s3-us-west-2.amazonaws.com/public.notion-static.com/d2387b7e-8b36-4ee5-8f8e-f21db921a08f/63c90d2d-2770-4ebf-8f05-5c39709d9ec3.png",
+          "type": "bot",
+          "bot": {}
+        }
+      },
+      {
+        "json": {
+          "object": "user",
+          "id": "86ed8d04-55a4-493d-8b23-82427824d838",
+          "name": "popcorn_test",
+          "avatar_url": null,
+          "type": "bot",
+          "bot": {
+            "owner": {
+              "type": "workspace",
+              "workspace": true
+            },
+            "workspace_name": "datapopcorn"
+          }
+        }
+      }
+    ],
+    "Get User": [
+      {
+        "json": {
+          "object": "user",
+          "id": "d89f5c9b-dfed-4fc1-8108-1ff4c1a2de04",
+          "name": "data.popcorn ",
+          "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLIwJrlWx4Zu5woikMdoAlbkCs7HLRc-JklLlA0Vj_DBCYoA0A=s100",
+          "type": "person",
+          "person": {
+            "email": "datapopcorn@gmail.com"
+          },
+          "request_id": "c0f8c8d8-2c3b-4126-88cf-375b6923e8fd"
+        }
+      }
+    ],
+    "Append Block": [
+      {
+        "json": {
+          "object": "list",
+          "results": [
+            {
+              "object": "block",
+              "id": "1b82a185-e5ce-8112-9a09-e4296601400f",
+              "parent": {
+                "type": "page_id",
+                "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+              },
+              "created_time": "2025-03-16T10:04:00.000Z",
+              "last_edited_time": "2025-03-16T10:04:00.000Z",
+              "created_by": {
+                "object": "user",
+                "id": "86ed8d04-55a4-493d-8b23-82427824d838"
+              },
+              "last_edited_by": {
+                "object": "user",
+                "id": "86ed8d04-55a4-493d-8b23-82427824d838"
+              },
+              "has_children": false,
+              "archived": false,
+              "in_trash": false,
+              "type": "heading_1",
+              "heading_1": {
+                "is_toggleable": false,
+                "color": "default",
+                "text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Heading1 제목입니다.",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Heading1 제목입니다.",
+                    "href": null
+                  }
+                ]
+              }
+            }
+          ],
+          "next_cursor": null,
+          "has_more": false,
+          "request_id": "53830c70-977c-4546-9985-3258391ee59c"
+        }
+      }
+    ],
+    "Get Block": [
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1ab2a185-e5ce-80b2-99d0-ee8d98343b41",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "d89f5c9b-dfed-4fc1-8108-1ff4c1a2de04"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "table_of_contents",
+          "table_of_contents": {
+            "color": "gray"
+          },
+          "root_id": "1522a185e5ce806ca4adf3e721420d16"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8071-a0b1-f44bf684f20e",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "📌 예시 워크플로우"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1522a185-e5ce-80a3-8ebe-d739336436a2",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "image",
+          "image": {
+            "caption": [],
+            "type": "file",
+            "file": {
+              "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/21fe9c87-eb6b-4b81-94d4-a7c1b5da4a05/68445c0c-f5a4-477b-b6df-f0803d862734/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466Q3SAYYVI%2F20250316%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250316T100446Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjENH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIAt6vhyNIlQZwTBWXj8yVELRJGAnlo3brYHts%2FEQpi%2FKAiEAwpjXAdWsB5pnmzSrrXWIm0NJZSy28RfGZk%2Bw5zIxbx8q%2FwMIKhAAGgw2Mzc0MjMxODM4MDUiDPsecsQ3X%2B15zfnLrCrcAwrnPsKDiUEJyLXGXmFFjIJuBljVg8hc8znNwItlQdgajlanGXO6JkD8WYqbtqhvf7qE8O1IDc7EbtckcyzU%2F1E5moWuSE2N8Mvsv20EFSej9r8Bm0oHQFXshImxwN3ipYnMLfzP5VsX8N9pg6P04lDd0q7xfn%2B3FaVz%2BTL5TyUnpa3BlsmrqD98r6bdKEE0wTl%2FSqDpk%2BMDLPdyJ1u3CuNW%2F1hIdb3ryhUum9kpe80j9EOJd8vk%2BUoGQMaLZykLJ1pLxWNL3yf8nvW5V74VT1Waa4KOr2C9apXNoZ6x5lW3m2OtQiZv438TSzcTI9ZjrDbOWeCMkX8jRmpeGQdxEh3dUtENY1gTmx4Vp%2F8B3YkyYcwsTQ0oVZ%2BeHgqntwGzPz8W3C6TK8C9gfMKtsIhJVd1WwhS6fC4owI5rLA42IF558KOkYme1HCtHTCpvbHZsranimp7%2FMmHBOhgWHUKkZDyIWtC7b%2Ft1YzmIP6Nv6TueKijQm%2FCzJ6G9JvcGVKOdyqXQm6lS3vHkHr5oBXoezn6SB3h8FJ0jBJot3sIlvr7gbbwm6SX3MsWXEkULYbBv2wTuM43GNKjnSZ%2FdSUU3RV7yG6InDM9hI2tQ2nmyWkVGqgvk9S5Qa%2FFJVfEMOmc2r4GOqUB5nPA4hPqjnrDB4SRwbB9eX0TB6HwMofonX8ctxozJrunSHbh4rZHnOC%2ByMSp%2BFgcER48qGSfIfmBaru%2BjfZIIyrHOErziOFWfdNFjVnHtvEoh3h12ArGOVnQzyccFih51FVF8DdLETirTQ3diNt7yaDfbvilB1yQiZ%2FVGY1ISZWeVylC2ziXeRapFvRHET%2B1lBPvXYa2EQeNfXrOPJ73D4jlbYya&X-Amz-Signature=1cdb4fe3b397daaf595564f5056a1f225fc2240a516413e4b76f69ba58c9267b&X-Amz-SignedHeaders=host&x-id=GetObject",
+              "expiry_time": "2025-03-16T11:04:46.616Z"
+            }
+          },
+          "root_id": "1522a185e5ce806ca4adf3e721420d16"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-801e-993e-ccdb425bc4cc",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": true,
+          "archived": false,
+          "in_trash": false,
+          "type": "toggle",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "예시 워크플로우 다운로드"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80e6-b54c-f8aa7635059c",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8013-8f47-f37ae1bd18b9",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "📌 Notion Node 개요"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80f7-a699-ea82365571ab",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "Notion Node란?"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-805c-8b25-db4c44bbd83a",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "n8n에서 Notion API를 활용해 Notion 데이터베이스와 상호작용할 수 있도록 도와주는 자동화 노드"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80ab-91f0-dbb56a270437",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "Notion의 페이지와 데이터베이스를 자동으로 생성, 조회, 수정, 삭제하는 등의 작업을 수행할 수 있음"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8045-bd99-ea0dae311aa1",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "반복적인 수작업을 줄이고, 다른 서비스와 연동하여 생산성을 최적화 할 수 있음!"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80df-9557-ffff38e59db5",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8006-be20-e112054ee01e",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "Notion Node를 통해 가능한 작업들"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8025-b13e-caf79429465c",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "✅ 페이지 관련 기능: Notion 페이지를 생성, 검색하고 블록을 추가하거나 수정 가능"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80ec-93e2-d791abf0524f",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "✅ 데이터베이스 관련 기능: 데이터베이스 조회, 검색, 페이지 추가 및 수정 가능"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80a6-8d45-d5cab54ad609",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "✅ 사용자 관련 기능: Notion 사용자 목록 조회 가능"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80b4-92d0-d93707f88246",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1522a185-e5ce-807a-8faf-ef87799ce6ad",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "📌 사전 준비"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8091-8e13-c5a8a6e85c25",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "Notion API KEY 발급"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80e8-86bf-c38b91398478",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "step1) Notion에서 Integration을 생성"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8067-8df9-ce765a689d45",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "d89f5c9b-dfed-4fc1-8108-1ff4c1a2de04"
+          },
+          "has_children": true,
+          "archived": false,
+          "in_trash": false,
+          "type": "toggle",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "detail"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8049-bcd3-ed06bf9f0b9a",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80b7-8181-cb99bbd6fd4e",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "step2) Integration의 API Key를 발급"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-802a-9db3-ff129d26923b",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": true,
+          "archived": false,
+          "in_trash": false,
+          "type": "toggle",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "detail"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8057-9474-c2a7e63d1df9",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8016-8bfb-ccc85f690491",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "step3) Notion에서 Integration을 특정 데이터베이스와 페이지에 연결하여 권한을 부여"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80b9-bb05-fe8f41c8662c",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": true,
+          "archived": false,
+          "in_trash": false,
+          "type": "toggle",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "detail"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80a1-8c09-cc7eff3ef70c",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8045-864a-e315f4604f09",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "이제 n8n을 통해 노션 페이지를 자동화 할 준비를 마쳤습니다! 💪"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-80a2-b497-c7affc4ad99d",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "이제부터 각 노드의 기능을 알아봅시다."
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-807c-ba1b-e74916ccef4f",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b12a185-e5ce-8044-9541-f693d724ea48",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "📌 Page 노드"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-80ce-a575-d2bb3dd0eda7",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "개요"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-802c-b664-ebc9458cbb8b",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "Notion Node (Page)는 n8n에서 Notion API를 활용하여 Notion의 페이지를 생성, 검색, 조회 및 삭제할 수 있도록 지원하는 노드입니다. "
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-802d-9aad-c3f57eac9a2f",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "이 노드를 활용하면 자동화된 워크플로우를 통해 Notion 페이지를 효율적으로 관리할 수 있습니다."
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-800e-8749-c562ab47864b",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-80ac-8ec2-d449e1a17711",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "1. Create Page (페이지 생성)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8058-a2b2-e6092e559cca",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "기능"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-80c0-b95f-fdd8ae542466",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "새로운 Notion 페이지를 생성합니다."
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8041-9958-fdb294b70624",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "입력 (Input)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8092-b743-e840261b8176",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "pageId: 부모 페이지 또는 데이터베이스의 URL (필수)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-80f7-9835-fd53a77e36da",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "title: 생성할 페이지의 제목 (필수)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8017-8086-f94d8fb266d4",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "simple: 단순 출력 여부 (선택)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-804e-a619-d71ad2f314b2",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "options: 추가 설정 (선택)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-80d5-81fd-e5ef5244531d",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "출력 (Output)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8050-8553-ddaac01c5d65",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "생성된 Notion 페이지의 ID"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8062-ad38-ce2aee785997",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "생성된 페이지의 URL"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8076-aeed-dbb9f7cf9976",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "bulleted_list_item",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "기타 관련 메타데이터 (생성 시간, 수정 시간 등)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8054-87e4-eaf555d6f736",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "paragraph",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": ""
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8070-980b-fad863b836f8",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_2",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "2. Search Page (페이지 검색)"
+        }
+      },
+      {
+        "json": {
+          "object": "block",
+          "parent_id": "1522a185e5ce806ca4adf3e721420d16",
+          "id": "1b82a185-e5ce-8047-b69a-c2ccaa70a112",
+          "parent": {
+            "type": "page_id",
+            "page_id": "1522a185-e5ce-806c-a4ad-f3e721420d16"
+          },
+          "last_edited_by": {
+            "object": "user",
+            "id": "cd4f9fa9-8ef3-438d-a500-a1fcf5c1c463"
+          },
+          "has_children": false,
+          "archived": false,
+          "in_trash": false,
+          "type": "heading_3",
+          "root_id": "1522a185e5ce806ca4adf3e721420d16",
+          "content": "기능"
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
