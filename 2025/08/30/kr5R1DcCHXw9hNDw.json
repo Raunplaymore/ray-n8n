@@ -1,0 +1,1150 @@
+{
+  "name": "구내 식당 칼로리 계산 리포트",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        1568
+      ],
+      "id": "d176448c-7441-4d92-a346-44092dd7a266",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "content": "## AI 식단 분석 \n- Main : 육개장\n- Side : 크리미어니언생선커틀렛, 베이컨그린빈볶음, 모둠콩조림, 쌀밥, 배추김치\n- Kcal : 1273",
+        "height": 480,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1200
+      ],
+      "id": "3cb7e531-e53c-4ec1-a895-1afeeaf58900",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# 구내 식당 칼로리 계산 리포트\n\n- TRIGGER : 매일 점심(11:30), 저녁(05:30) 실행.\n- TASK : 식단 내용을 이미지와 함께 분석해서 탄단지\n- TARGET : 디스코드에 발송, CSV로 추출 (노션, 구글시트 등 에 적재)\n\n```API\nhttps://front.cjfreshmeal.co.kr/meal/v1/today-all-meal?storeIdx=6437&mealDt=20250508&reqType=total\n```",
+        "height": 360,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3104,
+        608
+      ],
+      "id": "65640192-26b6-4214-a2a5-a5d2d56e8c33",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=mealIdx : {{ $('Limit').item.json.mealIdx }}\nmain : {{ $('Limit').item.json.name }}\nside : {{ $('Limit').item.json.side }}\nkcal : {{ $('Limit').item.json.kcal }}\nnutrition_ratio : {{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=너는 전문 영양사이자 식단 분석가야.\n사용자가 제공하는 구내식당 식단 정보를 바탕으로, 다음 3가지를 생성해줘:\n\t1.\tanalysis: 식단에 대한 간결한 분석 (200자 이내)\n\t2.\tscore: 식사의 건강 점수 (0~100 사이 정수)\n\t3.\tsuggestion: 건강한 식사를 위한 간단한 개선 제안 (150자 이내)\n\n⸻\n\n📥 입력 정보:\n\t•\tmain: 주메뉴 이름\n\t•\tside: 사이드 반찬 목록 (쉼표로 구분)\n\t•\tkcal: 총 칼로리 (정수)\n\t•\tnutrition_ratio: 탄수화물, 단백질, 지방 비율이 포함된 JSON (예시: { \"carb\": 60, \"protein\": 25, \"fat\": 15 })\n\n⸻\n\n📤 출력 포맷:\n\n{\n  \"mealIdx\": 식사ID,\n  \"carb\": 탄수화물 비율,\n  \"protein\": 단백질 비율,\n  \"fat\": 지방 비율,\n  \"analysis\": \"200자 이내로 식단에 대한 요약 분석 작성\",\n  \"score\": 0~100 정수로 평가,\n  \"suggestion\": \"150자 이내로 식단 개선 방법 제안\"\n}\n\n\n\n⸻\n\n💡 평가 기준:\n\t•\t탄단지 비율\n\t•\t권장 비율: 탄수화물 5055%, 단백질 2030%, 지방 20% 내외\n\t•\t탄수화물이 65% 이상이면 과다 섭취로 감점\n\t•\t단백질이 20% 미만이면 단백질 부족으로 감점\n\t•\t지방이 30% 이상이면 고지방 경고\n\t•\t총 칼로리\n\t•\t700~900 kcal 이내면 이상적\n\t•\t1000 kcal 이상이면 과다 섭취로 감점\n\t•\t반찬 구성\n\t•\t튀김류, 햄 등 가공육이 많으면 감점\n\t•\t콩, 채소, 생선 반찬은 가점\n\t•\tsuggestion 작성법\n\t•\t탄수화물 과다: “잡곡밥으로 바꾸면 좋아요.”\n\t•\t단백질 부족: “삶은 달걀이나 닭가슴살을 추가하면 좋습니다.”\n\t•\t지방 과다: “튀김류 대신 구이나 찜 요리를 선택하세요.”\n\t•\t칼로리 과다: “밥 양을 조절하거나, 국물 섭취를 줄이세요.”\n\n⸻\n\n📌 주의사항:\n\t•\t결과는 반드시 JSON 포맷으로 출력\n\t•\t설명이나 코드블록 없이, 오직 순수 JSON 텍스트로 출력\n\t•\tanalysis: 최대 200자\n\t•\tsuggestion: 최대 150자\n\t•\tscore: 반드시 정수\n\n⸻\n\n✅ 예시 입력:\n\nmain : 육개장  \nside : 크리미어니언생선커틀렛, 베이컨그린빈볶음, 모둠콩조림, 쌀밥, 배추김치  \nkcal : 1273  \nnutrition_ratio : { \"carb\": 60, \"protein\": 25, \"fat\": 15 }\n\n\n⸻\n\n✅ 예시 출력:\n\n{\n  \"mealIdx\": 1526273,\n  \"carb\": 55,\n  \"protein\": 25,\n  \"fat\": 20,\n  \"analysis\": \"단백질과 지방 비율은 적절하나, 칼로리가 높고 튀김 반찬 비중이 많아 주의가 필요합니다.\",\n  \"score\": 80,\n  \"suggestion\": \"튀김류 대신 구이나 찜 요리를 선택하고, 밥 양을 조금 줄이면 좋습니다.\"\n}\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        112,
+        1344
+      ],
+      "id": "c2954f95-91ff-4a0b-811f-7a9f296a123c",
+      "name": "영양분석 Agent"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "mealDt"
+            },
+            {
+              "fieldName": "time"
+            },
+            {
+              "fieldName": "corner"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        1248
+      ],
+      "id": "d78ed3c1-76b0-4ca7-8506-c024e59d9872",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4fff9305-4d5f-48a9-a570-9e651e98d640",
+              "leftValue": "={{ $json.thumbnailUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1248,
+        1248
+      ],
+      "id": "0839b743-f854-44c4-a374-1bc73654ff7e",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        1248
+      ],
+      "id": "7bbe1c0f-0499-4a56-a821-8dbb860c9c1a",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.thumbnailUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -576,
+        1344
+      ],
+      "id": "41d358f5-2fc3-4f68-a67d-0d62ad6d137f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "# TRIGGER\n- 매주 1회",
+        "height": 720,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3104,
+        992
+      ],
+      "id": "1f353f45-09b5-4e0c-8749-d01937596c80",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# TASK\n- TARGET",
+        "height": 720,
+        "width": 3500,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        992
+      ],
+      "id": "4c65368a-682a-4dbd-a86a-840b8848e7cf",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## AI 이미지 분석\n![](https://fsmealimageprd.ifresh.co.kr/meal/e7a90617-562e-4d72-a685-831e2e0560bc_IMG_1188.jpeg)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n```json\n    {\n      \"mealIdx\" : 1526273,\n      \"carb\": 50,\n      \"protein\": 30,\n      \"fat\": 20\n    }\n```",
+        "height": 620,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        1040
+      ],
+      "id": "28c53641-0a70-4c2c-8a51-6376276151c2",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=너는 전문 영양사이자 음식 이미지 분석가야.\n사용자가 제공한 식판 사진을 분석하여, 해당 식사의 탄수화물(carb), 단백질(protein), 지방(fat) 비율을 대략적으로 추정해줘.\n\nMain: {{ $('Limit').item.json.name }}\nSide: {{ $('Limit').item.json.side }}\n\n이미지 분석 기준:\n\t•\t탄수화물(carb): 밥, 떡, 빵, 국수류 등\n\t•\t단백질(protein): 고기, 생선, 달걀, 콩류 등\n\t•\t지방(fat): 튀김류, 마요네즈 소스, 햄, 기름진 음식\n\t•\t채소류는 식이섬유 공급원으로 참고하되, 탄단지 비중 계산에는 포함하지 않아도 좋아.\n\t•\t국이나 찌개류는 건더기 기준으로 판단하고, 국물은 비중 계산에 크게 포함하지 않아도 괜찮아.\n\n출력 포맷:\n  {\n    \"mealIdx\" : {{ $('Limit').item.json.mealIdx }} \n    \"carb\": 탄수화물 비중 (%),\n    \"protein\": 단백질 비중 (%),\n    \"fat\": 지방 비중 (%)\n  }\n\n예시 입력:\n\t•\t식판 이미지: 밥, 돼지고기국, 생선까스, 햄야채볶음, 콩조림, 김치\n\n예시 출력:\n    {\n      \"mealIdx\" : 1526273\n      \"carb\": 50,\n      \"protein\": 30,\n      \"fat\": 20\n    }\n\n주의:\n설명이나 ```json 코드 블록 없이, 순수 텍스트(JSON 포맷)로만 출력해줘.\n설명이나 ```json 코드 블록 없이, 순수 텍스트(JSON 포맷)로만 출력해줘.\n설명이나 ```json 코드 블록 없이, 순수 텍스트(JSON 포맷)로만 출력해줘.\n설명이나 ```json 코드 블록 없이, 순수 텍스트(JSON 포맷)로만 출력해줘.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -160,
+        1344
+      ],
+      "id": "a1bf33c0-ced0-4f70-b70e-7c0ca22037f5",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "content": "## 필터(이미지만 있는 식단만)",
+        "height": 300,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        1104
+      ],
+      "id": "cdc56584-d353-4837-a06a-40e7cfd878bc",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## 디버깅",
+        "height": 300,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        1104
+      ],
+      "id": "3b79e165-c00c-4fac-b882-376c75826b37",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## 정렬(날짜,시간)",
+        "height": 300,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        1104
+      ],
+      "id": "a4adc4dc-29ae-4d89-bb70-07da8544c9f4",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be6e48d2-413d-4880-8c75-8f9cbf157dc6",
+              "name": "mealDt",
+              "value": "={{ $json.mealDt }}",
+              "type": "string"
+            },
+            {
+              "id": "6b03b4b5-a776-4824-a5aa-b6484b8aa0a0",
+              "name": "time",
+              "value": "={{ $json.time }}",
+              "type": "string"
+            },
+            {
+              "id": "b7a0019f-1b05-41d2-bf5e-ab5bdad46510",
+              "name": "corner",
+              "value": "={{ $json.corner }}",
+              "type": "string"
+            },
+            {
+              "id": "866fbc4a-9d7a-465e-8436-9c20c840b5b7",
+              "name": "mealIdx",
+              "value": "={{ $json.mealIdx }}",
+              "type": "string"
+            },
+            {
+              "id": "ab90aca9-5d2d-41ff-bd88-9de14d8f6e3f",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "867048d7-69a1-4213-b973-f4717076db95",
+              "name": "side",
+              "value": "={{ $json.side }}",
+              "type": "string"
+            },
+            {
+              "id": "a8cae341-4edf-467f-b2ff-9e5eaea2e1bf",
+              "name": "thumbnailUrl",
+              "value": "={{ $json.thumbnailUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "70f50564-14a5-4a0e-8b6b-6fbaaac59c7a",
+              "name": "kcal",
+              "value": "={{ $json.kcal }}",
+              "type": "string"
+            },
+            {
+              "id": "d3f5da25-b9dd-4b51-9c6f-a26ed536ab09",
+              "name": "mealCd",
+              "value": "={{ $json.mealCd }}",
+              "type": "string"
+            },
+            {
+              "id": "7eb0f9e9-0ab9-4b1a-ae31-184928547de4",
+              "name": "moHour",
+              "value": "={{ $json.moHour }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1744,
+        1248
+      ],
+      "id": "4fcef3f2-6518-43f0-b290-1b8b32bf1920",
+      "name": "필요한 컬럼만"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 50,
+        "height": null,
+        "resizeOption": "percent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        1344
+      ],
+      "id": "3cbf0339-72f5-4ad2-bb05-5e457762ed50",
+      "name": "Resize Img",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -800,
+        1376
+      ],
+      "id": "afe75632-2647-439a-a4c1-62811b40d487",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "mealIdx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -608,
+        784
+      ],
+      "id": "dd581612-de3e-4d73-99fd-0adc32130084",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n   \"mealIdx\": 1526273,\n   \"carb\": 55,\n  \"protein\": 25,\n  \"fat\": 20,\n  \"analysis\": \"단백질과 지방 비율은 적절하나, 칼로리가 높고 튀김 반찬 비중이 많아 주의가 필요합니다.\",\n  \"score\": 80,\n  \"suggestion\": \"튀김류 대신 구이나 찜 요리를 선택하고, 밥 양을 조금 줄이면 좋습니다.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        1568
+      ],
+      "id": "18b3e62b-335c-4ec8-8a58-80de543dd8cc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bcbec239-efe6-41e0-9546-01ac4a5d3df4",
+              "name": "mealIdx",
+              "value": "={{ $json.output.mealIdx }}",
+              "type": "string"
+            },
+            {
+              "id": "b0e91c80-74f3-4afb-80a4-86f5629de6e9",
+              "name": "carb",
+              "value": "={{ $json.output.carb }}",
+              "type": "string"
+            },
+            {
+              "id": "2d737940-cf36-4f59-a0cd-04c75040fd6f",
+              "name": "protein",
+              "value": "={{ $json.output.protein }}",
+              "type": "string"
+            },
+            {
+              "id": "4e6ebfba-4220-4659-9e4a-fa81325099cc",
+              "name": "fat",
+              "value": "={{ $json.output.fat }}",
+              "type": "string"
+            },
+            {
+              "id": "0efe987b-6aa9-45c0-a266-c7bfcbd7fe23",
+              "name": "analysis",
+              "value": "={{ $json.output.analysis }}",
+              "type": "string"
+            },
+            {
+              "id": "26fd951b-9a7c-4725-911d-b76501b6bc24",
+              "name": "score",
+              "value": "={{ $json.output.score }}",
+              "type": "string"
+            },
+            {
+              "id": "f8b7ff37-83e7-4867-bb46-ec7a95b95e3c",
+              "name": "suggestion",
+              "value": "={{ $json.output.suggestion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        1472
+      ],
+      "id": "cc1e3f81-c337-423a-92d8-b9c341200d93",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=(TEST) 🍽️ 식단 분석 안내\n\n📍 코너: {{ $json.corner }}\n🍱 메인 메뉴: {{ $json.name }}\n🥗 사이드 메뉴: {{ $json.side }}\n🔥 총 칼로리: {{ $json.kcal }} kcal\n⚡ 영양 비율 (탄:단:지): {{ $json.carb }} : {{ $json.protein }} : {{ $json.fat }}\n{{ $json.thumbnailUrl }}\n\n⸻\n\n🏅 점수: {{ $json.score }} 점\n📝 식단 평가: {{ $json.analysis }}\n💡 개선 제안: {{ $json.suggestion }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        864
+      ],
+      "id": "26bbf624-15b3-4879-afdf-05c0f7f6cdc7",
+      "name": "Discord",
+      "webhookId": "2ae4af8e-38db-4668-817c-b56593902de0"
+    },
+    {
+      "parameters": {
+        "content": "# TARGET",
+        "height": 600,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        448
+      ],
+      "id": "af2251e4-9f7a-4080-8445-62eb88c4ea07",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        688
+      ],
+      "id": "9016625f-cd93-4204-9cc6-a6748499d1e7",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "## 이미지 다운사이징\n- openAI 노드 버퍼",
+        "height": 260,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        1248
+      ],
+      "id": "b55e95e1-70d0-420e-9e2d-923bed248b9f",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## 최종 아웃풋 정리",
+        "height": 300,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1360
+      ],
+      "id": "d61fc5d2-374b-4240-ba0a-2d63e103f0c9",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## JOIN : mealIdx",
+        "height": 260,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        688
+      ],
+      "id": "b78336b0-25f7-48a4-88c6-1beebeef229f",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "url": "=https://front.cjfreshmeal.co.kr/meal/v1/today-all-meal?storeIdx=6437&mealDt={{ $json.timestamp.toDateTime().format('yyyyMMdd') }}&reqType=total",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2688,
+        1152
+      ],
+      "id": "a9efc87a-cf5e-46d4-8773-18f740b19686",
+      "name": "구내식당 조회"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -1968,
+        1248
+      ],
+      "id": "ad0e36e2-143d-4478-b81f-0001867d562b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3024,
+        1152
+      ],
+      "id": "8033d693-221a-4d7b-b49a-acf8f6eb1753",
+      "name": "Run 1130"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 17,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3024,
+        1344
+      ],
+      "id": "e3d4e44c-e60f-4320-9bb5-d25f4f3665e7",
+      "name": "Run 0530"
+    },
+    {
+      "parameters": {
+        "content": "## 조/중/석 구분 & 데이터 전처리",
+        "height": 620,
+        "width": 860,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2464,
+        1008
+      ],
+      "id": "ce8215c8-2277-4598-aeb8-ca9807d5a635",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=data[2]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        1152
+      ],
+      "id": "872cf7a9-dae6-4745-9c1a-0953af15847c",
+      "name": "중식"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=data[3]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        1344
+      ],
+      "id": "d5f468f2-c5c3-4bb8-912a-5c85efbae1b0",
+      "name": "석식"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31a03a02-389c-44ca-ab2d-ce9b6dd5f919",
+              "name": "time",
+              "value": "2중식",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2176,
+        1152
+      ],
+      "id": "fc078989-84e5-4803-906f-47f0641b4ca9",
+      "name": "중식라벨"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31a03a02-389c-44ca-ab2d-ce9b6dd5f919",
+              "name": "time",
+              "value": "3석식",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2176,
+        1344
+      ],
+      "id": "f0017b9c-475d-4d1f-85ec-4d4329461891",
+      "name": "석식라벨"
+    },
+    {
+      "parameters": {
+        "tableId": "meal",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "mealIdx",
+              "fieldValue": "={{ $json.mealIdx }}"
+            },
+            {
+              "fieldId": "mealDt",
+              "fieldValue": "={{ $json.mealDt }}"
+            },
+            {
+              "fieldId": "time",
+              "fieldValue": "={{ $json.time }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "side",
+              "fieldValue": "={{ $json.side }}"
+            },
+            {
+              "fieldId": "thumbnailUrl",
+              "fieldValue": "={{ $json.thumbnailUrl }}"
+            },
+            {
+              "fieldId": "kcal",
+              "fieldValue": "={{ $json.kcal }}"
+            },
+            {
+              "fieldId": "carb",
+              "fieldValue": "={{ $json.carb }}"
+            },
+            {
+              "fieldId": "protein",
+              "fieldValue": "={{ $json.protein }}"
+            },
+            {
+              "fieldId": "fat",
+              "fieldValue": "={{ $json.fat }}"
+            },
+            {
+              "fieldId": "analysis",
+              "fieldValue": "={{ $json.analysis }} {{ $json.suggestion }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $json.score }}"
+            },
+            {
+              "fieldId": "corner",
+              "fieldValue": "={{ $json.corner }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        528
+      ],
+      "id": "8ac75bfb-ebef-4ff1-bed4-6739a6cd0061",
+      "name": "Supabase"
+    },
+    {
+      "parameters": {
+        "url": "=https://front.cjfreshmeal.co.kr/meal/v1/today-all-meal?storeIdx=6437&mealDt={{ $json.timestamp.toDateTime().format('yyyyMMdd') }}&reqType=total",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2688,
+        1344
+      ],
+      "id": "8a09198a-7660-4526-b6a1-ae04e6d5e530",
+      "name": "구내식당 조회1"
+    },
+    {
+      "parameters": {
+        "path": "cafeteria"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        192,
+        512
+      ],
+      "id": "3fe2ce7f-297d-4f06-a3e1-e8ee7c7bcf94",
+      "name": "MCP Server Trigger",
+      "webhookId": "470180c4-40ed-4fd8-8773-d8481eaa5a7c"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meal",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        272,
+        752
+      ],
+      "id": "925f082e-999b-41af-9166-79821768da50",
+      "name": "Get cafeteria"
+    },
+    {
+      "parameters": {
+        "content": "# MCP Server\n\n1/ n8n에서 MCP Trigger에 URL을 복사. 그리고 반드시 워크플로우를 Active로 설정\n2/ Claude PC App으로 접속 후 설정 > 개발자 에서 MCP 설정을 선택\n3/ claude_desktop_config.json 값을 아래 값으로 변경하기.\n```\n{\n  \"mcpServers\": {\n    \"n8n\": {\n      \"command\": \"npx\",\n      \"args\": [\n        \"-y\",\n        \"supergateway\",\n        \"--sse\",\n        \"http://localhost:5678/mcp/MCP/sse\"\n      ]\n    }\n  }\n}\n```\n\n4/ Claude PC App을 재실행하고 정상적으로 연결되었는지 체크하기.\n5/ 오류가 나면, 해당 오류를 GPT에게 문의. 간혹 두세번 껏다키면 다시 연결됨",
+        "height": 920,
+        "width": 600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "852c7f2c-ada6-4ba3-8f66-a28209d28990",
+      "name": "Sticky Note16"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "영양분석 Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "영양분석 Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Resize Img",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "영양분석 Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "필요한 컬럼만": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Img": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "영양분석 Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "구내식당 조회": {
+      "main": [
+        [
+          {
+            "node": "중식",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run 1130": {
+      "main": [
+        [
+          {
+            "node": "구내식당 조회",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run 0530": {
+      "main": [
+        [
+          {
+            "node": "구내식당 조회1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "필요한 컬럼만",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "중식": {
+      "main": [
+        [
+          {
+            "node": "중식라벨",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "석식": {
+      "main": [
+        [
+          {
+            "node": "석식라벨",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "중식라벨": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "석식라벨": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "구내식당 조회1": {
+      "main": [
+        [
+          {
+            "node": "석식",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get cafeteria": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Run 0530": [
+      {
+        "json": {
+          "timestamp": "2025-04-29T17:30:01.007+09:00",
+          "Readable date": "April 29th 2025, 5:30:01 pm",
+          "Readable time": "5:30:01 pm",
+          "Day of week": "Tuesday",
+          "Year": "2025",
+          "Month": "April",
+          "Day of month": "29",
+          "Hour": "17",
+          "Minute": "30",
+          "Second": "01",
+          "Timezone": "Asia/Seoul (UTC+09:00)"
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
