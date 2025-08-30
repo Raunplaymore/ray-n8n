@@ -1,0 +1,512 @@
+{
+  "name": "퀵차트 정의 생성",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        208
+      ],
+      "id": "d4f01048-f02f-4664-a37b-34cc49aafb58",
+      "name": "When chat message received",
+      "webhookId": "ca281693-6d85-4d85-93b7-198edd81d6f3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4976c78e-4096-4e07-8de9-17df7864133d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        224
+      ],
+      "id": "1eeeddcc-24a9-4bb8-9559-9e7e9f89a8af",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        224
+      ],
+      "id": "456634c1-a735-4692-ab08-d4a2e0bfb67c",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "url": "https://www.apple.com/newsroom/pdfs/fy2025-q1/FY25_Q1_Consolidated_Financial_Statements.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        624
+      ],
+      "id": "220ae61d-1719-4c85-a464-be4cd753dfe5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        624
+      ],
+      "id": "33a75d01-fdb8-48af-bdc4-f0a41c7938e6",
+      "name": "Supabase Vector Store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        848
+      ],
+      "id": "28b15c7a-c76d-4699-888a-0e68113a282d",
+      "name": "Embeddings OpenAI"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        128,
+        848
+      ],
+      "id": "56ae2565-3977-4bfe-a393-ae5d4aa4dcf8",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1040
+      ],
+      "id": "a98087bf-7b67-4f42-9c9a-e08ae0547861",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "apple_reports_2025Q1",
+        "toolDescription": "Analysis 2025-Q1 apple reports",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        224
+      ],
+      "id": "b083a7a7-124c-4d5b-92d7-907d8eddbc8b",
+      "name": "Supabase Vector Store1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        432
+      ],
+      "id": "948022ad-a000-4c38-af1c-d6a417c1eed9",
+      "name": "Embeddings OpenAI1"
+    },
+    {
+      "parameters": {
+        "content": "## 데이터 저장",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        560
+      ],
+      "id": "85f66227-acc2-4e91-bc54-120a2e495017",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 챗봇",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        144
+      ],
+      "id": "a3b4c63c-9f86-47bc-bc97-ace3024895c4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "name": "generate_a_chart",
+        "description": "Call this tool whenever you need to generate a chart.",
+        "workflowId": "={{ $workflow.id }}",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n\"type\": \"object\",\n\"properties\": {\n\t\"query\": {\n\t\t\"type\": \"string\",\n\t\t\"description\": \"a query describing the chart to generate\"\n\t\t}\n\t}\n}"
+      },
+      "id": "89b6655a-aa60-49b0-a5ee-97d2c27b0eac",
+      "name": "Generate a chart",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        512,
+        224
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"gpt-4o-mini\",\n    \"messages\": [\n        {\n            \"role\": \"system\",\n            \"content\": \"Based on the user request, generate a valid Chart.js definition. Important: - Be careful with the data scale and ensure that all data are visible. For example, if plotting data 2 and 3 on a bar chart, the baseline should be 0. - Charts colors should be different only if there are multiple datasets. - The output should be a valid JSON structure starting with {'chart':. Ensure that the structure matches this example: `{'chart': {'type': 'bar', 'data': {'labels': ['Hello', 'World'], 'datasets': [{'label': 'Foo', 'data': [1, 2]}]}}}`. In scales, min and max are numbers. Example: `{scales:{yAxes:[{ticks:{min:0,max:3}`\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": \"{{ $json.query.query }}\"\n        }\n    ],\n    \"response_format\": {\n  \"type\": \"json_schema\",\n  \"json_schema\": {\n    \"name\": \"chart_configuration\",\n    \"description\": \"Configuration schema for Chart.js charts\",\n    \"strict\": true,\n    \"schema\": {\n  \"type\": \"object\",\n  \"properties\": {\n    \"chart\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"type\": {\n          \"type\": \"string\",\n          \"enum\": [\"bar\", \"line\", \"radar\", \"pie\", \"doughnut\", \"polarArea\", \"bubble\", \"scatter\", \"area\"]\n        },\n        \"data\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"labels\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"string\"\n              }\n            },\n            \"datasets\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"label\": {\n                    \"type\": [\"string\", \"null\"]\n                  },\n                  \"data\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                      \"type\": \"number\"\n                    }\n                  },\n                  \"backgroundColor\": {\n                    \"type\": [\"array\", \"null\"],\n                    \"items\": {\n                      \"type\": \"string\"\n                    }\n                  },\n                  \"borderColor\": {\n                    \"type\": [\"array\", \"null\"],\n                    \"items\": {\n                      \"type\": \"string\"\n                    }\n                  },\n                  \"borderWidth\": {\n                    \"type\": [\"number\", \"null\"]\n                  }\n                },\n                \"required\": [\"data\", \"label\", \"backgroundColor\", \"borderColor\", \"borderWidth\"],\n                \"additionalProperties\": false\n              }\n            }\n          },\n          \"required\": [\"labels\", \"datasets\"],\n          \"additionalProperties\": false\n        }\n      },\n      \"required\": [\"type\", \"data\"],\n      \"additionalProperties\": false\n    },\n    \"options\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"scales\": {\n          \"type\": [\"object\", \"null\"],\n          \"properties\": {\n            \"yAxes\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": [\"object\", \"null\"],\n                \"properties\": {\n                  \"ticks\": {\n                    \"type\": [\"object\", \"null\"],\n                    \"properties\": {\n                      \"max\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"min\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"stepSize\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"beginAtZero\": {\n                        \"type\": [\"boolean\", \"null\"]\n                      }\n                    },\n                    \"required\": [\"max\", \"min\", \"stepSize\", \"beginAtZero\"],\n                    \"additionalProperties\": false\n                  },\n                  \"stacked\": {\n                    \"type\": [\"boolean\", \"null\"]\n                  }\n                },\n                \"required\": [\"ticks\", \"stacked\"],\n                \"additionalProperties\": false\n              }},\n              \"xAxes\": {\n                \"type\": [\"object\", \"null\"],\n                \"properties\": {\n                  \"stacked\": {\n                    \"type\": [\"boolean\", \"null\"]\n                  }\n                },\n                \"required\": [\"stacked\"],\n                \"additionalProperties\": false\n              }\n          },\n          \"required\": [\"yAxes\", \"xAxes\"],\n          \"additionalProperties\": false\n        },\n        \"plugins\": {\n          \"type\": [\"object\", \"null\"],\n          \"properties\": {\n            \"title\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"display\": {\n                  \"type\": [\"boolean\", \"null\"]\n                },\n                \"text\": {\n                  \"type\": [\"string\", \"null\"]\n                }\n              },\n              \"required\": [\"display\", \"text\"],\n              \"additionalProperties\": false\n            },\n            \"legend\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"display\": {\n                  \"type\": [\"boolean\", \"null\"]\n                },\n                \"position\": {\n                  \"type\": [\"string\", \"null\"],\n                  \"enum\": [\"top\", \"left\", \"bottom\", \"right\", null]\n                }\n              },\n              \"required\": [\"display\", \"position\"],\n              \"additionalProperties\": false\n            }\n          },\n          \"required\": [\"title\", \"legend\"],\n          \"additionalProperties\": false\n        }\n      },\n      \"required\": [\"scales\", \"plugins\"],\n      \"additionalProperties\": false\n    }\n  },\n  \"required\": [\"chart\", \"options\"],\n  \"additionalProperties\": false\n}\n}\n}\n}",
+        "options": {}
+      },
+      "id": "ab518e88-94a4-49e1-9afc-1ea84124726f",
+      "name": "OpenAI - Generate Chart definition with Structured Output",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        832,
+        960
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {},
+      "id": "2a3aa2c2-0798-4e5c-bd9f-8918799035cb",
+      "name": "Execute \"Generate a chart\" tool",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        608,
+        960
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.choices[0].message.content }}",
+        "options": {}
+      },
+      "id": "0d92face-8e16-435a-a029-31e146f47ca5",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea9e9ab6-4d6c-4662-9027-5b5b30762c4f",
+              "name": "response",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b790dee-0db6-4bc1-8531-466979f2ad00",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 퀵차트 정의 생성\n\n**HTTP 요청 노드**\n- OpenAI 노드에서 아직 구현되지 않았기 때문에 *HTTP 요청 노드를 사용하여 정의된 JSON 응답 형식으로 차트 쿼리를 OpenAI로 보냅니다*\n- JSON 구조는 차트JS 및 Quickchart.io 정의를 기반으로 하며, 이를 통해 멋진 그래프를 만들 수 있습니다.\n- 출력은 다음 노드로 전달되는 차트 정의가 포함된 JSON입니다.\n\n**응답 노드 설정**\n- Quickchart.io URL의 끝에 차트 정의를 추가합니다([문서 참조](https://quickchart.io/documentation/usage/parameters/)) )\n- 매개 변수에서 차트 인터페이스에 올바르게 표시하기 위해 너비를 250으로 지정한다는 점에 유의하세요.",
+        "height": 503,
+        "width": 901.8390013107377,
+        "color": 7
+      },
+      "id": "0b7ef620-1765-4d9e-8f25-fb30d3044c6b",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "파일을 업로드하세요",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "file",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        800
+      ],
+      "id": "94803d19-630d-4a15-8167-60b7f67e0363",
+      "name": "On form submission",
+      "webhookId": "6a1d755b-1db3-45aa-b58f-11ab6c22b3f0"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Generate Chart definition with Structured Output": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute \"Generate a chart\" tool": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Generate Chart definition with Structured Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate a chart": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Execute \"Generate a chart\" tool": [
+      {
+        "json": {
+          "query": {
+            "query": "2025Q1 애플 제품별 매출 지표 차트: 아이폰, 맥북, 아이패드, 웨어러블, 홈 및 악세서리, 서비스"
+          }
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": []
+}
