@@ -1,0 +1,420 @@
+{
+  "name": "여권/운전면허 사진 검증기",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "resize",
+        "dataPropertyName": "_______________jpg___png________",
+        "width": 1024,
+        "height": 1024,
+        "resizeOption": "onlyIfLarger",
+        "options": {}
+      },
+      "id": "110bb94a-721c-40a8-a229-b5eea6740596",
+      "name": "Resize For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1568,
+        288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 1. 검증할 사진 가져오기",
+        "height": 278,
+        "width": 594,
+        "color": 7
+      },
+      "id": "0d8b56a2-1ef4-4d72-bbb8-06773184c44d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        592,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. AI 비전 모델을 사용하여 여권 사진 유효성 확인\n[베이직 LLM 체인에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)\n\n사진이 여권 사진에 적합한지 확인하는 것은 AI 비전과 프로세스 자동화를 위한 훌륭한 사용 사례이며, n8n을 사용할 때도 마찬가지로 훌륭한 사용 사례입니다. 다음은 passport.go.kr 에서 복사한 외교부 지침을 붙여넣고 해당 규칙에 따라 들어오는 사진을 AI에 검증하도록 요청한 것입니다. 구조화된 출력 파서는 원하는 데이터베이스 또는 백엔드를 업데이트하는 데 사용할 수 있는 AI 응답을 간소화하는 데 사용됩니다.\n\n[외교부 여권안내](https://www.passport.go.kr/home/kor/contents.do?menuPos=32#)",
+        "height": 968,
+        "width": 934,
+        "color": 7
+      },
+      "id": "6c71e958-bb20-4f7d-8d59-afd0817b8ebf",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n\n# 여권/운전면허 사진 검증기\n## 외교부 지침에 따라 유효한 여권 사진에 적합한지 확인하는 워크플로우.\n\n### [Source](https://n8n.io/workflows/2420-automate-image-validation-tasks-using-ai-vision/)\n(edit : @data.popcorn)\n\n\n## 여권, 운전면허 규격 기준\n![](https://www.mofa.go.kr/webmodule/crosseditor/binary/images/000350/20131205152437353_H9NY0XNB.jpg)\n![](https://www.safedriving.or.kr/images/pc/photo_yes2024.png)",
+        "height": 1670,
+        "width": 546
+      },
+      "id": "1d5b0063-89c1-44bc-b1c7-2a84b10fb72b",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "52a40de8-f205-4316-afcf-93df59131502",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"is_valid\": { \"type\": \"boolean\" },\n        \"photo_description\": {\n          \"type\": \"string\",\n          \"description\": \"이미지에서 인물, 개체(있는 경우)의 모양과 배경을 설명합니다. 가능하면 각 개체의 색상을 언급합니다.\"},\n\t\t\"reasons\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        }\n\t}\n}"
+      },
+      "id": "b8953a00-d581-41f5-b753-7327bd3caebd",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1952,
+        480
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "한국 정부에서 설정한 여권 사진 기준에 따라 이미지가 유효한지 평가합니다. 답변은 한글로 합니다.",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# 여권 사진 유효성 검증 규칙\n\n## 디지털 사진 규칙\n[여권 사진 규정 안내](https://www.passport.go.kr/home/kor/contents.do?menuPos=32#)\n\n### 디지털 사진의 품질\n사진은 다음과 같아야 합니다:\n* 선명하고 초점이 맞아야 함\n* 컬러 사진이어야 함\n* 컴퓨터 소프트웨어로 수정되지 않아야 함\n* 가로 3.5cm, 세로 4.5cm 크기여야 함\n* 해상도는 300 DPI 이상이어야 함\n\n### 디지털 사진에 포함되어야 할 내용\n디지털 사진은 다음을 충족해야 합니다:\n* 다른 물체나 사람이 없어야 함\n* 균일한 흰색 또는 밝은 색 배경에서 촬영해야 함\n* 배경과의 명확한 대비가 있어야 함\n* '빨간 눈' 현상이 없어야 함\n* 본인의 머리, 어깨 및 상반신이 포함되어야 하며, 사진은 잘라내지 않아야 함 - 잘라내는 작업은 자동으로 진행됩니다.\n\n사진에서 다음을 준수해야 합니다:\n* 정면을 바라보고 카메라를 응시해야 함\n* 평범한 표정으로 입을 다물고 있어야 함\n* 눈이 열려 있고 보이도록 해야 함\n* 눈앞에 머리카락이 없어야 함\n* 귀를 가리지 말아야 함.\n* 머리 덮개를 착용하지 않아야 함 (종교적 또는 의료적 이유가 있는 경우 제외)\n* 얼굴을 가리는 것이 없어야 함\n* 얼굴이나 배경에 그림자가 없어야 함 - 밝은 배경에 그림자는 허용됨\n* 안경을 착용하지 않아야 하며, 착용해야 할 경우 선글라스나 색이 있는 안경은 안 되며, 눈이 프레임이나 반사, 그림자에 가려지지 않도록 해야 함.\n\n### 아기 및 어린이 사진\n* 어린이는 사진에 혼자 있어야 하며, 아기는 장난감이나 고무젖꼭지를 사용하지 않아야 함.\n* 6세 이하 어린이는 카메라를 직접 바라보지 않거나 평범한 표정을 지을 필요가 없음.\n* 1세 이하 아기는 눈을 감고 있어도 되며, 머리를 손으로 지지할 수 있지만 손은 사진에 보이지 않아야 함.\n* 1세 이하 아기는 평범한 밝은 색 시트 위에 누워야 하며, 위에서 촬영해야 함."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "_______________jpg___png________"
+            }
+          ]
+        }
+      },
+      "id": "13398555-9559-4f6b-9572-16abbb75b8d0",
+      "name": "Passport Photo Validator1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1760,
+        288
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['판독할 타입을 선택해주세요.'] }}",
+                    "rightValue": "여권",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4e35e821-1c31-4288-8bce-d7e677cdbb3a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "passport"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6805c144-87f0-4bee-ae98-666ef11a2938",
+                    "leftValue": "={{ $json['판독할 타입을 선택해주세요.'] }}",
+                    "rightValue": "운전면허",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "driver_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        912,
+        432
+      ],
+      "id": "7c715de1-53fd-4291-8cad-47dfbe65b269",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "formTitle": "여권/운전면허 사진 적합 판독기",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "사진을 업로드 해주세요.(.jpg, .png 만 됩니다.)",
+              "fieldType": "file",
+              "acceptFileTypes": ".jpg, .png",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "판독할 타입을 선택해주세요.",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "여권"
+                  },
+                  {
+                    "option": "운전면허"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        432
+      ],
+      "id": "8c18a39f-1f4a-47fc-bd63-bc6f12dfc901",
+      "name": "On form submission",
+      "webhookId": "01e7c242-82d7-4db8-921f-d24d605b1ee8"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "dataPropertyName": "_______________jpg___png________",
+        "width": 1024,
+        "height": 1024,
+        "resizeOption": "onlyIfLarger",
+        "options": {}
+      },
+      "id": "9d08f330-6b30-454b-8969-89f24f5f88a3",
+      "name": "Resize For AI1",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1568,
+        672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "한국 정부에서 설정한 운전면허 사진 기준에 따라 이미지가 유효한지 평가합니다. 답변은 한글로 합니다.",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# 운전면허증 사진 유효성 검증 규칙\n\n(출처)운전면허증 사진 규정 안내 (도로교통공단)\n- https://www.safedriving.or.kr/guide/larGuide10.do?menuCode=MN-PO-12111\n\n디지털 사진의 품질\n\n사진은 다음과 같아야 합니다:\n\t•\t선명하고 초점이 맞아야 함\n\t•\t컬러 사진이어야 함\n\t•\t사진을 디지털로 조작하거나 필터를 사용하지 않아야 함\n\t•\t가로 3.5cm, 세로 4.5cm 크기여야 함\n\t•\t해상도는 300 DPI 이상이 권장됨\n\n디지털 사진에 포함되어야 할 내용\n\n디지털 사진은 다음을 충족해야 합니다:\n\t•\t본인 이외에 다른 사람이나 물체가 없어야 함\n\t•\t균일한 흰색 또는 밝은 회색 배경에서 촬영해야 함\n\t•\t배경과 얼굴이 명확히 구분되어야 함\n\t•\t‘빨간 눈’ 현상이 없어야 함\n\t•\t얼굴 전체(정수리부터 턱까지) 및 어깨 일부가 포함되어야 하며, 자동 크롭될 수 있음\n\n사진에서 다음을 준수해야 합니다:\n\t•\t카메라를 정면으로 응시해야 함\n\t•\t평범한 표정으로 입을 다물고 있어야 함\n\t•\t눈이 완전히 보이도록 떠 있어야 함\n\t•\t눈을 가리는 머리카락이 없어야 함\n\t•\t머리 덮개는 착용하지 않아야 함 (단, 종교적·의료적 사유 시 가능하나 얼굴 전체가 보여야 함)\n\t•\t얼굴을 가리는 마스크, 손, 장신구 등이 없어야 함\n\t•\t배경이나 얼굴에 그림자가 없어야 함\n\t•\t안경 착용은 가능하나, 눈이 렌즈 프레임이나 빛 반사로 가려지지 않아야 하며, 선글라스·색안경은 금지됨\n\n아기 및 어린이 사진 제한 조건\n**중요: 운전면허증은 만 18세 이상 신청 대상이며, 아기 또는 어린이로 보이는 사진은 유효하지 않습니다.\n다음 중 하나라도 해당되면 거부하십시오:\n\t•\t얼굴이 10세 이하의 어린이 또는 유아로 추정됨\n\t•\t사진 속 인물이 장난감, 고무 젖꼭지, 보호자의 손 등에 의존하고 있음\n\t•\t머리가 시트 등에 눕혀져 있음\n\t•\t눈을 감고 있음\n\t•\t얼굴 비율상 턱·광대·이마가 유아의 비율에 가까움\n\n**만약 사진 속 인물이 아기 또는 유아로 보인다면 ‘유효하지 않음’으로 판단하라. 운전면허는 성인을 위한 신분증이므로, 아이로 보이는 인물의 사진은 거부해야 한다.”"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "_______________jpg___png________"
+            }
+          ]
+        }
+      },
+      "id": "1caa6654-3691-4c6a-a649-72d6ebc81c05",
+      "name": "DriverLisence Photo Validator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1760,
+        672
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-pro-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        880
+      ],
+      "id": "2ea2a99e-85c3-46fe-b2c4-ae8f77491845",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"is_valid\": { \"type\": \"boolean\" },\n        \"photo_description\": {\n          \"type\": \"string\",\n          \"description\": \"이미지에서 인물, 개체(있는 경우)의 모양과 배경을 설명합니다. 가능하면 각 개체의 색상을 언급합니다.\"},\n\t\t\"reasons\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        }\n\t}\n}"
+      },
+      "id": "702aad19-e0b6-40d1-a86e-ef0cd23dd56f",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1952,
+        880
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": "pixtral-12b-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        880
+      ],
+      "id": "1ae5c667-4674-4c12-8259-e851d08f8cd3",
+      "name": "Mistral Cloud Chat Model"
+    }
+  ],
+  "connections": {
+    "Resize For AI": {
+      "main": [
+        [
+          {
+            "node": "Passport Photo Validator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Passport Photo Validator1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Passport Photo Validator1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Resize For AI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resize For AI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize For AI1": {
+      "main": [
+        [
+          {
+            "node": "DriverLisence Photo Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "DriverLisence Photo Validator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DriverLisence Photo Validator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": null,
+  "tags": []
+}
