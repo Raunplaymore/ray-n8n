@@ -1,0 +1,923 @@
+{
+  "name": "Google Sheet Node",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "n8n guide example",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        512,
+        144
+      ],
+      "id": "722ce79d-5e4c-4fee-bd3a-ab684cf01751",
+      "name": "Create Spreadsheet"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "title": "example-sheet",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        144
+      ],
+      "id": "39126ba4-790e-4ee7-8986-ea153fc9c699",
+      "name": "Create Sheet"
+    },
+    {
+      "parameters": {
+        "operation": "getAllPeople"
+      },
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        944,
+        144
+      ],
+      "id": "7276120f-0910-4444-b06a-485d556b3422",
+      "name": "Customer Datastore (n8n training)"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create Sheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Create Sheet').item.json.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1168,
+        144
+      ],
+      "id": "e27ff89e-3410-45bc-a177-c9d3599cb1ee",
+      "name": "Append Row"
+    },
+    {
+      "parameters": {
+        "content": "## Create & Append\n- Create Spreadsheet: 스프레드시트 파일을 생성\n- Create Sheet: 스프레드시트 파일 내에 시트를 생성\n- Append Row: 시트 내에 행 추가(데이터 입력)",
+        "height": 300,
+        "width": 900,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "642f82e8-2705-4e2d-808b-c008f143a45e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        480,
+        464
+      ],
+      "id": "1cd41d71-b872-40fe-99f6-18bed757abb2",
+      "name": "Read Sheet"
+    },
+    {
+      "parameters": {
+        "content": "## Read & Update\n- Read Sheet: 시트 내에 데이터 읽어옴\n- Update Sheet: 특정 행의 값을 수정\n",
+        "height": 300,
+        "width": 460,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "937a091b-76de-430b-8bdf-19904a4594dc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Delete & Clear\n- Delete Sheet: 특정 행을 삭제\n- Clear Sheet: 시트의 모든 값을 삭제\n- Remove Sheet: 시트 자체를 삭제\n- Delete Spreadsheet: 스프레드시트 파일을 삭제\n",
+        "height": 360,
+        "width": 1120,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "ed8691aa-d5ed-4fb5-b452-f31be39def9f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?gid=819567351#gid=819567351",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819567351,
+          "mode": "list",
+          "cachedResultName": "example-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit#gid=819567351"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "country",
+              "lookupValue": "US"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        464,
+        832
+      ],
+      "id": "d6ca2aba-fb5f-4967-a07c-07be4bf7c74c",
+      "name": "Read Sheet_"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?gid=819567351#gid=819567351",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819567351,
+          "mode": "list",
+          "cachedResultName": "example-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit#gid=819567351"
+        },
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        688,
+        832
+      ],
+      "id": "b5aa585b-1834-43f5-8d0b-b0824069fe4b",
+      "name": "Delete Row"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk",
+          "mode": "list",
+          "cachedResultName": "n8n guide example",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819567351,
+          "mode": "list",
+          "cachedResultName": "example-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit#gid=819567351"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        912,
+        832
+      ],
+      "id": "58dd50ea-90bc-49cd-942f-7ecc5294d15d",
+      "name": "Clear Sheet"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?gid=819567351#gid=819567351",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819567351,
+          "mode": "list",
+          "cachedResultName": "example-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit#gid=819567351"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "datapopcorn",
+            "email": "datapopcorn@gmail.com",
+            "country": "KOR",
+            "notes": "He looks peaceful.",
+            "created": "1999-05-12"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        704,
+        464
+      ],
+      "id": "3d3d02ee-8a1e-45d9-8579-0d8c933c7a34",
+      "name": "Update Sheet"
+    },
+    {
+      "parameters": {
+        "operation": "remove",
+        "documentId": {
+          "__rl": true,
+          "value": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk",
+          "mode": "list",
+          "cachedResultName": "n8n guide example",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819567351,
+          "mode": "list",
+          "cachedResultName": "example-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit#gid=819567351"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        832
+      ],
+      "id": "7bcd6be2-08a6-49db-b22c-ab5be73559e8",
+      "name": "Remove Sheet"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "operation": "deleteSpreadsheet",
+        "documentId": {
+          "__rl": true,
+          "value": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk",
+          "mode": "list",
+          "cachedResultName": "n8n guide example",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit?usp=drivesdk"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        832
+      ],
+      "id": "2f200b5e-c8dc-4167-8fdc-f49ae12173c3",
+      "name": "Delete Spreadsheet"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        288
+      ],
+      "id": "dff9a869-b018-4b03-88cc-f884e2bf8fe2",
+      "name": "Google Sheets Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# (트리거) 행이 변화될때",
+        "height": 240,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        208
+      ],
+      "id": "0126f9c4-6276-4535-addb-47074e6bc24e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "![](https://raw.githubusercontent.com/2innnnn0/assets/refs/heads/master/image/datapopcorn_logo_50px.png)\n# Google Sheet Node",
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7c573847-f68e-4e94-b87a-85cfcab4fa5a",
+      "name": "Sticky Note4"
+    }
+  ],
+  "connections": {
+    "Create Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Create Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sheet": {
+      "main": [
+        [
+          {
+            "node": "Customer Datastore (n8n training)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Datastore (n8n training)": {
+      "main": [
+        [
+          {
+            "node": "Append Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Sheet": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Sheet_": {
+      "main": [
+        [
+          {
+            "node": "Delete Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "Create Spreadsheet": [
+      {
+        "json": {
+          "spreadsheetId": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk",
+          "properties": {
+            "title": "n8n guide example",
+            "locale": "ko_KR",
+            "autoRecalc": "ON_CHANGE",
+            "timeZone": "Etc/GMT",
+            "defaultFormat": {
+              "backgroundColor": {
+                "red": 1,
+                "green": 1,
+                "blue": 1
+              },
+              "padding": {
+                "top": 2,
+                "right": 3,
+                "bottom": 2,
+                "left": 3
+              },
+              "verticalAlignment": "BOTTOM",
+              "wrapStrategy": "OVERFLOW_CELL",
+              "textFormat": {
+                "foregroundColor": {},
+                "fontFamily": "arial,sans,sans-serif",
+                "fontSize": 10,
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "foregroundColorStyle": {
+                  "rgbColor": {}
+                }
+              },
+              "backgroundColorStyle": {
+                "rgbColor": {
+                  "red": 1,
+                  "green": 1,
+                  "blue": 1
+                }
+              }
+            },
+            "spreadsheetTheme": {
+              "primaryFontFamily": "Arial",
+              "themeColors": [
+                {
+                  "colorType": "TEXT",
+                  "color": {
+                    "rgbColor": {}
+                  }
+                },
+                {
+                  "colorType": "BACKGROUND",
+                  "color": {
+                    "rgbColor": {
+                      "red": 1,
+                      "green": 1,
+                      "blue": 1
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT1",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.25882354,
+                      "green": 0.52156866,
+                      "blue": 0.95686275
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT2",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.91764706,
+                      "green": 0.2627451,
+                      "blue": 0.20784314
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT3",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.9843137,
+                      "green": 0.7372549,
+                      "blue": 0.015686275
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT4",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.20392157,
+                      "green": 0.65882355,
+                      "blue": 0.3254902
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT5",
+                  "color": {
+                    "rgbColor": {
+                      "red": 1,
+                      "green": 0.42745098,
+                      "blue": 0.003921569
+                    }
+                  }
+                },
+                {
+                  "colorType": "ACCENT6",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.27450982,
+                      "green": 0.7411765,
+                      "blue": 0.7764706
+                    }
+                  }
+                },
+                {
+                  "colorType": "LINK",
+                  "color": {
+                    "rgbColor": {
+                      "red": 0.06666667,
+                      "green": 0.33333334,
+                      "blue": 0.8
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "sheets": [
+            {
+              "properties": {
+                "sheetId": 0,
+                "title": "시트1",
+                "index": 0,
+                "sheetType": "GRID",
+                "gridProperties": {
+                  "rowCount": 1000,
+                  "columnCount": 26
+                }
+              }
+            }
+          ],
+          "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk/edit"
+        }
+      }
+    ],
+    "Create Sheet": [
+      {
+        "json": {
+          "spreadsheetId": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk",
+          "sheetId": 819567351,
+          "title": "example-sheet",
+          "index": 1,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26
+          }
+        }
+      }
+    ],
+    "Customer Datastore (n8n training)": [
+      {
+        "json": {
+          "id": "23423532",
+          "name": "Jay Gatsby",
+          "email": "gatsby@west-egg.com",
+          "notes": "Keeps asking about a green light??",
+          "country": "US",
+          "created": "1925-04-10"
+        }
+      },
+      {
+        "json": {
+          "id": "23423533",
+          "name": "José Arcadio Buendía",
+          "email": "jab@macondo.co",
+          "notes": "Lots of people named after him. Very confusing",
+          "country": "CO",
+          "created": "1967-05-05"
+        }
+      },
+      {
+        "json": {
+          "id": "23423534",
+          "name": "Max Sendak",
+          "email": "info@in-and-out-of-weeks.org",
+          "notes": "Keeps rolling his terrible eyes",
+          "country": "US",
+          "created": "1963-04-09"
+        }
+      },
+      {
+        "json": {
+          "id": "23423535",
+          "name": "Zaphod Beeblebrox",
+          "email": "captain@heartofgold.com",
+          "notes": "Felt like I was talking to more than one person",
+          "country": null,
+          "created": "1979-10-12"
+        }
+      },
+      {
+        "json": {
+          "id": "23423536",
+          "name": "Edmund Pevensie",
+          "email": "edmund@narnia.gov",
+          "notes": "Passionate sailor",
+          "country": "UK",
+          "created": "1950-10-16"
+        }
+      }
+    ],
+    "Append Row": [
+      {
+        "json": {
+          "id": "23423532",
+          "name": "Jay Gatsby",
+          "email": "gatsby@west-egg.com",
+          "notes": "Keeps asking about a green light??",
+          "country": "US",
+          "created": "1925-04-10"
+        }
+      },
+      {
+        "json": {
+          "id": "23423533",
+          "name": "José Arcadio Buendía",
+          "email": "jab@macondo.co",
+          "notes": "Lots of people named after him. Very confusing",
+          "country": "CO",
+          "created": "1967-05-05"
+        }
+      },
+      {
+        "json": {
+          "id": "23423534",
+          "name": "Max Sendak",
+          "email": "info@in-and-out-of-weeks.org",
+          "notes": "Keeps rolling his terrible eyes",
+          "country": "US",
+          "created": "1963-04-09"
+        }
+      },
+      {
+        "json": {
+          "id": "23423535",
+          "name": "Zaphod Beeblebrox",
+          "email": "captain@heartofgold.com",
+          "notes": "Felt like I was talking to more than one person",
+          "country": null,
+          "created": "1979-10-12"
+        }
+      },
+      {
+        "json": {
+          "id": "23423536",
+          "name": "Edmund Pevensie",
+          "email": "edmund@narnia.gov",
+          "notes": "Passionate sailor",
+          "country": "UK",
+          "created": "1950-10-16"
+        }
+      }
+    ],
+    "Read Sheet": [
+      {
+        "json": {
+          "row_number": 2,
+          "id": 23423532,
+          "name": "Jay Gatsby",
+          "email": "gatsby@west-egg.com",
+          "notes": "Keeps asking about a green light??",
+          "country": "US",
+          "created": "1925-04-10"
+        }
+      }
+    ],
+    "Read Sheet_": [
+      {
+        "json": {
+          "row_number": 4,
+          "id": 23423534,
+          "name": "Max Sendak",
+          "email": "info@in-and-out-of-weeks.org",
+          "notes": "Keeps rolling his terrible eyes",
+          "country": "US",
+          "created": "1963-04-09"
+        }
+      }
+    ],
+    "Clear Sheet": [
+      {
+        "json": {}
+      }
+    ],
+    "Update Sheet": [
+      {
+        "json": {
+          "id": 23423532,
+          "name": "datapopcorn",
+          "email": "datapopcorn@gmail.com",
+          "country": "KOR",
+          "notes": "He looks peaceful.",
+          "created": "1999-05-12"
+        }
+      }
+    ],
+    "Remove Sheet": [
+      {
+        "json": {
+          "spreadsheetId": "1XyV0bZTc2nLKSq1-zdybOdp8mZH9r0lclKObxCDC-uk"
+        }
+      }
+    ],
+    "Delete Spreadsheet": [
+      {
+        "json": {
+          "success": true
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T08:59:38.310Z",
+      "updatedAt": "2025-08-30T08:59:38.310Z",
+      "id": "AcUSaCB8M2O4FWJw",
+      "name": "inflearn"
+    }
+  ]
+}
