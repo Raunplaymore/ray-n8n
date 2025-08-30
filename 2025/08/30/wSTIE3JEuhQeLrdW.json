@@ -1,0 +1,5611 @@
+{
+  "name": "Youtube transcript",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        112
+      ],
+      "id": "e348baa3-b76c-4c8e-aee9-6a687f280347",
+      "name": "When clicking \"Execute Workflow\""
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-youtube-transcription.youtubeTranscripter",
+      "typeVersion": 1,
+      "position": [
+        272,
+        112
+      ],
+      "id": "61cddc6d-c9c9-4704-99a6-3e92c0ccec6f",
+      "name": "YouTube Transcript"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "text"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        704,
+        112
+      ],
+      "id": "66f7d58c-5635-46d9-8bca-cc99773927c1",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transcript",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        112
+      ],
+      "id": "03cea512-c189-4a06-95b7-c64bfb537032",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=아래 내용 100자 이내로 요약해줘.\n{{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.7,
+      "position": [
+        928,
+        112
+      ],
+      "id": "b839ace3-6a2d-486a-aa77-cb3b957557bd",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "sT7hNL4vseLzzecV",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        544
+      ],
+      "id": "a59922ec-83e7-4b61-85f8-2030a7fe7ae0",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "formTitle": "youtube URL",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "url",
+              "placeholder": "https://youtu.be/zcjTErUqvxM?si=nD1U_lEL3DAlZJfm",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "language (ko, en)",
+              "placeholder": "ko",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        544
+      ],
+      "id": "cb73f5ef-2ab9-43a0-a1c4-c6c66c867bef",
+      "name": "On form submission",
+      "webhookId": "906bee24-e470-4029-afa5-869e568b4c06",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.language }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5d3d94e9-3000-4ae6-8ec2-206741caeef0",
+      "name": "Fetch YouTube Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  const html = item.json.data;\n  const preferredLang = item.json.language; // optional 사용\n  const match = html.match(/\"captionTracks\":\\[(.*?)\\]/);\n\n  if (!match) {\n    item.json = { error: 'Transcript not found (no captionTracks)' };\n    continue;\n  }\n\n  const tracks = JSON.parse(`[${match[1]}]`);\n\n  // 언어 지정이 있으면 해당 언어 우선\n  let track = null;\n\n  if (preferredLang) {\n    track = tracks.find(t =>\n      (t.languageCode === preferredLang || t.vssId?.includes(`.${preferredLang}`))\n    );\n  }\n\n  // 지정 언어가 없거나 찾지 못했으면: 수동 자막 → 자동 자막 순서로 아무거나\n  if (!track) {\n    track = tracks.find(t => !t.kind) || tracks.find(t => t.kind === 'asr');\n  }\n\n  item.json.transcriptUrl = track?.baseUrl || null;\n  item.json.transcriptLang = track?.languageCode || null;\n}\n\nreturn items;"
+      },
+      "id": "96e2a59b-dd86-48a2-baa2-907fc6554dca",
+      "name": "Extract Transcript URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.transcriptUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $('When Executed by Another Workflow').item.json['language (ko, en)'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0a68fcf8-5bc3-4bd3-a834-b55d0165266e",
+      "name": "Fetch Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        944
+      ],
+      "id": "53259ad4-d891-4fc5-8498-36c1b163ea92",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const xmlString = $input.first().json.data;\nconst youtubeUrl = $input.first().json.youtubeUrl;\n\nconst lang = 'ko';\n// 매우 간단한 XML 파서 (DOMParser 없이 작동)\nconst matches = [...xmlString.matchAll(/<text start=\"([^\"]+)\" dur=\"([^\"]+)\">([\\s\\S]*?)<\\/text>/g)];\n\nconst transcript = matches.map(match => ({\n  text: match[3].replace(/&amp;/g, '&').replace(/&quot;/g, '\"').replace(/&lt;/g, '<').replace(/&gt;/g, '>'),\n  duration: parseFloat(match[2]),\n  offset: parseFloat(match[1]),\n  lang: lang\n}));\n\nreturn [\n  {\n    json: {\n      youtubeId: youtubeUrl,\n      transcript: transcript\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        944
+      ],
+      "id": "86cd6fe0-c3b3-4324-956f-9e62685fb833",
+      "name": "Format"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "text"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        704,
+        544
+      ],
+      "id": "ff6250e2-f04c-44df-866d-3f3d985e1daf",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transcript",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        544
+      ],
+      "id": "dd127938-595b-46cc-a44d-ace1f62461d6",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=아래는 유튜브 영상의 자막입니다.  \n이 자막을 바탕으로 콘텐츠의 주요 주장과 흐름을 구조화된 요약문으로 작성해 주세요.  \n내용을 단순히 요약하는 것이 아니라, 시청자가 핵심만 빠르게 파악할 수 있도록 전략적 흐름으로 재구성해 주세요.\n{{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=당신은 유튜브 영상의 자막을 읽고, 핵심 메시지를 잘 전달하는 콘텐츠 요약 작가입니다.\n\n- 자막 내용을 기반으로 영상이 전달하고자 하는 **주제, 주장, 논리 전개 순서**를 구조화된 형태로 요약해 주세요.\n- 시청자가 영상을 보지 않아도 내용을 빠르게 이해할 수 있도록 요약해 주세요.\n- 답변은 반드시 한글로 해야합니다.\n- 문단은 다음과 같은 구조로 구성해 주세요:\n\n[JSON OUTPUT FORMAT]\n{\n  \"title\": \"요약의 제목 또는 주제\",\n  \"summary\": \"전체 내용을 압축한 핵심 개요\",\n  \"sections\": [\n    {\n      \"heading\": \"소제목 1\",\n      \"content\": \"해당 섹션의 요약 내용\"\n    },\n    {\n      \"heading\": \"소제목 2\",\n      \"content\": \"이 섹션에서는 관련 개념이나 사례를 설명\"\n    }\n  ]\n}\n- 각 문단은 자연스럽고 읽기 쉬운 문장으로 작성하고, **중요한 부분은 굵게 강조**해 주세요.\n- 이모지를 활용해 각 문단을 시각적으로 구분해 주세요.\n- 단순 요약이 아니라 **콘텐츠의 의도와 흐름을 재구성**해 주세요."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        928,
+        544
+      ],
+      "id": "e0ba39b5-d9a2-4d02-87ba-40302069c0cc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-preview-03-25",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        864,
+        768
+      ],
+      "id": "d0dc11d9-04d1-4862-8c89-73d9c064ed81",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"요약의 제목 또는 주제\",\n  \"summary\": \"전체 내용을 압축한 핵심 개요\",\n  \"sections\": [\n    {\n      \"heading\": \"소제목 1\",\n      \"content\": \"해당 섹션의 요약 내용\"\n    },\n    {\n      \"heading\": \"소제목 2\",\n      \"content\": \"이 섹션에서는 관련 개념이나 사례를 설명\"\n    },\n    {\n      \"heading\": \"소제목 3\",\n      \"content\": \"시청자에게 도움이 되는 정보, 인사이트, 조언 등을 포함\"\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        784
+      ],
+      "id": "331bce48-efc7-44a6-b8d2-5afc79dd0bbc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "content": "## Original - Community Node",
+        "height": 80,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "582eb94d-3b26-42d3-83a9-90c84fe71fb7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Renew - Sub-Workflow",
+        "height": 80,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        432
+      ],
+      "id": "50b72977-805e-4b9d-bbbd-68981de6958b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## (Sub-workflow) Get Transcript",
+        "height": 80,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        848
+      ],
+      "id": "cf9b324c-a74b-4966-95de-b1e566062bb0",
+      "name": "Sticky Note2"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch YouTube Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Transcript URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Transcript URL": {
+      "main": [
+        [
+          {
+            "node": "Fetch Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Transcript": {
+      "main": [
+        [
+          {
+            "node": "Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Fetch YouTube Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {
+    "YouTube Transcript": [
+      {
+        "json": {
+          "youtubeId": "https://youtu.be/4gGWba-6nOk?si=dijOS1seAMyU4cYh",
+          "transcript": [
+            {
+              "text": "Here&amp;#39;s how to actually make your first",
+              "duration": 3.6,
+              "offset": 0,
+              "lang": "en"
+            },
+            {
+              "text": "thousand online with AI from somebody",
+              "duration": 3.839,
+              "offset": 1.52,
+              "lang": "en"
+            },
+            {
+              "text": "that scaled his own AI and automation",
+              "duration": 4.08,
+              "offset": 3.6,
+              "lang": "en"
+            },
+            {
+              "text": "service business to $72,000 per month",
+              "duration": 4.24,
+              "offset": 5.359,
+              "lang": "en"
+            },
+            {
+              "text": "and now runs communities teaching people",
+              "duration": 3.6,
+              "offset": 7.68,
+              "lang": "en"
+            },
+            {
+              "text": "how to do the same. Now, I&amp;#39;m creating",
+              "duration": 3.12,
+              "offset": 9.599,
+              "lang": "en"
+            },
+            {
+              "text": "this video as sort of like a push back",
+              "duration": 2.72,
+              "offset": 11.28,
+              "lang": "en"
+            },
+            {
+              "text": "because I&amp;#39;ve seen a lot of people enter",
+              "duration": 3.12,
+              "offset": 12.719,
+              "lang": "en"
+            },
+            {
+              "text": "the AI and automation space recently",
+              "duration": 3.199,
+              "offset": 14,
+              "lang": "en"
+            },
+            {
+              "text": "that have no experience actually",
+              "duration": 2.961,
+              "offset": 15.839,
+              "lang": "en"
+            },
+            {
+              "text": "building out these systems. AI and",
+              "duration": 3.201,
+              "offset": 17.199,
+              "lang": "en"
+            },
+            {
+              "text": "automation sounds really flashy and",
+              "duration": 3.04,
+              "offset": 18.8,
+              "lang": "en"
+            },
+            {
+              "text": "obviously there&amp;#39;s a lot of financial",
+              "duration": 3.039,
+              "offset": 20.4,
+              "lang": "en"
+            },
+            {
+              "text": "potential in there, but what it",
+              "duration": 3.519,
+              "offset": 21.84,
+              "lang": "en"
+            },
+            {
+              "text": "certainly isn&amp;#39;t is easy. So, just",
+              "duration": 3.441,
+              "offset": 23.439,
+              "lang": "en"
+            },
+            {
+              "text": "because something is simple and just",
+              "duration": 2.641,
+              "offset": 25.359,
+              "lang": "en"
+            },
+            {
+              "text": "because something gets a lot of",
+              "duration": 3.52,
+              "offset": 26.88,
+              "lang": "en"
+            },
+            {
+              "text": "attention does not mean that it is easy.",
+              "duration": 3.76,
+              "offset": 28,
+              "lang": "en"
+            },
+            {
+              "text": "And I&amp;#39;m going to make that case in this",
+              "duration": 2.319,
+              "offset": 30.4,
+              "lang": "en"
+            },
+            {
+              "text": "video and then I&amp;#39;m going to give you",
+              "duration": 2.639,
+              "offset": 31.76,
+              "lang": "en"
+            },
+            {
+              "text": "guys a simple road map to avoid falling",
+              "duration": 2.961,
+              "offset": 32.719,
+              "lang": "en"
+            },
+            {
+              "text": "into the trap that I&amp;#39;m seeing a lot of",
+              "duration": 3.121,
+              "offset": 34.399,
+              "lang": "en"
+            },
+            {
+              "text": "people do right now. So, to make a long",
+              "duration": 3.52,
+              "offset": 35.68,
+              "lang": "en"
+            },
+            {
+              "text": "story short, the make money online",
+              "duration": 3.68,
+              "offset": 37.52,
+              "lang": "en"
+            },
+            {
+              "text": "landscape cuz rest assured that&amp;#39;s what",
+              "duration": 3.6,
+              "offset": 39.2,
+              "lang": "en"
+            },
+            {
+              "text": "this is. It&amp;#39;s the exact same thing as",
+              "duration": 3.12,
+              "offset": 41.2,
+              "lang": "en"
+            },
+            {
+              "text": "like the social media marketing agency",
+              "duration": 3.36,
+              "offset": 42.8,
+              "lang": "en"
+            },
+            {
+              "text": "fad of a few years ago, the web design",
+              "duration": 3.36,
+              "offset": 44.32,
+              "lang": "en"
+            },
+            {
+              "text": "fad of a few years ago, the drop",
+              "duration": 2.96,
+              "offset": 46.16,
+              "lang": "en"
+            },
+            {
+              "text": "shipping fad. What we&amp;#39;re seeing right",
+              "duration": 3.84,
+              "offset": 47.68,
+              "lang": "en"
+            },
+            {
+              "text": "now is exactly that same thing. has been",
+              "duration": 4.64,
+              "offset": 49.12,
+              "lang": "en"
+            },
+            {
+              "text": "super saturated with tons of misleading",
+              "duration": 4.24,
+              "offset": 51.52,
+              "lang": "en"
+            },
+            {
+              "text": "opportunities. Now, it&amp;#39;s true that AI",
+              "duration": 3.6,
+              "offset": 53.76,
+              "lang": "en"
+            },
+            {
+              "text": "has created a window for opportunities,",
+              "duration": 3.04,
+              "offset": 55.76,
+              "lang": "en"
+            },
+            {
+              "text": "but it&amp;#39;s not in the way that most gurus",
+              "duration": 2.879,
+              "offset": 57.36,
+              "lang": "en"
+            },
+            {
+              "text": "present it. The way that most people are",
+              "duration": 3.04,
+              "offset": 58.8,
+              "lang": "en"
+            },
+            {
+              "text": "pitching it right now is it&amp;#39;s like a",
+              "duration": 3.841,
+              "offset": 60.239,
+              "lang": "en"
+            },
+            {
+              "text": "passive income scheme. Okay? People are",
+              "duration": 3.92,
+              "offset": 61.84,
+              "lang": "en"
+            },
+            {
+              "text": "selling you AI businesses as if it",
+              "duration": 3.2,
+              "offset": 64.08,
+              "lang": "en"
+            },
+            {
+              "text": "requires no effort. It&amp;#39;s going to make",
+              "duration": 3.359,
+              "offset": 65.76,
+              "lang": "en"
+            },
+            {
+              "text": "you money while you sleep. Let me tell",
+              "duration": 3.44,
+              "offset": 67.28,
+              "lang": "en"
+            },
+            {
+              "text": "you something. This specific business",
+              "duration": 3.04,
+              "offset": 69.119,
+              "lang": "en"
+            },
+            {
+              "text": "model, which people are selling you, but",
+              "duration": 3.52,
+              "offset": 70.72,
+              "lang": "en"
+            },
+            {
+              "text": "not totally formulating, is an agency",
+              "duration": 4.081,
+              "offset": 72.159,
+              "lang": "en"
+            },
+            {
+              "text": "service business model. You can&amp;#39;t make",
+              "duration": 3.44,
+              "offset": 74.24,
+              "lang": "en"
+            },
+            {
+              "text": "money while you sleep with this. You",
+              "duration": 3.36,
+              "offset": 76.24,
+              "lang": "en"
+            },
+            {
+              "text": "need to get on sales calls with",
+              "duration": 4.16,
+              "offset": 77.68,
+              "lang": "en"
+            },
+            {
+              "text": "prospects. You need to hunch over",
+              "duration": 4.96,
+              "offset": 79.6,
+              "lang": "en"
+            },
+            {
+              "text": "laptops or MacBook screens, building,",
+              "duration": 4.319,
+              "offset": 81.84,
+              "lang": "en"
+            },
+            {
+              "text": "dragging, and dropping systems. You need",
+              "duration": 3.12,
+              "offset": 84.56,
+              "lang": "en"
+            },
+            {
+              "text": "to be whiteboarding flows. You need to",
+              "duration": 3.121,
+              "offset": 86.159,
+              "lang": "en"
+            },
+            {
+              "text": "be doing things like prompt engineering.",
+              "duration": 4.16,
+              "offset": 87.68,
+              "lang": "en"
+            },
+            {
+              "text": "So, reality check. The vast majority of",
+              "duration": 4.32,
+              "offset": 89.28,
+              "lang": "en"
+            },
+            {
+              "text": "these AI gurus have never built any",
+              "duration": 3.279,
+              "offset": 91.84,
+              "lang": "en"
+            },
+            {
+              "text": "successful businesses outside of just",
+              "duration": 3.36,
+              "offset": 93.6,
+              "lang": "en"
+            },
+            {
+              "text": "selling courses. If you want to make a",
+              "duration": 3.841,
+              "offset": 95.119,
+              "lang": "en"
+            },
+            {
+              "text": "determination as to how exactly to get",
+              "duration": 3.36,
+              "offset": 96.96,
+              "lang": "en"
+            },
+            {
+              "text": "up and running, focus on people that",
+              "duration": 2.479,
+              "offset": 98.96,
+              "lang": "en"
+            },
+            {
+              "text": "have actually done the thing that you",
+              "duration": 2.4,
+              "offset": 100.32,
+              "lang": "en"
+            },
+            {
+              "text": "want to do, not just people that talk",
+              "duration": 3.601,
+              "offset": 101.439,
+              "lang": "en"
+            },
+            {
+              "text": "about it. Okay? And also, passive income",
+              "duration": 3.759,
+              "offset": 102.72,
+              "lang": "en"
+            },
+            {
+              "text": "schemes rarely work for beginners",
+              "duration": 3.28,
+              "offset": 105.04,
+              "lang": "en"
+            },
+            {
+              "text": "without existing audiences. What you&amp;#39;ll",
+              "duration": 3.361,
+              "offset": 106.479,
+              "lang": "en"
+            },
+            {
+              "text": "find is, and if you&amp;#39;re a beginner, maybe",
+              "duration": 2.88,
+              "offset": 108.32,
+              "lang": "en"
+            },
+            {
+              "text": "this won&amp;#39;t make the most sense to you,",
+              "duration": 3.36,
+              "offset": 109.84,
+              "lang": "en"
+            },
+            {
+              "text": "but there&amp;#39;s a difference between inbound",
+              "duration": 4,
+              "offset": 111.2,
+              "lang": "en"
+            },
+            {
+              "text": "marketing and then outbound marketing.",
+              "duration": 4.08,
+              "offset": 113.2,
+              "lang": "en"
+            },
+            {
+              "text": "So, inbound marketing is when a customer",
+              "duration": 4.8,
+              "offset": 115.2,
+              "lang": "en"
+            },
+            {
+              "text": "comes to a business. In order for a",
+              "duration": 4.479,
+              "offset": 117.28,
+              "lang": "en"
+            },
+            {
+              "text": "business to get some sort of inbound",
+              "duration": 3.119,
+              "offset": 120,
+              "lang": "en"
+            },
+            {
+              "text": "marketing, obviously, that business",
+              "duration": 3.281,
+              "offset": 121.759,
+              "lang": "en"
+            },
+            {
+              "text": "needs distribution. It needs popularity.",
+              "duration": 3.441,
+              "offset": 123.119,
+              "lang": "en"
+            },
+            {
+              "text": "It needs some way to get the word out.",
+              "duration": 3.76,
+              "offset": 125.04,
+              "lang": "en"
+            },
+            {
+              "text": "right now. If you are a beginner",
+              "duration": 4.319,
+              "offset": 126.56,
+              "lang": "en"
+            },
+            {
+              "text": "business and you have no idea what the",
+              "duration": 3.6,
+              "offset": 128.8,
+              "lang": "en"
+            },
+            {
+              "text": "heck you&amp;#39;re doing, you have no capital",
+              "duration": 3.601,
+              "offset": 130.879,
+              "lang": "en"
+            },
+            {
+              "text": "to invest, you have no ads to whip up,",
+              "duration": 3.36,
+              "offset": 132.4,
+              "lang": "en"
+            },
+            {
+              "text": "you have no idea how to position your",
+              "duration": 3.2,
+              "offset": 134.48,
+              "lang": "en"
+            },
+            {
+              "text": "product, you can&amp;#39;t really do inbound",
+              "duration": 4.32,
+              "offset": 135.76,
+              "lang": "en"
+            },
+            {
+              "text": "marketing very well, if at all. So, what",
+              "duration": 4.16,
+              "offset": 137.68,
+              "lang": "en"
+            },
+            {
+              "text": "most of these businesses, accelerators,",
+              "duration": 3.68,
+              "offset": 140.08,
+              "lang": "en"
+            },
+            {
+              "text": "and courses are pitching you is inbound.",
+              "duration": 3.84,
+              "offset": 141.84,
+              "lang": "en"
+            },
+            {
+              "text": "In reality, if you&amp;#39;re a total beginner,",
+              "duration": 3.44,
+              "offset": 143.76,
+              "lang": "en"
+            },
+            {
+              "text": "more or less, the only way that you can",
+              "duration": 3.36,
+              "offset": 145.68,
+              "lang": "en"
+            },
+            {
+              "text": "actually generate outsized opportunities",
+              "duration": 4.08,
+              "offset": 147.2,
+              "lang": "en"
+            },
+            {
+              "text": "is through outbound. So, it&amp;#39;s not just",
+              "duration": 4.479,
+              "offset": 149.04,
+              "lang": "en"
+            },
+            {
+              "text": "sitting on your butt and, you know,",
+              "duration": 3.679,
+              "offset": 151.28,
+              "lang": "en"
+            },
+            {
+              "text": "hearing the chuch-ching noises while you",
+              "duration": 2.561,
+              "offset": 153.519,
+              "lang": "en"
+            },
+            {
+              "text": "sleep. What you have to do is you",
+              "duration": 2,
+              "offset": 154.959,
+              "lang": "en"
+            },
+            {
+              "text": "actually have to go and you have to",
+              "duration": 2.56,
+              "offset": 156.08,
+              "lang": "en"
+            },
+            {
+              "text": "hunt, you have to prospect, you have to,",
+              "duration": 3.041,
+              "offset": 156.959,
+              "lang": "en"
+            },
+            {
+              "text": "you know, get on the phone, you have to",
+              "duration": 3.44,
+              "offset": 158.64,
+              "lang": "en"
+            },
+            {
+              "text": "dial, you have to record Loom videos,",
+              "duration": 3.84,
+              "offset": 160,
+              "lang": "en"
+            },
+            {
+              "text": "you have to send cold emails, you have",
+              "duration": 3.12,
+              "offset": 162.08,
+              "lang": "en"
+            },
+            {
+              "text": "to put yourself out there over and over",
+              "duration": 3.039,
+              "offset": 163.84,
+              "lang": "en"
+            },
+            {
+              "text": "and over again. And what you&amp;#39;ll find is",
+              "duration": 3.84,
+              "offset": 165.2,
+              "lang": "en"
+            },
+            {
+              "text": "that&amp;#39;s not very sexy. So, very few",
+              "duration": 4,
+              "offset": 166.879,
+              "lang": "en"
+            },
+            {
+              "text": "people ultimately talk about that. But",
+              "duration": 3.68,
+              "offset": 169.04,
+              "lang": "en"
+            },
+            {
+              "text": "if you want to make a business uh work",
+              "duration": 3.281,
+              "offset": 170.879,
+              "lang": "en"
+            },
+            {
+              "text": "from scratch, especially in like a",
+              "duration": 4,
+              "offset": 172.72,
+              "lang": "en"
+            },
+            {
+              "text": "bootstrapped way, you can&amp;#39;t focus on the",
+              "duration": 4.32,
+              "offset": 174.16,
+              "lang": "en"
+            },
+            {
+              "text": "inbound. Inbound just doesn&amp;#39;t work.",
+              "duration": 4.239,
+              "offset": 176.72,
+              "lang": "en"
+            },
+            {
+              "text": "Okay? So, be very skeptical of anybody",
+              "duration": 3.839,
+              "offset": 178.48,
+              "lang": "en"
+            },
+            {
+              "text": "that&amp;#39;s selling inbound to a total",
+              "duration": 3.2,
+              "offset": 180.959,
+              "lang": "en"
+            },
+            {
+              "text": "beginner audience for that reason. And",
+              "duration": 3.681,
+              "offset": 182.319,
+              "lang": "en"
+            },
+            {
+              "text": "then ultimately uh marketplaces end up",
+              "duration": 3.521,
+              "offset": 184.159,
+              "lang": "en"
+            },
+            {
+              "text": "flooded with tens of thousands of people",
+              "duration": 3.2,
+              "offset": 186,
+              "lang": "en"
+            },
+            {
+              "text": "that try the exact same thing that are",
+              "duration": 3.44,
+              "offset": 187.68,
+              "lang": "en"
+            },
+            {
+              "text": "being promoted. Now what I mean by this",
+              "duration": 4.24,
+              "offset": 189.2,
+              "lang": "en"
+            },
+            {
+              "text": "is unfortunately simply by virtue of the",
+              "duration": 4.08,
+              "offset": 191.12,
+              "lang": "en"
+            },
+            {
+              "text": "fact that beginners obviously want",
+              "duration": 3.04,
+              "offset": 193.44,
+              "lang": "en"
+            },
+            {
+              "text": "simple things that they could follow",
+              "duration": 4.56,
+              "offset": 195.2,
+              "lang": "en"
+            },
+            {
+              "text": "step by step. People confuse strategy",
+              "duration": 6.16,
+              "offset": 196.48,
+              "lang": "en"
+            },
+            {
+              "text": "with tactics. To be abundantly clear",
+              "duration": 4.32,
+              "offset": 199.76,
+              "lang": "en"
+            },
+            {
+              "text": "strategy and tactics are very different",
+              "duration": 3.76,
+              "offset": 202.64,
+              "lang": "en"
+            },
+            {
+              "text": "things. A tactic is something like uh",
+              "duration": 4.72,
+              "offset": 204.08,
+              "lang": "en"
+            },
+            {
+              "text": "cold email copy. A tactic is something",
+              "duration": 4.72,
+              "offset": 206.4,
+              "lang": "en"
+            },
+            {
+              "text": "like a script. A tactic is like, I don&amp;#39;t",
+              "duration": 3.999,
+              "offset": 208.8,
+              "lang": "en"
+            },
+            {
+              "text": "know, some sort of like advertising that",
+              "duration": 3.679,
+              "offset": 211.12,
+              "lang": "en"
+            },
+            {
+              "text": "you&amp;#39;re copying. The strategy is the",
+              "duration": 3.841,
+              "offset": 212.799,
+              "lang": "en"
+            },
+            {
+              "text": "deeper reasons why you choose the",
+              "duration": 4.16,
+              "offset": 214.799,
+              "lang": "en"
+            },
+            {
+              "text": "tactics. It&amp;#39;s like human psychology.",
+              "duration": 4.64,
+              "offset": 216.64,
+              "lang": "en"
+            },
+            {
+              "text": "It&amp;#39;s like sales skills. It&amp;#39;s like uh",
+              "duration": 5.601,
+              "offset": 218.959,
+              "lang": "en"
+            },
+            {
+              "text": "market understanding. Okay? So, if you",
+              "duration": 4.879,
+              "offset": 221.28,
+              "lang": "en"
+            },
+            {
+              "text": "just spend your entire life trying to",
+              "duration": 3.52,
+              "offset": 224.56,
+              "lang": "en"
+            },
+            {
+              "text": "copy the tactics, which is what",
+              "duration": 3.521,
+              "offset": 226.159,
+              "lang": "en"
+            },
+            {
+              "text": "ultimately these courses and programs",
+              "duration": 3.36,
+              "offset": 228.08,
+              "lang": "en"
+            },
+            {
+              "text": "get you really good at doing, the second",
+              "duration": 3.44,
+              "offset": 229.68,
+              "lang": "en"
+            },
+            {
+              "text": "that the market changes, you&amp;#39;re not",
+              "duration": 3.6,
+              "offset": 231.44,
+              "lang": "en"
+            },
+            {
+              "text": "going to be able to accommodate. When",
+              "duration": 4,
+              "offset": 233.12,
+              "lang": "en"
+            },
+            {
+              "text": "markets get saturated with millions of",
+              "duration": 4.24,
+              "offset": 235.04,
+              "lang": "en"
+            },
+            {
+              "text": "people doing the exact same tactic, the",
+              "duration": 3.92,
+              "offset": 237.12,
+              "lang": "en"
+            },
+            {
+              "text": "only people that actually make it are",
+              "duration": 3.28,
+              "offset": 239.28,
+              "lang": "en"
+            },
+            {
+              "text": "people that understand the strategy",
+              "duration": 2.72,
+              "offset": 241.04,
+              "lang": "en"
+            },
+            {
+              "text": "because people that understand the",
+              "duration": 2.56,
+              "offset": 242.56,
+              "lang": "en"
+            },
+            {
+              "text": "strategy can generate new tactics",
+              "duration": 2.88,
+              "offset": 243.76,
+              "lang": "en"
+            },
+            {
+              "text": "anytime they want. But people that",
+              "duration": 2.88,
+              "offset": 245.12,
+              "lang": "en"
+            },
+            {
+              "text": "understand tactics, they have no idea",
+              "duration": 2.959,
+              "offset": 246.64,
+              "lang": "en"
+            },
+            {
+              "text": "what the underlying strategy is. So they",
+              "duration": 3.599,
+              "offset": 248,
+              "lang": "en"
+            },
+            {
+              "text": "are screwed. So don&amp;#39;t be one of those",
+              "duration": 4.161,
+              "offset": 249.599,
+              "lang": "en"
+            },
+            {
+              "text": "tacticon people. Be a strategy only",
+              "duration": 4,
+              "offset": 251.599,
+              "lang": "en"
+            },
+            {
+              "text": "person. Now obviously the question is",
+              "duration": 3.68,
+              "offset": 253.76,
+              "lang": "en"
+            },
+            {
+              "text": "how the hell do you do that? Well, the",
+              "duration": 3.76,
+              "offset": 255.599,
+              "lang": "en"
+            },
+            {
+              "text": "way that you do it is you avoid these",
+              "duration": 4.24,
+              "offset": 257.44,
+              "lang": "en"
+            },
+            {
+              "text": "productbased businesses. To make a long",
+              "duration": 4.161,
+              "offset": 259.359,
+              "lang": "en"
+            },
+            {
+              "text": "story short, when you&amp;#39;re starting out as",
+              "duration": 3.36,
+              "offset": 261.68,
+              "lang": "en"
+            },
+            {
+              "text": "a beginner in entrepreneurship, you",
+              "duration": 2.8,
+              "offset": 263.52,
+              "lang": "en"
+            },
+            {
+              "text": "basically have a fundamental choice",
+              "duration": 2.879,
+              "offset": 265.04,
+              "lang": "en"
+            },
+            {
+              "text": "between two types of businesses. You",
+              "duration": 3.12,
+              "offset": 266.32,
+              "lang": "en"
+            },
+            {
+              "text": "have a product based business or you",
+              "duration": 3.28,
+              "offset": 267.919,
+              "lang": "en"
+            },
+            {
+              "text": "have a service-based business. Product",
+              "duration": 3.44,
+              "offset": 269.44,
+              "lang": "en"
+            },
+            {
+              "text": "based business is selling something like",
+              "duration": 3.921,
+              "offset": 271.199,
+              "lang": "en"
+            },
+            {
+              "text": "a widget on Amazon. Let&amp;#39;s say it&amp;#39;s",
+              "duration": 3.759,
+              "offset": 272.88,
+              "lang": "en"
+            },
+            {
+              "text": "e-commerce for the most part. It&amp;#39;s stuff",
+              "duration": 3.44,
+              "offset": 275.12,
+              "lang": "en"
+            },
+            {
+              "text": "like information products, right? Called",
+              "duration": 3.84,
+              "offset": 276.639,
+              "lang": "en"
+            },
+            {
+              "text": "products for a reason. A service on the",
+              "duration": 3.52,
+              "offset": 278.56,
+              "lang": "en"
+            },
+            {
+              "text": "other hand is something that you do for",
+              "duration": 3.601,
+              "offset": 280.479,
+              "lang": "en"
+            },
+            {
+              "text": "somebody. It&amp;#39;s like a landscaping gig.",
+              "duration": 3.92,
+              "offset": 282.08,
+              "lang": "en"
+            },
+            {
+              "text": "It&amp;#39;s like HVAC. It&amp;#39;s like plumbing. It&amp;#39;s",
+              "duration": 5.44,
+              "offset": 284.08,
+              "lang": "en"
+            },
+            {
+              "text": "like digital marketing. like SEO, PPC,",
+              "duration": 5.919,
+              "offset": 286,
+              "lang": "en"
+            },
+            {
+              "text": "AI, and automation. Now, the core",
+              "duration": 4.08,
+              "offset": 289.52,
+              "lang": "en"
+            },
+            {
+              "text": "advantage of service businesses over",
+              "duration": 3.601,
+              "offset": 291.919,
+              "lang": "en"
+            },
+            {
+              "text": "product businesses is they require very",
+              "duration": 3.84,
+              "offset": 293.6,
+              "lang": "en"
+            },
+            {
+              "text": "little upfront investment. The only",
+              "duration": 3.44,
+              "offset": 295.52,
+              "lang": "en"
+            },
+            {
+              "text": "upfront investment you basically have to",
+              "duration": 3.44,
+              "offset": 297.44,
+              "lang": "en"
+            },
+            {
+              "text": "make in a service business is you have",
+              "duration": 3.679,
+              "offset": 298.96,
+              "lang": "en"
+            },
+            {
+              "text": "to use your time and you have to use",
+              "duration": 4.319,
+              "offset": 300.88,
+              "lang": "en"
+            },
+            {
+              "text": "developed skills to manage and fulfill",
+              "duration": 4.721,
+              "offset": 302.639,
+              "lang": "en"
+            },
+            {
+              "text": "the expectations of clients. But a lot",
+              "duration": 3.28,
+              "offset": 305.199,
+              "lang": "en"
+            },
+            {
+              "text": "of the time, you don&amp;#39;t really have to",
+              "duration": 3.04,
+              "offset": 307.36,
+              "lang": "en"
+            },
+            {
+              "text": "invest that much money. And typically,",
+              "duration": 3.601,
+              "offset": 308.479,
+              "lang": "en"
+            },
+            {
+              "text": "nowhere near as much money as a product",
+              "duration": 3.28,
+              "offset": 310.4,
+              "lang": "en"
+            },
+            {
+              "text": "based business because you don&amp;#39;t have to",
+              "duration": 3.2,
+              "offset": 312.08,
+              "lang": "en"
+            },
+            {
+              "text": "make the product. The benefit to this",
+              "duration": 4.079,
+              "offset": 313.68,
+              "lang": "en"
+            },
+            {
+              "text": "for beginners is if you are choosing a",
+              "duration": 4.16,
+              "offset": 315.28,
+              "lang": "en"
+            },
+            {
+              "text": "service business, you get this learn",
+              "duration": 3.921,
+              "offset": 317.759,
+              "lang": "en"
+            },
+            {
+              "text": "while you earn advantage that allows you",
+              "duration": 3.8,
+              "offset": 319.44,
+              "lang": "en"
+            },
+            {
+              "text": "to generate cash flow while also",
+              "duration": 3.2,
+              "offset": 321.68,
+              "lang": "en"
+            },
+            {
+              "text": "simultaneously deepening your",
+              "duration": 3.72,
+              "offset": 323.24,
+              "lang": "en"
+            },
+            {
+              "text": "understanding of client needs, industry",
+              "duration": 3.92,
+              "offset": 324.88,
+              "lang": "en"
+            },
+            {
+              "text": "problems, things like marketing, things",
+              "duration": 3.64,
+              "offset": 326.96,
+              "lang": "en"
+            },
+            {
+              "text": "like sales, and ultimately automation",
+              "duration": 3.839,
+              "offset": 328.8,
+              "lang": "en"
+            },
+            {
+              "text": "opportunities. So my recommendation for",
+              "duration": 4.039,
+              "offset": 330.6,
+              "lang": "en"
+            },
+            {
+              "text": "you is pick a service business. Okay?",
+              "duration": 5.041,
+              "offset": 332.639,
+              "lang": "en"
+            },
+            {
+              "text": "Pick AI automation agency as a model.",
+              "duration": 4.801,
+              "offset": 334.639,
+              "lang": "en"
+            },
+            {
+              "text": "Don&amp;#39;t pick, you know, make a digital",
+              "duration": 3.359,
+              "offset": 337.68,
+              "lang": "en"
+            },
+            {
+              "text": "product and put it on some Notion",
+              "duration": 3.199,
+              "offset": 339.44,
+              "lang": "en"
+            },
+            {
+              "text": "template that&amp;#39;s generated using AI and",
+              "duration": 2.88,
+              "offset": 341.039,
+              "lang": "en"
+            },
+            {
+              "text": "then try and sell it through inbound",
+              "duration": 2.641,
+              "offset": 342.639,
+              "lang": "en"
+            },
+            {
+              "text": "ads. That stuff just really doesn&amp;#39;t",
+              "duration": 3.041,
+              "offset": 343.919,
+              "lang": "en"
+            },
+            {
+              "text": "work, guys. It it sucks for me to say,",
+              "duration": 3.04,
+              "offset": 345.28,
+              "lang": "en"
+            },
+            {
+              "text": "but if you&amp;#39;re a beginner, you have no",
+              "duration": 2.48,
+              "offset": 346.96,
+              "lang": "en"
+            },
+            {
+              "text": "idea where to even start with that",
+              "duration": 2.8,
+              "offset": 348.32,
+              "lang": "en"
+            },
+            {
+              "text": "stuff. It&amp;#39;s much better focusing on the",
+              "duration": 3.36,
+              "offset": 349.44,
+              "lang": "en"
+            },
+            {
+              "text": "simple 0ero to one stuff that at least",
+              "duration": 3.28,
+              "offset": 351.12,
+              "lang": "en"
+            },
+            {
+              "text": "gets a few dollars in your bank account.",
+              "duration": 2.88,
+              "offset": 352.8,
+              "lang": "en"
+            },
+            {
+              "text": "And once you have that, you can worry",
+              "duration": 3.04,
+              "offset": 354.4,
+              "lang": "en"
+            },
+            {
+              "text": "about building these higher level flows",
+              "duration": 3,
+              "offset": 355.68,
+              "lang": "en"
+            },
+            {
+              "text": "and funnels and all that stuff",
+              "duration": 3.44,
+              "offset": 357.44,
+              "lang": "en"
+            },
+            {
+              "text": "afterwards. So, the service model allows",
+              "duration": 4.12,
+              "offset": 358.68,
+              "lang": "en"
+            },
+            {
+              "text": "you to monetize your skills. That&amp;#39;s the",
+              "duration": 3.12,
+              "offset": 360.88,
+              "lang": "en"
+            },
+            {
+              "text": "main part. You&amp;#39;re monetizing your",
+              "duration": 2.56,
+              "offset": 362.8,
+              "lang": "en"
+            },
+            {
+              "text": "skills. And you don&amp;#39;t need any external",
+              "duration": 3.28,
+              "offset": 364,
+              "lang": "en"
+            },
+            {
+              "text": "funding for that. Each client project",
+              "duration": 3.92,
+              "offset": 365.36,
+              "lang": "en"
+            },
+            {
+              "text": "also becomes a paid case study. You get",
+              "duration": 3.84,
+              "offset": 367.28,
+              "lang": "en"
+            },
+            {
+              "text": "to learn while you earn for your growing",
+              "duration": 3.199,
+              "offset": 369.28,
+              "lang": "en"
+            },
+            {
+              "text": "business portfolio. And then you get to",
+              "duration": 3.04,
+              "offset": 371.12,
+              "lang": "en"
+            },
+            {
+              "text": "use that business portfolio to sell more",
+              "duration": 4.641,
+              "offset": 372.479,
+              "lang": "en"
+            },
+            {
+              "text": "people. If I could do like a simple SOP,",
+              "duration": 4.159,
+              "offset": 374.16,
+              "lang": "en"
+            },
+            {
+              "text": "that stands for standard operating",
+              "duration": 2.24,
+              "offset": 377.12,
+              "lang": "en"
+            },
+            {
+              "text": "procedure, something you&amp;#39;re probably",
+              "duration": 2.16,
+              "offset": 378.319,
+              "lang": "en"
+            },
+            {
+              "text": "going to be building a lot of in",
+              "duration": 2.559,
+              "offset": 379.36,
+              "lang": "en"
+            },
+            {
+              "text": "business, this is what it would look",
+              "duration": 2.801,
+              "offset": 380.479,
+              "lang": "en"
+            },
+            {
+              "text": "like. You have lots of skills and you",
+              "duration": 3.361,
+              "offset": 381.919,
+              "lang": "en"
+            },
+            {
+              "text": "have lots of time. If you choose a",
+              "duration": 3.44,
+              "offset": 383.28,
+              "lang": "en"
+            },
+            {
+              "text": "productbased approach, it&amp;#39;s going to",
+              "duration": 2.72,
+              "offset": 385.28,
+              "lang": "en"
+            },
+            {
+              "text": "take you time to develop the product. A",
+              "duration": 2.64,
+              "offset": 386.72,
+              "lang": "en"
+            },
+            {
+              "text": "lot of the AI people are saying, &amp;quot;Well,",
+              "duration": 3.199,
+              "offset": 388,
+              "lang": "en"
+            },
+            {
+              "text": "it takes you five minutes. You whip up a",
+              "duration": 3.44,
+              "offset": 389.36,
+              "lang": "en"
+            },
+            {
+              "text": "template, a prompt, send it out.&amp;quot; Those",
+              "duration": 3.201,
+              "offset": 391.199,
+              "lang": "en"
+            },
+            {
+              "text": "just aren&amp;#39;t very high quality yet. So,",
+              "duration": 3.6,
+              "offset": 392.8,
+              "lang": "en"
+            },
+            {
+              "text": "you can&amp;#39;t exactly do that. You then",
+              "duration": 3.12,
+              "offset": 394.4,
+              "lang": "en"
+            },
+            {
+              "text": "launch your marketing for the product",
+              "duration": 2.16,
+              "offset": 396.4,
+              "lang": "en"
+            },
+            {
+              "text": "because you start with the product then",
+              "duration": 2.56,
+              "offset": 397.52,
+              "lang": "en"
+            },
+            {
+              "text": "you do marketing afterwards. That might",
+              "duration": 3.28,
+              "offset": 398.56,
+              "lang": "en"
+            },
+            {
+              "text": "take you another month. Okay. If you get",
+              "duration": 3.36,
+              "offset": 400.08,
+              "lang": "en"
+            },
+            {
+              "text": "your first sales, which is a big maybe",
+              "duration": 2.32,
+              "offset": 401.84,
+              "lang": "en"
+            },
+            {
+              "text": "because you don&amp;#39;t really know what",
+              "duration": 2.16,
+              "offset": 403.44,
+              "lang": "en"
+            },
+            {
+              "text": "you&amp;#39;re doing, you might make your first",
+              "duration": 3.599,
+              "offset": 404.16,
+              "lang": "en"
+            },
+            {
+              "text": "thousand or $2,000 in like a few months.",
+              "duration": 4,
+              "offset": 405.6,
+              "lang": "en"
+            },
+            {
+              "text": "That might take a like a crazy amount of",
+              "duration": 3.681,
+              "offset": 407.759,
+              "lang": "en"
+            },
+            {
+              "text": "time. As a beginner, the number one",
+              "duration": 3.599,
+              "offset": 409.6,
+              "lang": "en"
+            },
+            {
+              "text": "thing you don&amp;#39;t have is you do not have",
+              "duration": 3.759,
+              "offset": 411.44,
+              "lang": "en"
+            },
+            {
+              "text": "feedback. And if you want to like stay",
+              "duration": 3.761,
+              "offset": 413.199,
+              "lang": "en"
+            },
+            {
+              "text": "in entrepreneurship and not fail like",
+              "duration": 3.681,
+              "offset": 415.199,
+              "lang": "en"
+            },
+            {
+              "text": "the 95% of people that try this, you",
+              "duration": 3.28,
+              "offset": 416.96,
+              "lang": "en"
+            },
+            {
+              "text": "need some sort of positive feedback as",
+              "duration": 2.64,
+              "offset": 418.88,
+              "lang": "en"
+            },
+            {
+              "text": "quickly as possible. Contrast that with",
+              "duration": 3.12,
+              "offset": 420.24,
+              "lang": "en"
+            },
+            {
+              "text": "a service-based approach. You do, I",
+              "duration": 3.04,
+              "offset": 421.52,
+              "lang": "en"
+            },
+            {
+              "text": "don&amp;#39;t know, some sort of free or very",
+              "duration": 2.64,
+              "offset": 423.36,
+              "lang": "en"
+            },
+            {
+              "text": "low paid work to get your first case",
+              "duration": 3.6,
+              "offset": 424.56,
+              "lang": "en"
+            },
+            {
+              "text": "study. Use that case study to sell your",
+              "duration": 4,
+              "offset": 426,
+              "lang": "en"
+            },
+            {
+              "text": "first actual paid project. You then",
+              "duration": 3.439,
+              "offset": 428.16,
+              "lang": "en"
+            },
+            {
+              "text": "deliver some results. You make some more",
+              "duration": 2.8,
+              "offset": 430,
+              "lang": "en"
+            },
+            {
+              "text": "money. You take all that money, you",
+              "duration": 3.201,
+              "offset": 431.599,
+              "lang": "en"
+            },
+            {
+              "text": "reinvest it in skills, okay? Skill",
+              "duration": 3.839,
+              "offset": 432.8,
+              "lang": "en"
+            },
+            {
+              "text": "stacking. So, you learn sales, you learn",
+              "duration": 2.959,
+              "offset": 434.8,
+              "lang": "en"
+            },
+            {
+              "text": "marketing, you learn lead genen, you",
+              "duration": 2.641,
+              "offset": 436.639,
+              "lang": "en"
+            },
+            {
+              "text": "learn all these important things. Then",
+              "duration": 3.041,
+              "offset": 437.759,
+              "lang": "en"
+            },
+            {
+              "text": "you scale. And then finally, after",
+              "duration": 2.96,
+              "offset": 439.28,
+              "lang": "en"
+            },
+            {
+              "text": "you&amp;#39;ve scaled a business and after",
+              "duration": 2.64,
+              "offset": 440.8,
+              "lang": "en"
+            },
+            {
+              "text": "you&amp;#39;ve done all this, by the way, in",
+              "duration": 2.72,
+              "offset": 442.24,
+              "lang": "en"
+            },
+            {
+              "text": "like one to two months instead of four",
+              "duration": 2.879,
+              "offset": 443.44,
+              "lang": "en"
+            },
+            {
+              "text": "to six months, then you can just",
+              "duration": 3.359,
+              "offset": 444.96,
+              "lang": "en"
+            },
+            {
+              "text": "productize your service and then turn",
+              "duration": 3.921,
+              "offset": 446.319,
+              "lang": "en"
+            },
+            {
+              "text": "that thing from a series of steps that",
+              "duration": 3.041,
+              "offset": 448.319,
+              "lang": "en"
+            },
+            {
+              "text": "you have to do every time you onboard a",
+              "duration": 2.72,
+              "offset": 450.24,
+              "lang": "en"
+            },
+            {
+              "text": "new client to something like a product.",
+              "duration": 4.239,
+              "offset": 451.36,
+              "lang": "en"
+            },
+            {
+              "text": "Anyway, what does this mean? This is the",
+              "duration": 5.04,
+              "offset": 452.96,
+              "lang": "en"
+            },
+            {
+              "text": "definition of double dipping. And",
+              "duration": 4.241,
+              "offset": 455.599,
+              "lang": "en"
+            },
+            {
+              "text": "anytime you&amp;#39;re in business, you look for",
+              "duration": 4.16,
+              "offset": 458,
+              "lang": "en"
+            },
+            {
+              "text": "opportunities to double dip. So, I guess",
+              "duration": 4.24,
+              "offset": 459.84,
+              "lang": "en"
+            },
+            {
+              "text": "to make a long story short, the TLDDR,",
+              "duration": 3.36,
+              "offset": 462.16,
+              "lang": "en"
+            },
+            {
+              "text": "too long, didn&amp;#39;t read the the cliff",
+              "duration": 2.8,
+              "offset": 464.08,
+              "lang": "en"
+            },
+            {
+              "text": "notes, whatever you want to call them,",
+              "duration": 2.64,
+              "offset": 465.52,
+              "lang": "en"
+            },
+            {
+              "text": "are if you&amp;#39;re going to start this",
+              "duration": 3.52,
+              "offset": 466.88,
+              "lang": "en"
+            },
+            {
+              "text": "business model, avoid inboundbased",
+              "duration": 4.319,
+              "offset": 468.16,
+              "lang": "en"
+            },
+            {
+              "text": "business models that have you creating a",
+              "duration": 3.68,
+              "offset": 470.4,
+              "lang": "en"
+            },
+            {
+              "text": "product before you actually get out and",
+              "duration": 3.361,
+              "offset": 472.479,
+              "lang": "en"
+            },
+            {
+              "text": "sell it, and instead focus on",
+              "duration": 3.519,
+              "offset": 474.08,
+              "lang": "en"
+            },
+            {
+              "text": "service-based business models that let",
+              "duration": 5.039,
+              "offset": 475.84,
+              "lang": "en"
+            },
+            {
+              "text": "you learn while you earn. Now, the",
+              "duration": 4.961,
+              "offset": 477.599,
+              "lang": "en"
+            },
+            {
+              "text": "specific business model that I recommend",
+              "duration": 4.641,
+              "offset": 480.879,
+              "lang": "en"
+            },
+            {
+              "text": "is AI, automation, agencies, or",
+              "duration": 4.72,
+              "offset": 482.56,
+              "lang": "en"
+            },
+            {
+              "text": "freelancing. All right, so this is",
+              "duration": 3.679,
+              "offset": 485.52,
+              "lang": "en"
+            },
+            {
+              "text": "different from all the fancy AI products",
+              "duration": 3.199,
+              "offset": 487.28,
+              "lang": "en"
+            },
+            {
+              "text": "that you&amp;#39;re probably seeing a lot of",
+              "duration": 3.28,
+              "offset": 489.199,
+              "lang": "en"
+            },
+            {
+              "text": "people do. So what is an AI automation",
+              "duration": 3.761,
+              "offset": 490.479,
+              "lang": "en"
+            },
+            {
+              "text": "agency? Well, believe it or not,",
+              "duration": 5.44,
+              "offset": 492.479,
+              "lang": "en"
+            },
+            {
+              "text": "agencies are very old. Agencies are a",
+              "duration": 6,
+              "offset": 494.24,
+              "lang": "en"
+            },
+            {
+              "text": "collection usually of people that are",
+              "duration": 3.84,
+              "offset": 497.919,
+              "lang": "en"
+            },
+            {
+              "text": "good at something. So you have, I don&amp;#39;t",
+              "duration": 3.92,
+              "offset": 500.24,
+              "lang": "en"
+            },
+            {
+              "text": "know, basically five or 10 freelancers.",
+              "duration": 3.601,
+              "offset": 501.759,
+              "lang": "en"
+            },
+            {
+              "text": "This is the idea of a traditional",
+              "duration": 3.12,
+              "offset": 504.16,
+              "lang": "en"
+            },
+            {
+              "text": "agency. Anyway, one person is like a",
+              "duration": 4.08,
+              "offset": 505.36,
+              "lang": "en"
+            },
+            {
+              "text": "PPC, another person&amp;#39;s an SEO person,",
+              "duration": 3.84,
+              "offset": 507.28,
+              "lang": "en"
+            },
+            {
+              "text": "another person&amp;#39;s like a copywriter, and",
+              "duration": 3.12,
+              "offset": 509.44,
+              "lang": "en"
+            },
+            {
+              "text": "they all combine forces, they",
+              "duration": 2.719,
+              "offset": 511.12,
+              "lang": "en"
+            },
+            {
+              "text": "collaborate, there&amp;#39;s some sort of",
+              "duration": 2.64,
+              "offset": 512.56,
+              "lang": "en"
+            },
+            {
+              "text": "manager around them that, you know,",
+              "duration": 2.801,
+              "offset": 513.839,
+              "lang": "en"
+            },
+            {
+              "text": "coordinates their work and and so on and",
+              "duration": 3.12,
+              "offset": 515.2,
+              "lang": "en"
+            },
+            {
+              "text": "so forth. And then they form an agency",
+              "duration": 3.519,
+              "offset": 516.64,
+              "lang": "en"
+            },
+            {
+              "text": "which can offer a collection of these",
+              "duration": 3.839,
+              "offset": 518.32,
+              "lang": "en"
+            },
+            {
+              "text": "services. And the idea is because these",
+              "duration": 3.76,
+              "offset": 520.159,
+              "lang": "en"
+            },
+            {
+              "text": "people are so great at their individual",
+              "duration": 3.12,
+              "offset": 522.159,
+              "lang": "en"
+            },
+            {
+              "text": "services when you combine them, they",
+              "duration": 3.521,
+              "offset": 523.919,
+              "lang": "en"
+            },
+            {
+              "text": "tend to exceed the sum total of their",
+              "duration": 3.601,
+              "offset": 525.279,
+              "lang": "en"
+            },
+            {
+              "text": "parts. You know, the whole is greater",
+              "duration": 2.72,
+              "offset": 527.44,
+              "lang": "en"
+            },
+            {
+              "text": "than the sum of its parts. That&amp;#39;s kind",
+              "duration": 3.04,
+              "offset": 528.88,
+              "lang": "en"
+            },
+            {
+              "text": "of the idea behind the agency. Then",
+              "duration": 4.32,
+              "offset": 530.16,
+              "lang": "en"
+            },
+            {
+              "text": "because the agency can maximize project",
+              "duration": 3.84,
+              "offset": 531.92,
+              "lang": "en"
+            },
+            {
+              "text": "acquisition because they have the",
+              "duration": 2.479,
+              "offset": 534.48,
+              "lang": "en"
+            },
+            {
+              "text": "resources, they can also do things like",
+              "duration": 2.72,
+              "offset": 535.76,
+              "lang": "en"
+            },
+            {
+              "text": "hire salespeople and then everybody just",
+              "duration": 2.801,
+              "offset": 536.959,
+              "lang": "en"
+            },
+            {
+              "text": "gets to specialize in their own thing.",
+              "duration": 2.64,
+              "offset": 538.48,
+              "lang": "en"
+            },
+            {
+              "text": "And as a result, the agency gets to",
+              "duration": 3.199,
+              "offset": 539.76,
+              "lang": "en"
+            },
+            {
+              "text": "grow. Now agencies have been around for",
+              "duration": 3.2,
+              "offset": 541.12,
+              "lang": "en"
+            },
+            {
+              "text": "a long time. The first kind of like",
+              "duration": 3.601,
+              "offset": 542.959,
+              "lang": "en"
+            },
+            {
+              "text": "legit agencies were the Madison Avenue",
+              "duration": 3.76,
+              "offset": 544.32,
+              "lang": "en"
+            },
+            {
+              "text": "advertising agencies back in I believe",
+              "duration": 3.839,
+              "offset": 546.56,
+              "lang": "en"
+            },
+            {
+              "text": "the late 50s or or the early 60s. So",
+              "duration": 4.08,
+              "offset": 548.08,
+              "lang": "en"
+            },
+            {
+              "text": "that whole business model is not new.",
+              "duration": 4.161,
+              "offset": 550.399,
+              "lang": "en"
+            },
+            {
+              "text": "The only difference basically is that",
+              "duration": 5.679,
+              "offset": 552.16,
+              "lang": "en"
+            },
+            {
+              "text": "now there&amp;#39;s just one really cool and",
+              "duration": 5.6,
+              "offset": 554.56,
+              "lang": "en"
+            },
+            {
+              "text": "kind of very all-encompassing service",
+              "duration": 3.921,
+              "offset": 557.839,
+              "lang": "en"
+            },
+            {
+              "text": "called AI automation which is just one",
+              "duration": 3.359,
+              "offset": 560.16,
+              "lang": "en"
+            },
+            {
+              "text": "of the service fulfillment pieces that",
+              "duration": 4.079,
+              "offset": 561.76,
+              "lang": "en"
+            },
+            {
+              "text": "an agency can provide. Okay. So what the",
+              "duration": 4.481,
+              "offset": 563.519,
+              "lang": "en"
+            },
+            {
+              "text": "AI automation agency business model is",
+              "duration": 4.321,
+              "offset": 565.839,
+              "lang": "en"
+            },
+            {
+              "text": "is it&amp;#39;s just a fulfillment mechanism for",
+              "duration": 4.88,
+              "offset": 568,
+              "lang": "en"
+            },
+            {
+              "text": "a very decades old business model. And",
+              "duration": 4.4,
+              "offset": 570.16,
+              "lang": "en"
+            },
+            {
+              "text": "that&amp;#39;s why it&amp;#39;s the ideal business model",
+              "duration": 3.6,
+              "offset": 572.88,
+              "lang": "en"
+            },
+            {
+              "text": "for beginners to start because there&amp;#39;s",
+              "duration": 3.44,
+              "offset": 574.56,
+              "lang": "en"
+            },
+            {
+              "text": "still reasonably high demand. They&amp;#39;re",
+              "duration": 3.039,
+              "offset": 576.48,
+              "lang": "en"
+            },
+            {
+              "text": "very low technical barriers and they&amp;#39;re",
+              "duration": 2.959,
+              "offset": 578,
+              "lang": "en"
+            },
+            {
+              "text": "also actually really good profit margins",
+              "duration": 2.961,
+              "offset": 579.519,
+              "lang": "en"
+            },
+            {
+              "text": "relative to traditional agencies. But",
+              "duration": 3.041,
+              "offset": 580.959,
+              "lang": "en"
+            },
+            {
+              "text": "one thing I didn&amp;#39;t mention here is that",
+              "duration": 2.84,
+              "offset": 582.48,
+              "lang": "en"
+            },
+            {
+              "text": "it is",
+              "duration": 3.279,
+              "offset": 584,
+              "lang": "en"
+            },
+            {
+              "text": "welldefined. People have been doing this",
+              "duration": 4.92,
+              "offset": 585.32,
+              "lang": "en"
+            },
+            {
+              "text": "for a very long time. So typically you",
+              "duration": 4.081,
+              "offset": 587.279,
+              "lang": "en"
+            },
+            {
+              "text": "don&amp;#39;t really have to invent anything",
+              "duration": 3.2,
+              "offset": 590.24,
+              "lang": "en"
+            },
+            {
+              "text": "new. Like whereas you know a lot of the",
+              "duration": 3.36,
+              "offset": 591.36,
+              "lang": "en"
+            },
+            {
+              "text": "time these products you&amp;#39;re going to have",
+              "duration": 2.88,
+              "offset": 593.44,
+              "lang": "en"
+            },
+            {
+              "text": "to invent something totally new and fill",
+              "duration": 4.16,
+              "offset": 594.72,
+              "lang": "en"
+            },
+            {
+              "text": "a need and get product market fit with",
+              "duration": 4.56,
+              "offset": 596.32,
+              "lang": "en"
+            },
+            {
+              "text": "services specifically agency services",
+              "duration": 3.04,
+              "offset": 598.88,
+              "lang": "en"
+            },
+            {
+              "text": "you don&amp;#39;t have to do any of that. The",
+              "duration": 2.88,
+              "offset": 600.88,
+              "lang": "en"
+            },
+            {
+              "text": "whole business model has been working",
+              "duration": 3.28,
+              "offset": 601.92,
+              "lang": "en"
+            },
+            {
+              "text": "like a welloiled machine for the better",
+              "duration": 3.12,
+              "offset": 603.76,
+              "lang": "en"
+            },
+            {
+              "text": "part of the last 60 years. All that you",
+              "duration": 4.48,
+              "offset": 605.2,
+              "lang": "en"
+            },
+            {
+              "text": "do is you apply your own skill and your",
+              "duration": 4.48,
+              "offset": 606.88,
+              "lang": "en"
+            },
+            {
+              "text": "ability to fulfill the projects that",
+              "duration": 3.44,
+              "offset": 609.68,
+              "lang": "en"
+            },
+            {
+              "text": "come your way in order to operate it.",
+              "duration": 2.88,
+              "offset": 611.36,
+              "lang": "en"
+            },
+            {
+              "text": "And because there are a lot of these",
+              "duration": 2.8,
+              "offset": 613.12,
+              "lang": "en"
+            },
+            {
+              "text": "defined road maps, you get people like",
+              "duration": 3.44,
+              "offset": 614.24,
+              "lang": "en"
+            },
+            {
+              "text": "me, get people like a bunch of other",
+              "duration": 3.12,
+              "offset": 615.92,
+              "lang": "en"
+            },
+            {
+              "text": "YouTube creators that are agency",
+              "duration": 3.2,
+              "offset": 617.68,
+              "lang": "en"
+            },
+            {
+              "text": "specific that you know can can show you",
+              "duration": 3.039,
+              "offset": 619.04,
+              "lang": "en"
+            },
+            {
+              "text": "how to do a pretty good job with this",
+              "duration": 2.72,
+              "offset": 620.88,
+              "lang": "en"
+            },
+            {
+              "text": "stuff to at least get from zero to one.",
+              "duration": 3.041,
+              "offset": 622.079,
+              "lang": "en"
+            },
+            {
+              "text": "Okay, there&amp;#39;s another major reason why",
+              "duration": 2.88,
+              "offset": 623.6,
+              "lang": "en"
+            },
+            {
+              "text": "this is a pretty chunky opportunity",
+              "duration": 3.6,
+              "offset": 625.12,
+              "lang": "en"
+            },
+            {
+              "text": "right now. So AI is just the fulfillment",
+              "duration": 4.08,
+              "offset": 626.48,
+              "lang": "en"
+            },
+            {
+              "text": "part of an agency, right? So, it&amp;#39;s",
+              "duration": 3.119,
+              "offset": 628.72,
+              "lang": "en"
+            },
+            {
+              "text": "nothing special in and of itself to run",
+              "duration": 2.64,
+              "offset": 630.56,
+              "lang": "en"
+            },
+            {
+              "text": "an AI automation agency. You still have",
+              "duration": 2.961,
+              "offset": 631.839,
+              "lang": "en"
+            },
+            {
+              "text": "to know how to run an agency. But",
+              "duration": 3.52,
+              "offset": 633.2,
+              "lang": "en"
+            },
+            {
+              "text": "because AI is so flashy right now, you",
+              "duration": 3.279,
+              "offset": 634.8,
+              "lang": "en"
+            },
+            {
+              "text": "can get away with offering that as a",
+              "duration": 3.2,
+              "offset": 636.72,
+              "lang": "en"
+            },
+            {
+              "text": "service, making more money, improved",
+              "duration": 3.521,
+              "offset": 638.079,
+              "lang": "en"
+            },
+            {
+              "text": "margins, and then you also get to do",
+              "duration": 3.52,
+              "offset": 639.92,
+              "lang": "en"
+            },
+            {
+              "text": "some templates. So, anyway, the second",
+              "duration": 3.28,
+              "offset": 641.6,
+              "lang": "en"
+            },
+            {
+              "text": "big reason why this is so valuable is",
+              "duration": 2.639,
+              "offset": 643.44,
+              "lang": "en"
+            },
+            {
+              "text": "because there are these no code tools",
+              "duration": 3.519,
+              "offset": 644.88,
+              "lang": "en"
+            },
+            {
+              "text": "like make.com and then naden and there",
+              "duration": 4.641,
+              "offset": 646.079,
+              "lang": "en"
+            },
+            {
+              "text": "also a few others that transformed this",
+              "duration": 4.721,
+              "offset": 648.399,
+              "lang": "en"
+            },
+            {
+              "text": "very high value service which used to be",
+              "duration": 4.559,
+              "offset": 650.72,
+              "lang": "en"
+            },
+            {
+              "text": "software engineering into something that",
+              "duration": 4.32,
+              "offset": 653.12,
+              "lang": "en"
+            },
+            {
+              "text": "is accessible to virtually anyone. These",
+              "duration": 4.56,
+              "offset": 655.279,
+              "lang": "en"
+            },
+            {
+              "text": "are drag and drop no code builders that",
+              "duration": 4.56,
+              "offset": 657.44,
+              "lang": "en"
+            },
+            {
+              "text": "allow you to set up pretty complicated",
+              "duration": 4.881,
+              "offset": 659.839,
+              "lang": "en"
+            },
+            {
+              "text": "workflows from your laptop with no",
+              "duration": 4.48,
+              "offset": 662,
+              "lang": "en"
+            },
+            {
+              "text": "actual programming experience which is",
+              "duration": 3.44,
+              "offset": 664.72,
+              "lang": "en"
+            },
+            {
+              "text": "pretty incredible. So my guess of this",
+              "duration": 3.84,
+              "offset": 666.48,
+              "lang": "en"
+            },
+            {
+              "text": "over here is that it&amp;#39;s well defined.",
+              "duration": 4.96,
+              "offset": 668.16,
+              "lang": "en"
+            },
+            {
+              "text": "This over here is that it is accessible.",
+              "duration": 4.56,
+              "offset": 670.32,
+              "lang": "en"
+            },
+            {
+              "text": "I like how my writing is getting worse",
+              "duration": 3.44,
+              "offset": 673.12,
+              "lang": "en"
+            },
+            {
+              "text": "every 5 seconds. If point number one is",
+              "duration": 2.88,
+              "offset": 674.88,
+              "lang": "en"
+            },
+            {
+              "text": "that it&amp;#39;s well defined. Point number two",
+              "duration": 2.959,
+              "offset": 676.56,
+              "lang": "en"
+            },
+            {
+              "text": "is that it&amp;#39;s very accessible now. Okay.",
+              "duration": 3.44,
+              "offset": 677.76,
+              "lang": "en"
+            },
+            {
+              "text": "And then point number three is that",
+              "duration": 3.44,
+              "offset": 679.519,
+              "lang": "en"
+            },
+            {
+              "text": "unlike other agency models like uh",
+              "duration": 3.28,
+              "offset": 681.2,
+              "lang": "en"
+            },
+            {
+              "text": "social media marketing agencies, I use",
+              "duration": 3.12,
+              "offset": 682.959,
+              "lang": "en"
+            },
+            {
+              "text": "an extra m there. They usually require",
+              "duration": 2.96,
+              "offset": 684.48,
+              "lang": "en"
+            },
+            {
+              "text": "some sort of constant ongoing work to",
+              "duration": 3.44,
+              "offset": 686.079,
+              "lang": "en"
+            },
+            {
+              "text": "maintain results. If you build a really",
+              "duration": 3.6,
+              "offset": 687.44,
+              "lang": "en"
+            },
+            {
+              "text": "good automated solution for somebody on",
+              "duration": 3.201,
+              "offset": 689.519,
+              "lang": "en"
+            },
+            {
+              "text": "retainer, that automated solution will",
+              "duration": 3.039,
+              "offset": 691.04,
+              "lang": "en"
+            },
+            {
+              "text": "actually continue delivering value even",
+              "duration": 2.4,
+              "offset": 692.72,
+              "lang": "en"
+            },
+            {
+              "text": "when you&amp;#39;re not actually around to",
+              "duration": 2.641,
+              "offset": 694.079,
+              "lang": "en"
+            },
+            {
+              "text": "product forward. Now, does this mean",
+              "duration": 3.12,
+              "offset": 695.12,
+              "lang": "en"
+            },
+            {
+              "text": "that this is passive investment? Does",
+              "duration": 3.04,
+              "offset": 696.72,
+              "lang": "en"
+            },
+            {
+              "text": "this mean that you get to earn while you",
+              "duration": 3.2,
+              "offset": 698.24,
+              "lang": "en"
+            },
+            {
+              "text": "sleep? No. Obviously, you still need to",
+              "duration": 3.199,
+              "offset": 699.76,
+              "lang": "en"
+            },
+            {
+              "text": "be around there to shepherd it. But I",
+              "duration": 2.48,
+              "offset": 701.44,
+              "lang": "en"
+            },
+            {
+              "text": "guess the point that I&amp;#39;m making is",
+              "duration": 2.56,
+              "offset": 702.959,
+              "lang": "en"
+            },
+            {
+              "text": "there&amp;#39;s a lot more inertia in AI and",
+              "duration": 3.039,
+              "offset": 703.92,
+              "lang": "en"
+            },
+            {
+              "text": "automation solutions because you&amp;#39;re not",
+              "duration": 3.121,
+              "offset": 705.519,
+              "lang": "en"
+            },
+            {
+              "text": "just giving somebody a deliverable. What",
+              "duration": 2.721,
+              "offset": 706.959,
+              "lang": "en"
+            },
+            {
+              "text": "you&amp;#39;re doing is you&amp;#39;re building a system",
+              "duration": 3.199,
+              "offset": 708.64,
+              "lang": "en"
+            },
+            {
+              "text": "that produces deliverables. Okay? So,",
+              "duration": 3.56,
+              "offset": 709.68,
+              "lang": "en"
+            },
+            {
+              "text": "this is",
+              "duration": 4,
+              "offset": 711.839,
+              "lang": "en"
+            },
+            {
+              "text": "long-term. And not only is it long-term,",
+              "duration": 4.36,
+              "offset": 713.24,
+              "lang": "en"
+            },
+            {
+              "text": "personally, I think it&amp;#39;s easier to",
+              "duration": 3.601,
+              "offset": 715.839,
+              "lang": "en"
+            },
+            {
+              "text": "justify high costs. They&amp;#39;re also",
+              "duration": 3.44,
+              "offset": 717.6,
+              "lang": "en"
+            },
+            {
+              "text": "exceptionally higher profit margins than",
+              "duration": 3.04,
+              "offset": 719.44,
+              "lang": "en"
+            },
+            {
+              "text": "the vast majority of other old school",
+              "duration": 3.2,
+              "offset": 721.04,
+              "lang": "en"
+            },
+            {
+              "text": "agencies because of this long-term and",
+              "duration": 4.08,
+              "offset": 722.48,
+              "lang": "en"
+            },
+            {
+              "text": "high ticket thing. So margins of 70%",
+              "duration": 4.24,
+              "offset": 724.24,
+              "lang": "en"
+            },
+            {
+              "text": "plus are not uncommon. And then what&amp;#39;s",
+              "duration": 3.04,
+              "offset": 726.56,
+              "lang": "en"
+            },
+            {
+              "text": "really cool is because these are cloud",
+              "duration": 2.24,
+              "offset": 728.48,
+              "lang": "en"
+            },
+            {
+              "text": "systems, you can actually template out",
+              "duration": 2.479,
+              "offset": 729.6,
+              "lang": "en"
+            },
+            {
+              "text": "the vast majority of them. Like a lot of",
+              "duration": 2.72,
+              "offset": 730.72,
+              "lang": "en"
+            },
+            {
+              "text": "people just want the same system built",
+              "duration": 3.281,
+              "offset": 732.079,
+              "lang": "en"
+            },
+            {
+              "text": "again and again and again and again or",
+              "duration": 3.199,
+              "offset": 733.44,
+              "lang": "en"
+            },
+            {
+              "text": "different clients want the exact same",
+              "duration": 2.479,
+              "offset": 735.36,
+              "lang": "en"
+            },
+            {
+              "text": "thing that you just delivered for client",
+              "duration": 2.721,
+              "offset": 736.639,
+              "lang": "en"
+            },
+            {
+              "text": "A. You know, they client B wants it,",
+              "duration": 3.361,
+              "offset": 737.839,
+              "lang": "en"
+            },
+            {
+              "text": "client C wants it, client D wants it.",
+              "duration": 3.12,
+              "offset": 739.36,
+              "lang": "en"
+            },
+            {
+              "text": "And because of that, you get to template",
+              "duration": 2.879,
+              "offset": 741.2,
+              "lang": "en"
+            },
+            {
+              "text": "and just copy and paste. meaning that",
+              "duration": 3.359,
+              "offset": 742.48,
+              "lang": "en"
+            },
+            {
+              "text": "you don&amp;#39;t actually have to go from like,",
+              "duration": 4.481,
+              "offset": 744.079,
+              "lang": "en"
+            },
+            {
+              "text": "you know, zero all the way up to 100% of",
+              "duration": 4.081,
+              "offset": 745.839,
+              "lang": "en"
+            },
+            {
+              "text": "the fulfillment. You kind of shortcut",
+              "duration": 2.399,
+              "offset": 748.56,
+              "lang": "en"
+            },
+            {
+              "text": "it. You can actually get a project",
+              "duration": 2.64,
+              "offset": 749.92,
+              "lang": "en"
+            },
+            {
+              "text": "that&amp;#39;s 80% of the way there and then",
+              "duration": 2.961,
+              "offset": 750.959,
+              "lang": "en"
+            },
+            {
+              "text": "just make a couple of changes and get it",
+              "duration": 3.2,
+              "offset": 752.56,
+              "lang": "en"
+            },
+            {
+              "text": "to that 100. That&amp;#39;s a 5x leverage for",
+              "duration": 2.8,
+              "offset": 753.92,
+              "lang": "en"
+            },
+            {
+              "text": "those of you guys that are keeping",
+              "duration": 3.36,
+              "offset": 755.76,
+              "lang": "en"
+            },
+            {
+              "text": "track. Okay, so here&amp;#39;s why this wins",
+              "duration": 4.16,
+              "offset": 756.72,
+              "lang": "en"
+            },
+            {
+              "text": "over other real models. Drop shipping",
+              "duration": 3.6,
+              "offset": 759.12,
+              "lang": "en"
+            },
+            {
+              "text": "and ecom requires constant product",
+              "duration": 3.199,
+              "offset": 760.88,
+              "lang": "en"
+            },
+            {
+              "text": "sourcing and customer service. If",
+              "duration": 3.359,
+              "offset": 762.72,
+              "lang": "en"
+            },
+            {
+              "text": "anybody here has tried the drop shipping",
+              "duration": 3.601,
+              "offset": 764.079,
+              "lang": "en"
+            },
+            {
+              "text": "and ecom, you need to constantly be",
+              "duration": 3.041,
+              "offset": 766.079,
+              "lang": "en"
+            },
+            {
+              "text": "sourcing new products. There&amp;#39;s an",
+              "duration": 3.04,
+              "offset": 767.68,
+              "lang": "en"
+            },
+            {
+              "text": "incredible amount of competition. You",
+              "duration": 3.279,
+              "offset": 769.12,
+              "lang": "en"
+            },
+            {
+              "text": "also have to focus big time on stuff",
+              "duration": 4.32,
+              "offset": 770.72,
+              "lang": "en"
+            },
+            {
+              "text": "like ads and stuff like tripwire offers",
+              "duration": 4.24,
+              "offset": 772.399,
+              "lang": "en"
+            },
+            {
+              "text": "and so on and so forth. And then, you",
+              "duration": 2.96,
+              "offset": 775.04,
+              "lang": "en"
+            },
+            {
+              "text": "know, you need to focus on on customer",
+              "duration": 2.64,
+              "offset": 776.639,
+              "lang": "en"
+            },
+            {
+              "text": "service as well. If you&amp;#39;re doing some",
+              "duration": 3.44,
+              "offset": 778,
+              "lang": "en"
+            },
+            {
+              "text": "sort of content creation with uh selling",
+              "duration": 4,
+              "offset": 779.279,
+              "lang": "en"
+            },
+            {
+              "text": "digital products, okay, where it&amp;#39;s kind",
+              "duration": 3.68,
+              "offset": 781.44,
+              "lang": "en"
+            },
+            {
+              "text": "of like inbound, you have ongoing",
+              "duration": 3.761,
+              "offset": 783.279,
+              "lang": "en"
+            },
+            {
+              "text": "production of said product, you have a",
+              "duration": 4.64,
+              "offset": 785.12,
+              "lang": "en"
+            },
+            {
+              "text": "much lower or slower time to market, and",
+              "duration": 4.479,
+              "offset": 787.04,
+              "lang": "en"
+            },
+            {
+              "text": "then there&amp;#39;s an uncertain monetization",
+              "duration": 3.44,
+              "offset": 789.76,
+              "lang": "en"
+            },
+            {
+              "text": "strategy. Don&amp;#39;t get me wrong, if you",
+              "duration": 3.281,
+              "offset": 791.519,
+              "lang": "en"
+            },
+            {
+              "text": "build a digital product like I have now",
+              "duration": 3.24,
+              "offset": 793.2,
+              "lang": "en"
+            },
+            {
+              "text": "with my maker school and make",
+              "duration": 3.68,
+              "offset": 794.8,
+              "lang": "en"
+            },
+            {
+              "text": "moneywithmake.com, when you do finally",
+              "duration": 3.959,
+              "offset": 796.44,
+              "lang": "en"
+            },
+            {
+              "text": "grow, you grow really fast. But most",
+              "duration": 3.84,
+              "offset": 798.48,
+              "lang": "en"
+            },
+            {
+              "text": "beginners don&amp;#39;t want to spend the first",
+              "duration": 4.161,
+              "offset": 800.399,
+              "lang": "en"
+            },
+            {
+              "text": "3 years of their life making, I don&amp;#39;t",
+              "duration": 4.639,
+              "offset": 802.32,
+              "lang": "en"
+            },
+            {
+              "text": "know, 25 cents. No, they obviously want",
+              "duration": 3.68,
+              "offset": 804.56,
+              "lang": "en"
+            },
+            {
+              "text": "to get up and running with something",
+              "duration": 3.44,
+              "offset": 806.959,
+              "lang": "en"
+            },
+            {
+              "text": "like an agency where instead of spending",
+              "duration": 3.839,
+              "offset": 808.24,
+              "lang": "en"
+            },
+            {
+              "text": "the vast majority of their introductory",
+              "duration": 3.44,
+              "offset": 810.399,
+              "lang": "en"
+            },
+            {
+              "text": "business period broke, they can actually",
+              "duration": 3.041,
+              "offset": 812.079,
+              "lang": "en"
+            },
+            {
+              "text": "make a little bit of money much quicker.",
+              "duration": 2.481,
+              "offset": 813.839,
+              "lang": "en"
+            },
+            {
+              "text": "And then if they wanted to, you know,",
+              "duration": 3.279,
+              "offset": 815.12,
+              "lang": "en"
+            },
+            {
+              "text": "eventually segue to some sort of digital",
+              "duration": 3.519,
+              "offset": 816.32,
+              "lang": "en"
+            },
+            {
+              "text": "product model, well, then they could do",
+              "duration": 3.12,
+              "offset": 818.399,
+              "lang": "en"
+            },
+            {
+              "text": "it then with money and resources. Okay?",
+              "duration": 2.961,
+              "offset": 819.839,
+              "lang": "en"
+            },
+            {
+              "text": "But, uh, most beginners don&amp;#39;t want to",
+              "duration": 2.961,
+              "offset": 821.519,
+              "lang": "en"
+            },
+            {
+              "text": "spend all that time in that weird limbo.",
+              "duration": 3.92,
+              "offset": 822.8,
+              "lang": "en"
+            },
+            {
+              "text": "Most beginners would rather be like this",
+              "duration": 3.919,
+              "offset": 824.48,
+              "lang": "en"
+            },
+            {
+              "text": "orange graph here and get a lot more",
+              "duration": 4.239,
+              "offset": 826.72,
+              "lang": "en"
+            },
+            {
+              "text": "area under the curve. So the last thing",
+              "duration": 4.401,
+              "offset": 828.399,
+              "lang": "en"
+            },
+            {
+              "text": "is software development needs extensive",
+              "duration": 3.12,
+              "offset": 830.959,
+              "lang": "en"
+            },
+            {
+              "text": "technical skills and longer time",
+              "duration": 2.56,
+              "offset": 832.8,
+              "lang": "en"
+            },
+            {
+              "text": "horizons. What I&amp;#39;m doing is I&amp;#39;m just",
+              "duration": 2.801,
+              "offset": 834.079,
+              "lang": "en"
+            },
+            {
+              "text": "contrasting automation agency models to",
+              "duration": 2.719,
+              "offset": 835.36,
+              "lang": "en"
+            },
+            {
+              "text": "software development models, content",
+              "duration": 2.72,
+              "offset": 836.88,
+              "lang": "en"
+            },
+            {
+              "text": "creation models, and then drop shipping",
+              "duration": 3.2,
+              "offset": 838.079,
+              "lang": "en"
+            },
+            {
+              "text": "and ecom models here. And anyway, like",
+              "duration": 2.88,
+              "offset": 839.6,
+              "lang": "en"
+            },
+            {
+              "text": "there&amp;#39;s no real point in getting in",
+              "duration": 2.481,
+              "offset": 841.279,
+              "lang": "en"
+            },
+            {
+              "text": "software dev anymore. Sorry to break",
+              "duration": 2.64,
+              "offset": 842.48,
+              "lang": "en"
+            },
+            {
+              "text": "your guys&amp;#39; hearts, but models are just",
+              "duration": 2.319,
+              "offset": 843.76,
+              "lang": "en"
+            },
+            {
+              "text": "getting to the point where they&amp;#39;re good",
+              "duration": 2.8,
+              "offset": 845.12,
+              "lang": "en"
+            },
+            {
+              "text": "enough for vast majority of needs.",
+              "duration": 3.2,
+              "offset": 846.079,
+              "lang": "en"
+            },
+            {
+              "text": "That&amp;#39;s where the whole term vibe coding",
+              "duration": 3.039,
+              "offset": 847.92,
+              "lang": "en"
+            },
+            {
+              "text": "has come from. Um, and you know, in all",
+              "duration": 2.641,
+              "offset": 849.279,
+              "lang": "en"
+            },
+            {
+              "text": "honesty, these are just going to",
+              "duration": 2,
+              "offset": 850.959,
+              "lang": "en"
+            },
+            {
+              "text": "continue getting better until they&amp;#39;re",
+              "duration": 2.64,
+              "offset": 851.92,
+              "lang": "en"
+            },
+            {
+              "text": "just significantly better than than most",
+              "duration": 3.921,
+              "offset": 852.959,
+              "lang": "en"
+            },
+            {
+              "text": "human developers. So, the age of human",
+              "duration": 3.76,
+              "offset": 854.56,
+              "lang": "en"
+            },
+            {
+              "text": "software developers is certainly coming",
+              "duration": 3.6,
+              "offset": 856.88,
+              "lang": "en"
+            },
+            {
+              "text": "to a close. That&amp;#39;s why it makes sense to",
+              "duration": 4.319,
+              "offset": 858.32,
+              "lang": "en"
+            },
+            {
+              "text": "focus your time and leverage it less on",
+              "duration": 3.919,
+              "offset": 860.48,
+              "lang": "en"
+            },
+            {
+              "text": "the actual software implementation, more",
+              "duration": 3.44,
+              "offset": 862.639,
+              "lang": "en"
+            },
+            {
+              "text": "on templated solutions, no code",
+              "duration": 3.841,
+              "offset": 864.399,
+              "lang": "en"
+            },
+            {
+              "text": "solutions that allow clients to do some",
+              "duration": 3.361,
+              "offset": 866.079,
+              "lang": "en"
+            },
+            {
+              "text": "maintenance on their own and stuff like",
+              "duration": 2.56,
+              "offset": 868.24,
+              "lang": "en"
+            },
+            {
+              "text": "that. Now, if you wanted a quick little",
+              "duration": 3.36,
+              "offset": 869.44,
+              "lang": "en"
+            },
+            {
+              "text": "SOP, we&amp;#39;re now writing an orange. Here&amp;#39;s",
+              "duration": 3.12,
+              "offset": 870.8,
+              "lang": "en"
+            },
+            {
+              "text": "what you do. You build practice",
+              "duration": 3.039,
+              "offset": 872.8,
+              "lang": "en"
+            },
+            {
+              "text": "automations for one week. That&amp;#39;s 7 days.",
+              "duration": 3.84,
+              "offset": 873.92,
+              "lang": "en"
+            },
+            {
+              "text": "Do some free work or low paid work to",
+              "duration": 3.201,
+              "offset": 875.839,
+              "lang": "en"
+            },
+            {
+              "text": "acquire your first result. You could do",
+              "duration": 2.639,
+              "offset": 877.76,
+              "lang": "en"
+            },
+            {
+              "text": "this on any platform. You can do this",
+              "duration": 2.479,
+              "offset": 879.04,
+              "lang": "en"
+            },
+            {
+              "text": "through DMs. You can do this through",
+              "duration": 2.961,
+              "offset": 880.399,
+              "lang": "en"
+            },
+            {
+              "text": "warm network. Whatever you want. Get",
+              "duration": 3.281,
+              "offset": 881.519,
+              "lang": "en"
+            },
+            {
+              "text": "your first client through Upwork or cold",
+              "duration": 3.44,
+              "offset": 883.36,
+              "lang": "en"
+            },
+            {
+              "text": "email. Build solutions using templates.",
+              "duration": 4.159,
+              "offset": 884.8,
+              "lang": "en"
+            },
+            {
+              "text": "Get yourself 80% complete and then",
+              "duration": 4.24,
+              "offset": 886.8,
+              "lang": "en"
+            },
+            {
+              "text": "customize the final 20% for clients.",
+              "duration": 3.361,
+              "offset": 888.959,
+              "lang": "en"
+            },
+            {
+              "text": "When you deliver your first few",
+              "duration": 2.96,
+              "offset": 891.04,
+              "lang": "en"
+            },
+            {
+              "text": "solutions, you can do so at $1,000 to",
+              "duration": 3.68,
+              "offset": 892.32,
+              "lang": "en"
+            },
+            {
+              "text": "$2,000. That&amp;#39;s way more money than a lot",
+              "duration": 2.959,
+              "offset": 894,
+              "lang": "en"
+            },
+            {
+              "text": "of people make when they&amp;#39;re selling",
+              "duration": 2.16,
+              "offset": 896,
+              "lang": "en"
+            },
+            {
+              "text": "digital products in, let&amp;#39;s say, the",
+              "duration": 2.801,
+              "offset": 896.959,
+              "lang": "en"
+            },
+            {
+              "text": "first month. Usually, if you sell",
+              "duration": 2.96,
+              "offset": 898.16,
+              "lang": "en"
+            },
+            {
+              "text": "digital products the first month, you",
+              "duration": 4.4,
+              "offset": 899.76,
+              "lang": "en"
+            },
+            {
+              "text": "are at negative $1,000. Then, when you",
+              "duration": 4.719,
+              "offset": 901.12,
+              "lang": "en"
+            },
+            {
+              "text": "build a solution, template it out for",
+              "duration": 3.28,
+              "offset": 904.16,
+              "lang": "en"
+            },
+            {
+              "text": "future clients. So, I don&amp;#39;t know, save",
+              "duration": 3.601,
+              "offset": 905.839,
+              "lang": "en"
+            },
+            {
+              "text": "the blueprint or save the NAND template,",
+              "duration": 3.6,
+              "offset": 907.44,
+              "lang": "en"
+            },
+            {
+              "text": "save it in a folder labeled what it",
+              "duration": 3.6,
+              "offset": 909.44,
+              "lang": "en"
+            },
+            {
+              "text": "does, and then next time that you get a",
+              "duration": 3.52,
+              "offset": 911.04,
+              "lang": "en"
+            },
+            {
+              "text": "client, you&amp;#39;ll have a massive library of",
+              "duration": 3.12,
+              "offset": 913.04,
+              "lang": "en"
+            },
+            {
+              "text": "reusable systems that allow you to scale",
+              "duration": 4.24,
+              "offset": 914.56,
+              "lang": "en"
+            },
+            {
+              "text": "with additional minimal work per client.",
+              "duration": 4.32,
+              "offset": 916.16,
+              "lang": "en"
+            },
+            {
+              "text": "So, you know, this sort of like takes",
+              "duration": 4.479,
+              "offset": 918.8,
+              "lang": "en"
+            },
+            {
+              "text": "both of the best parts of both the",
+              "duration": 4.56,
+              "offset": 920.48,
+              "lang": "en"
+            },
+            {
+              "text": "agency and then the SAS model. The best",
+              "duration": 3.201,
+              "offset": 923.279,
+              "lang": "en"
+            },
+            {
+              "text": "part of the agency model is that you get",
+              "duration": 2.88,
+              "offset": 925.04,
+              "lang": "en"
+            },
+            {
+              "text": "to make money quickly. The best part of",
+              "duration": 3.12,
+              "offset": 926.48,
+              "lang": "en"
+            },
+            {
+              "text": "the SAS model is that you tend to scale",
+              "duration": 3.599,
+              "offset": 927.92,
+              "lang": "en"
+            },
+            {
+              "text": "much quicker. And so, in reality, your",
+              "duration": 3.28,
+              "offset": 929.6,
+              "lang": "en"
+            },
+            {
+              "text": "revenue growth graph will look something",
+              "duration": 3.921,
+              "offset": 931.519,
+              "lang": "en"
+            },
+            {
+              "text": "like this, as opposed to something like",
+              "duration": 3.68,
+              "offset": 932.88,
+              "lang": "en"
+            },
+            {
+              "text": "this.",
+              "duration": 5.199,
+              "offset": 935.44,
+              "lang": "en"
+            },
+            {
+              "text": "or something like this. Blue is agency,",
+              "duration": 7.2,
+              "offset": 936.56,
+              "lang": "en"
+            },
+            {
+              "text": "red is SAS, and then orange is sort of",
+              "duration": 4.401,
+              "offset": 940.639,
+              "lang": "en"
+            },
+            {
+              "text": "what we&amp;#39;re doing, which is sort of a",
+              "duration": 3.199,
+              "offset": 943.76,
+              "lang": "en"
+            },
+            {
+              "text": "combination of software and the agency",
+              "duration": 4.32,
+              "offset": 945.04,
+              "lang": "en"
+            },
+            {
+              "text": "model. Okay. So, in terms of getting",
+              "duration": 3.761,
+              "offset": 946.959,
+              "lang": "en"
+            },
+            {
+              "text": "started, there are variety of ways to do",
+              "duration": 3.599,
+              "offset": 949.36,
+              "lang": "en"
+            },
+            {
+              "text": "so. Obviously, I now operate a course",
+              "duration": 3.679,
+              "offset": 950.72,
+              "lang": "en"
+            },
+            {
+              "text": "where I show people how to do this zero",
+              "duration": 3.041,
+              "offset": 952.959,
+              "lang": "en"
+            },
+            {
+              "text": "to one called Maker School. I guide your",
+              "duration": 3.601,
+              "offset": 954.399,
+              "lang": "en"
+            },
+            {
+              "text": "hand and I walk you through like tasks",
+              "duration": 3.839,
+              "offset": 956,
+              "lang": "en"
+            },
+            {
+              "text": "on day one, tasks on day two, task on",
+              "duration": 3.199,
+              "offset": 958,
+              "lang": "en"
+            },
+            {
+              "text": "day three. I&amp;#39;m not just going to shill",
+              "duration": 2.56,
+              "offset": 959.839,
+              "lang": "en"
+            },
+            {
+              "text": "my product here, although obviously I",
+              "duration": 2.56,
+              "offset": 961.199,
+              "lang": "en"
+            },
+            {
+              "text": "wouldn&amp;#39;t make a high quality product if",
+              "duration": 2.481,
+              "offset": 962.399,
+              "lang": "en"
+            },
+            {
+              "text": "I didn&amp;#39;t really believe that it was the",
+              "duration": 2.721,
+              "offset": 963.759,
+              "lang": "en"
+            },
+            {
+              "text": "best solution. But anyway, starting an A",
+              "duration": 2.959,
+              "offset": 964.88,
+              "lang": "en"
+            },
+            {
+              "text": "automation agency requires surprising",
+              "duration": 2.56,
+              "offset": 966.48,
+              "lang": "en"
+            },
+            {
+              "text": "little preparation. What I mean is you",
+              "duration": 2.24,
+              "offset": 967.839,
+              "lang": "en"
+            },
+            {
+              "text": "can go from zero to your first client",
+              "duration": 2.64,
+              "offset": 969.04,
+              "lang": "en"
+            },
+            {
+              "text": "within 1 to two months. I think the",
+              "duration": 3.361,
+              "offset": 970.079,
+              "lang": "en"
+            },
+            {
+              "text": "fastest first client we&amp;#39;ve gotten now",
+              "duration": 3.92,
+              "offset": 971.68,
+              "lang": "en"
+            },
+            {
+              "text": "was within something like 15 minutes.",
+              "duration": 3.519,
+              "offset": 973.44,
+              "lang": "en"
+            },
+            {
+              "text": "Somebody sent an Upwork application.",
+              "duration": 2.96,
+              "offset": 975.6,
+              "lang": "en"
+            },
+            {
+              "text": "Upwork being a freelancing platform for",
+              "duration": 3.68,
+              "offset": 976.959,
+              "lang": "en"
+            },
+            {
+              "text": "an AI and automation agency. Job client",
+              "duration": 3.279,
+              "offset": 978.56,
+              "lang": "en"
+            },
+            {
+              "text": "got back to them immediately. They got",
+              "duration": 2.32,
+              "offset": 980.639,
+              "lang": "en"
+            },
+            {
+              "text": "back to the client immediately. They set",
+              "duration": 2.56,
+              "offset": 981.839,
+              "lang": "en"
+            },
+            {
+              "text": "up a call and within 15 minutes they had",
+              "duration": 3.761,
+              "offset": 982.959,
+              "lang": "en"
+            },
+            {
+              "text": "a proposal signed ready to go. So",
+              "duration": 3.921,
+              "offset": 984.399,
+              "lang": "en"
+            },
+            {
+              "text": "obviously 1 to two months is a",
+              "duration": 3.039,
+              "offset": 986.72,
+              "lang": "en"
+            },
+            {
+              "text": "reasonable thing for most total",
+              "duration": 3.28,
+              "offset": 988.32,
+              "lang": "en"
+            },
+            {
+              "text": "beginners to work towards. But I want",
+              "duration": 3.361,
+              "offset": 989.759,
+              "lang": "en"
+            },
+            {
+              "text": "you to know there are many cases in",
+              "duration": 2.96,
+              "offset": 991.6,
+              "lang": "en"
+            },
+            {
+              "text": "which that occurs much easier. Now, the",
+              "duration": 3.12,
+              "offset": 993.12,
+              "lang": "en"
+            },
+            {
+              "text": "minimum viable business of this AI",
+              "duration": 4.079,
+              "offset": 994.56,
+              "lang": "en"
+            },
+            {
+              "text": "automation model involves three skills.",
+              "duration": 4.399,
+              "offset": 996.24,
+              "lang": "en"
+            },
+            {
+              "text": "Basic automation skills, a specific",
+              "duration": 3.601,
+              "offset": 998.639,
+              "lang": "en"
+            },
+            {
+              "text": "service offering, and then one or two",
+              "duration": 2.88,
+              "offset": 1000.639,
+              "lang": "en"
+            },
+            {
+              "text": "client acquisition methods. My",
+              "duration": 3.039,
+              "offset": 1002.24,
+              "lang": "en"
+            },
+            {
+              "text": "recommendation is choose uh specific",
+              "duration": 3.12,
+              "offset": 1003.519,
+              "lang": "en"
+            },
+            {
+              "text": "client acquisition methods rather than",
+              "duration": 2.881,
+              "offset": 1005.279,
+              "lang": "en"
+            },
+            {
+              "text": "trying like a million approaches. And",
+              "duration": 2.721,
+              "offset": 1006.639,
+              "lang": "en"
+            },
+            {
+              "text": "specifically, I&amp;#39;d recommend you use",
+              "duration": 2.72,
+              "offset": 1008.16,
+              "lang": "en"
+            },
+            {
+              "text": "Upwork. Then I&amp;#39;d also recommend you use",
+              "duration": 3.68,
+              "offset": 1009.36,
+              "lang": "en"
+            },
+            {
+              "text": "cold email. Okay, so three things. You",
+              "duration": 4,
+              "offset": 1010.88,
+              "lang": "en"
+            },
+            {
+              "text": "need automation skills, and I&amp;#39;ll show",
+              "duration": 3.039,
+              "offset": 1013.04,
+              "lang": "en"
+            },
+            {
+              "text": "you how to get all these in a second.",
+              "duration": 2.959,
+              "offset": 1014.88,
+              "lang": "en"
+            },
+            {
+              "text": "You need a specific type of service. And",
+              "duration": 2.801,
+              "offset": 1016.079,
+              "lang": "en"
+            },
+            {
+              "text": "then finally, you need client",
+              "duration": 2.641,
+              "offset": 1017.839,
+              "lang": "en"
+            },
+            {
+              "text": "acquisition methods. Also, if you want",
+              "duration": 3.04,
+              "offset": 1018.88,
+              "lang": "en"
+            },
+            {
+              "text": "to be successful, you focus on",
+              "duration": 2.64,
+              "offset": 1020.48,
+              "lang": "en"
+            },
+            {
+              "text": "completing projects rather than",
+              "duration": 3.44,
+              "offset": 1021.92,
+              "lang": "en"
+            },
+            {
+              "text": "perfecting them. In reality, you&amp;#39;re not",
+              "duration": 3.76,
+              "offset": 1023.12,
+              "lang": "en"
+            },
+            {
+              "text": "going to be a fantastic or perfect",
+              "duration": 2.959,
+              "offset": 1025.36,
+              "lang": "en"
+            },
+            {
+              "text": "developer on your first gig. If you",
+              "duration": 2.559,
+              "offset": 1026.88,
+              "lang": "en"
+            },
+            {
+              "text": "spend all of your time trying to like",
+              "duration": 2.561,
+              "offset": 1028.319,
+              "lang": "en"
+            },
+            {
+              "text": "deliver it perfectly and not just move",
+              "duration": 2.88,
+              "offset": 1029.439,
+              "lang": "en"
+            },
+            {
+              "text": "on, you&amp;#39;re not necessarily going to be",
+              "duration": 2.799,
+              "offset": 1030.88,
+              "lang": "en"
+            },
+            {
+              "text": "able to take advantage of the momentum",
+              "duration": 2.561,
+              "offset": 1032.319,
+              "lang": "en"
+            },
+            {
+              "text": "that my approach, which is just",
+              "duration": 2.64,
+              "offset": 1033.679,
+              "lang": "en"
+            },
+            {
+              "text": "front-loading client acquisition, gives",
+              "duration": 3.199,
+              "offset": 1034.88,
+              "lang": "en"
+            },
+            {
+              "text": "you. And then, yeah, just in terms of a",
+              "duration": 2.961,
+              "offset": 1036.319,
+              "lang": "en"
+            },
+            {
+              "text": "basic curriculum, spend one week",
+              "duration": 2.561,
+              "offset": 1038.079,
+              "lang": "en"
+            },
+            {
+              "text": "learning basic automation skills and",
+              "duration": 2.72,
+              "offset": 1039.28,
+              "lang": "en"
+            },
+            {
+              "text": "then spend your next week creating a",
+              "duration": 2.799,
+              "offset": 1040.64,
+              "lang": "en"
+            },
+            {
+              "text": "specific service offer and starting a",
+              "duration": 3.039,
+              "offset": 1042,
+              "lang": "en"
+            },
+            {
+              "text": "lead genen process. So, here are the",
+              "duration": 3.921,
+              "offset": 1043.439,
+              "lang": "en"
+            },
+            {
+              "text": "tools that I would use. Make.com or",
+              "duration": 3.921,
+              "offset": 1045.039,
+              "lang": "en"
+            },
+            {
+              "text": "naden, you don&amp;#39;t need both. Instantly is",
+              "duration": 3.28,
+              "offset": 1047.36,
+              "lang": "en"
+            },
+            {
+              "text": "a cold email platform. Ampify is a",
+              "duration": 3.52,
+              "offset": 1048.96,
+              "lang": "en"
+            },
+            {
+              "text": "scraping platform. Apollo is a lead",
+              "duration": 4.159,
+              "offset": 1050.64,
+              "lang": "en"
+            },
+            {
+              "text": "database. Upwork is a freelancing",
+              "duration": 4.079,
+              "offset": 1052.48,
+              "lang": "en"
+            },
+            {
+              "text": "platform. Then Loom is a simple and easy",
+              "duration": 3.281,
+              "offset": 1054.799,
+              "lang": "en"
+            },
+            {
+              "text": "way to just record videos. Kind of like",
+              "duration": 3.12,
+              "offset": 1056.559,
+              "lang": "en"
+            },
+            {
+              "text": "this one where you&amp;#39;re answering a client",
+              "duration": 3.76,
+              "offset": 1058.08,
+              "lang": "en"
+            },
+            {
+              "text": "question. Three great videos that I&amp;#39;d",
+              "duration": 4.88,
+              "offset": 1059.679,
+              "lang": "en"
+            },
+            {
+              "text": "recommend checking out. Uh, wow. That",
+              "duration": 3.839,
+              "offset": 1061.84,
+              "lang": "en"
+            },
+            {
+              "text": "it&amp;#39;s very interesting. I don&amp;#39;t remember",
+              "duration": 3.12,
+              "offset": 1064.559,
+              "lang": "en"
+            },
+            {
+              "text": "having that hairdo. Is $10,000 a month",
+              "duration": 3.521,
+              "offset": 1065.679,
+              "lang": "en"
+            },
+            {
+              "text": "AI business over here. So, how to build",
+              "duration": 3.601,
+              "offset": 1067.679,
+              "lang": "en"
+            },
+            {
+              "text": "a profitable AI business in 2025. Then",
+              "duration": 4.32,
+              "offset": 1069.2,
+              "lang": "en"
+            },
+            {
+              "text": "80% of AI automation basics in just 29",
+              "duration": 3.6,
+              "offset": 1071.28,
+              "lang": "en"
+            },
+            {
+              "text": "minutes. Then finally, if you guys want",
+              "duration": 2.72,
+              "offset": 1073.52,
+              "lang": "en"
+            },
+            {
+              "text": "to get up and running with Naden, which",
+              "duration": 2.88,
+              "offset": 1074.88,
+              "lang": "en"
+            },
+            {
+              "text": "is the current biggest platform, watch",
+              "duration": 3.6,
+              "offset": 1076.24,
+              "lang": "en"
+            },
+            {
+              "text": "this nad full course, 6 hours that shows",
+              "duration": 3.52,
+              "offset": 1077.76,
+              "lang": "en"
+            },
+            {
+              "text": "you how to build and sell automations",
+              "duration": 3.92,
+              "offset": 1079.84,
+              "lang": "en"
+            },
+            {
+              "text": "and agents as well. So this is the",
+              "duration": 4.16,
+              "offset": 1081.28,
+              "lang": "en"
+            },
+            {
+              "text": "curriculum. You start by learning some",
+              "duration": 3.44,
+              "offset": 1083.76,
+              "lang": "en"
+            },
+            {
+              "text": "basic make.com and nen stuff. This",
+              "duration": 3.84,
+              "offset": 1085.44,
+              "lang": "en"
+            },
+            {
+              "text": "video, if you watch it on 1.5x means you",
+              "duration": 3.2,
+              "offset": 1087.2,
+              "lang": "en"
+            },
+            {
+              "text": "could literally do this in about 4",
+              "duration": 4.48,
+              "offset": 1089.28,
+              "lang": "en"
+            },
+            {
+              "text": "hours. You could be 4 hours away from",
+              "duration": 4.639,
+              "offset": 1090.4,
+              "lang": "en"
+            },
+            {
+              "text": "knowing everything you need to know",
+              "duration": 2.88,
+              "offset": 1093.76,
+              "lang": "en"
+            },
+            {
+              "text": "about a platform like naden to actually",
+              "duration": 3.121,
+              "offset": 1095.039,
+              "lang": "en"
+            },
+            {
+              "text": "get out there and start producing value",
+              "duration": 3.36,
+              "offset": 1096.64,
+              "lang": "en"
+            },
+            {
+              "text": "for customers. Then just build a couple",
+              "duration": 3.28,
+              "offset": 1098.16,
+              "lang": "en"
+            },
+            {
+              "text": "of simple practice automations. Most of",
+              "duration": 3.36,
+              "offset": 1100,
+              "lang": "en"
+            },
+            {
+              "text": "my programs include this. uh then choose",
+              "duration": 3.92,
+              "offset": 1101.44,
+              "lang": "en"
+            },
+            {
+              "text": "one specific service to offer. Then just",
+              "duration": 3.439,
+              "offset": 1103.36,
+              "lang": "en"
+            },
+            {
+              "text": "start lead genen. So create an Upwork",
+              "duration": 2.8,
+              "offset": 1105.36,
+              "lang": "en"
+            },
+            {
+              "text": "profile, set up a cold email system,",
+              "duration": 3.041,
+              "offset": 1106.799,
+              "lang": "en"
+            },
+            {
+              "text": "apply to five Upwork jobs daily with a",
+              "duration": 2.96,
+              "offset": 1108.16,
+              "lang": "en"
+            },
+            {
+              "text": "video, and then send a 100 targeted",
+              "duration": 3.12,
+              "offset": 1109.84,
+              "lang": "en"
+            },
+            {
+              "text": "emails daily. Eventually, you&amp;#39;re going",
+              "duration": 3.52,
+              "offset": 1111.12,
+              "lang": "en"
+            },
+            {
+              "text": "to get some interest. Then you just book",
+              "duration": 3.68,
+              "offset": 1112.96,
+              "lang": "en"
+            },
+            {
+              "text": "a discovery call and start the project.",
+              "duration": 3.44,
+              "offset": 1114.64,
+              "lang": "en"
+            },
+            {
+              "text": "And then finally, you deliver your first",
+              "duration": 2.96,
+              "offset": 1116.64,
+              "lang": "en"
+            },
+            {
+              "text": "client project, get your first case",
+              "duration": 2.479,
+              "offset": 1118.08,
+              "lang": "en"
+            },
+            {
+              "text": "study. And you know what you do at the",
+              "duration": 3.84,
+              "offset": 1119.6,
+              "lang": "en"
+            },
+            {
+              "text": "end? You just loop it around. You just",
+              "duration": 4.081,
+              "offset": 1120.559,
+              "lang": "en"
+            },
+            {
+              "text": "do it over and over and over again.",
+              "duration": 2.4,
+              "offset": 1123.44,
+              "lang": "en"
+            },
+            {
+              "text": "Well, I guess you don&amp;#39;t do that part",
+              "duration": 2.399,
+              "offset": 1124.64,
+              "lang": "en"
+            },
+            {
+              "text": "over and over and over again, but",
+              "duration": 2.56,
+              "offset": 1125.84,
+              "lang": "en"
+            },
+            {
+              "text": "hopefully you guys see my point. Okay,",
+              "duration": 2.961,
+              "offset": 1127.039,
+              "lang": "en"
+            },
+            {
+              "text": "some points to consider just before I",
+              "duration": 3.279,
+              "offset": 1128.4,
+              "lang": "en"
+            },
+            {
+              "text": "wrap up. highly recommend you guys have",
+              "duration": 3.6,
+              "offset": 1130,
+              "lang": "en"
+            },
+            {
+              "text": "a daily lead generation ritual. Now,",
+              "duration": 3.201,
+              "offset": 1131.679,
+              "lang": "en"
+            },
+            {
+              "text": "this is what I was talking about.",
+              "duration": 4.64,
+              "offset": 1133.6,
+              "lang": "en"
+            },
+            {
+              "text": "Outbound does not have a simple passive",
+              "duration": 5.52,
+              "offset": 1134.88,
+              "lang": "en"
+            },
+            {
+              "text": "lead generation way. You can&amp;#39;t just like",
+              "duration": 3.92,
+              "offset": 1138.24,
+              "lang": "en"
+            },
+            {
+              "text": "generate leads passively. If you want to",
+              "duration": 3.04,
+              "offset": 1140.4,
+              "lang": "en"
+            },
+            {
+              "text": "be the one that is doing the selling,",
+              "duration": 2.399,
+              "offset": 1142.16,
+              "lang": "en"
+            },
+            {
+              "text": "which most of you guys are probably",
+              "duration": 2.479,
+              "offset": 1143.44,
+              "lang": "en"
+            },
+            {
+              "text": "going to have to be the start line of",
+              "duration": 2.641,
+              "offset": 1144.559,
+              "lang": "en"
+            },
+            {
+              "text": "your business, you need to put in the",
+              "duration": 2.481,
+              "offset": 1145.919,
+              "lang": "en"
+            },
+            {
+              "text": "work. That doesn&amp;#39;t mean you need to",
+              "duration": 2.8,
+              "offset": 1147.2,
+              "lang": "en"
+            },
+            {
+              "text": "spend all day doing it. You can do it",
+              "duration": 3.519,
+              "offset": 1148.4,
+              "lang": "en"
+            },
+            {
+              "text": "intelligently. And my recommendation for",
+              "duration": 3.84,
+              "offset": 1150,
+              "lang": "en"
+            },
+            {
+              "text": "you is spend the first couple of hours",
+              "duration": 4.081,
+              "offset": 1151.919,
+              "lang": "en"
+            },
+            {
+              "text": "of your day, first 60 to 90 minutes",
+              "duration": 4.4,
+              "offset": 1153.84,
+              "lang": "en"
+            },
+            {
+              "text": "basically, dedicated exclusively to this",
+              "duration": 4.24,
+              "offset": 1156,
+              "lang": "en"
+            },
+            {
+              "text": "free client acquisition system. free or",
+              "duration": 3.679,
+              "offset": 1158.24,
+              "lang": "en"
+            },
+            {
+              "text": "lowcost client acquisition systems",
+              "duration": 2.88,
+              "offset": 1160.24,
+              "lang": "en"
+            },
+            {
+              "text": "because by doing so, what you&amp;#39;re doing",
+              "duration": 2.481,
+              "offset": 1161.919,
+              "lang": "en"
+            },
+            {
+              "text": "is you&amp;#39;re trading a little bit of your",
+              "duration": 3.6,
+              "offset": 1163.12,
+              "lang": "en"
+            },
+            {
+              "text": "time for much faster growth later on.",
+              "duration": 4,
+              "offset": 1164.4,
+              "lang": "en"
+            },
+            {
+              "text": "Then track everything. Use a simple",
+              "duration": 3.28,
+              "offset": 1166.72,
+              "lang": "en"
+            },
+            {
+              "text": "spreadsheet. Monitor all of the outreach",
+              "duration": 2.8,
+              "offset": 1168.4,
+              "lang": "en"
+            },
+            {
+              "text": "and the responses that you&amp;#39;re sending,",
+              "duration": 2.799,
+              "offset": 1170,
+              "lang": "en"
+            },
+            {
+              "text": "the cold DMs, the Loom videos, the cold",
+              "duration": 3.2,
+              "offset": 1171.2,
+              "lang": "en"
+            },
+            {
+              "text": "emails, cold calls. I don&amp;#39;t recommend",
+              "duration": 2.801,
+              "offset": 1172.799,
+              "lang": "en"
+            },
+            {
+              "text": "cold calls, but I wanted to throw that",
+              "duration": 3.36,
+              "offset": 1174.4,
+              "lang": "en"
+            },
+            {
+              "text": "in there just in case. All of the",
+              "duration": 3.92,
+              "offset": 1175.6,
+              "lang": "en"
+            },
+            {
+              "text": "various outbound strategies that you&amp;#39;re",
+              "duration": 4.24,
+              "offset": 1177.76,
+              "lang": "en"
+            },
+            {
+              "text": "using, track them so you know what to",
+              "duration": 3.84,
+              "offset": 1179.52,
+              "lang": "en"
+            },
+            {
+              "text": "change next week. And then just stick",
+              "duration": 3.6,
+              "offset": 1182,
+              "lang": "en"
+            },
+            {
+              "text": "with it for 30 days. This seems like a",
+              "duration": 4,
+              "offset": 1183.36,
+              "lang": "en"
+            },
+            {
+              "text": "very big ask, but if you could stick",
+              "duration": 3.12,
+              "offset": 1185.6,
+              "lang": "en"
+            },
+            {
+              "text": "with something for 30 days, you&amp;#39;re going",
+              "duration": 2.72,
+              "offset": 1187.36,
+              "lang": "en"
+            },
+            {
+              "text": "to have more results with that thing",
+              "duration": 3.92,
+              "offset": 1188.72,
+              "lang": "en"
+            },
+            {
+              "text": "than 98% of other people will that you",
+              "duration": 4.32,
+              "offset": 1190.08,
+              "lang": "en"
+            },
+            {
+              "text": "know quit before the 30-day mark. Even",
+              "duration": 3.6,
+              "offset": 1192.64,
+              "lang": "en"
+            },
+            {
+              "text": "if you are terrible at outreach on day",
+              "duration": 3.84,
+              "offset": 1194.4,
+              "lang": "en"
+            },
+            {
+              "text": "one, by the end of day 30, assuming you",
+              "duration": 4.64,
+              "offset": 1196.24,
+              "lang": "en"
+            },
+            {
+              "text": "consistently do some little output every",
+              "duration": 4.08,
+              "offset": 1198.24,
+              "lang": "en"
+            },
+            {
+              "text": "single day, you&amp;#39;re going to be great at",
+              "duration": 3.36,
+              "offset": 1200.88,
+              "lang": "en"
+            },
+            {
+              "text": "outreach. Outreach is not some super",
+              "duration": 4.16,
+              "offset": 1202.32,
+              "lang": "en"
+            },
+            {
+              "text": "scary intimidating thing. Outreach is",
+              "duration": 3.92,
+              "offset": 1204.24,
+              "lang": "en"
+            },
+            {
+              "text": "extraordinarily straightforward. You",
+              "duration": 2.96,
+              "offset": 1206.48,
+              "lang": "en"
+            },
+            {
+              "text": "just need to put in the reps. Think of",
+              "duration": 3.2,
+              "offset": 1208.16,
+              "lang": "en"
+            },
+            {
+              "text": "it like the gym. You can&amp;#39;t do all of the",
+              "duration": 4.16,
+              "offset": 1209.44,
+              "lang": "en"
+            },
+            {
+              "text": "outreach bicep curls on one day or else",
+              "duration": 4.08,
+              "offset": 1211.36,
+              "lang": "en"
+            },
+            {
+              "text": "all you&amp;#39;ll do is just break your arm.",
+              "duration": 3.28,
+              "offset": 1213.6,
+              "lang": "en"
+            },
+            {
+              "text": "Essentially, what you need to do is you",
+              "duration": 3.04,
+              "offset": 1215.44,
+              "lang": "en"
+            },
+            {
+              "text": "need to drip it out. You need to do 60",
+              "duration": 4.08,
+              "offset": 1216.88,
+              "lang": "en"
+            },
+            {
+              "text": "bicep curls in day one, 60 bicep curls",
+              "duration": 4.4,
+              "offset": 1218.48,
+              "lang": "en"
+            },
+            {
+              "text": "on day four, 60 bicep curls on day",
+              "duration": 3.2,
+              "offset": 1220.96,
+              "lang": "en"
+            },
+            {
+              "text": "seven. You just need to keep that up as",
+              "duration": 3.84,
+              "offset": 1222.88,
+              "lang": "en"
+            },
+            {
+              "text": "long as humanly possible. Then build a",
+              "duration": 4.32,
+              "offset": 1224.16,
+              "lang": "en"
+            },
+            {
+              "text": "follow-up framework for all those leads.",
+              "duration": 3.04,
+              "offset": 1226.72,
+              "lang": "en"
+            },
+            {
+              "text": "The vast majority of your deals are",
+              "duration": 2.319,
+              "offset": 1228.48,
+              "lang": "en"
+            },
+            {
+              "text": "going to come from some sort of",
+              "duration": 2.56,
+              "offset": 1229.76,
+              "lang": "en"
+            },
+            {
+              "text": "follow-up. Most people stop after one",
+              "duration": 3.12,
+              "offset": 1230.799,
+              "lang": "en"
+            },
+            {
+              "text": "outbound message, but success, I find,",
+              "duration": 2.8,
+              "offset": 1232.32,
+              "lang": "en"
+            },
+            {
+              "text": "typically requires at least three",
+              "duration": 3.281,
+              "offset": 1233.919,
+              "lang": "en"
+            },
+            {
+              "text": "touches, if not more. And then add value",
+              "duration": 4,
+              "offset": 1235.12,
+              "lang": "en"
+            },
+            {
+              "text": "in every message. One big thing that I",
+              "duration": 3.52,
+              "offset": 1237.2,
+              "lang": "en"
+            },
+            {
+              "text": "think separates the amateur salespeople",
+              "duration": 3.36,
+              "offset": 1239.12,
+              "lang": "en"
+            },
+            {
+              "text": "from the really good salespeople is the",
+              "duration": 3.6,
+              "offset": 1240.72,
+              "lang": "en"
+            },
+            {
+              "text": "really good sales people are basically",
+              "duration": 4,
+              "offset": 1242.48,
+              "lang": "en"
+            },
+            {
+              "text": "radically empathetic. And I didn&amp;#39;t fully",
+              "duration": 3.44,
+              "offset": 1244.32,
+              "lang": "en"
+            },
+            {
+              "text": "understand what this meant until quite",
+              "duration": 3.04,
+              "offset": 1246.48,
+              "lang": "en"
+            },
+            {
+              "text": "recently actually. But really good sales",
+              "duration": 3.279,
+              "offset": 1247.76,
+              "lang": "en"
+            },
+            {
+              "text": "people are so empathetic they can put",
+              "duration": 3.36,
+              "offset": 1249.52,
+              "lang": "en"
+            },
+            {
+              "text": "themselves in the customer shoes and",
+              "duration": 4.161,
+              "offset": 1251.039,
+              "lang": "en"
+            },
+            {
+              "text": "imagine what their reaction would be if",
+              "duration": 4.48,
+              "offset": 1252.88,
+              "lang": "en"
+            },
+            {
+              "text": "you were to reach out to them. So if you",
+              "duration": 3.76,
+              "offset": 1255.2,
+              "lang": "en"
+            },
+            {
+              "text": "want to be really good at outbound, what",
+              "duration": 2.72,
+              "offset": 1257.36,
+              "lang": "en"
+            },
+            {
+              "text": "you need to do is you need to put",
+              "duration": 2.719,
+              "offset": 1258.96,
+              "lang": "en"
+            },
+            {
+              "text": "yourself in your customer&amp;#39;s shoes. What",
+              "duration": 3.36,
+              "offset": 1260.08,
+              "lang": "en"
+            },
+            {
+              "text": "are you more likely to respond to? Hey,",
+              "duration": 3.921,
+              "offset": 1261.679,
+              "lang": "en"
+            },
+            {
+              "text": "hey bro, how you doing? How long time no",
+              "duration": 4.479,
+              "offset": 1263.44,
+              "lang": "en"
+            },
+            {
+              "text": "talk? Want to touch base? or hey man, I",
+              "duration": 4.64,
+              "offset": 1265.6,
+              "lang": "en"
+            },
+            {
+              "text": "think I could make you another $43,000.",
+              "duration": 3.441,
+              "offset": 1267.919,
+              "lang": "en"
+            },
+            {
+              "text": "I know this is totally out of left",
+              "duration": 2.64,
+              "offset": 1270.24,
+              "lang": "en"
+            },
+            {
+              "text": "field, but here&amp;#39;s a step-by-step road",
+              "duration": 3.12,
+              "offset": 1271.36,
+              "lang": "en"
+            },
+            {
+              "text": "map and a guide I put together. No",
+              "duration": 2.88,
+              "offset": 1272.88,
+              "lang": "en"
+            },
+            {
+              "text": "strings attached and you don&amp;#39;t have to",
+              "duration": 2.559,
+              "offset": 1274.48,
+              "lang": "en"
+            },
+            {
+              "text": "respond to this if you don&amp;#39;t want.",
+              "duration": 2.88,
+              "offset": 1275.76,
+              "lang": "en"
+            },
+            {
+              "text": "Obviously, the second, right? And even",
+              "duration": 2.561,
+              "offset": 1277.039,
+              "lang": "en"
+            },
+            {
+              "text": "though you&amp;#39;re saying things like you",
+              "duration": 2,
+              "offset": 1278.64,
+              "lang": "en"
+            },
+            {
+              "text": "don&amp;#39;t have to respond if you don&amp;#39;t want",
+              "duration": 2.72,
+              "offset": 1279.6,
+              "lang": "en"
+            },
+            {
+              "text": "and uh you know, no strings attached.",
+              "duration": 3.279,
+              "offset": 1280.64,
+              "lang": "en"
+            },
+            {
+              "text": "When people see that much value thrown",
+              "duration": 3.52,
+              "offset": 1282.32,
+              "lang": "en"
+            },
+            {
+              "text": "at them, they almost invariably do",
+              "duration": 4.081,
+              "offset": 1283.919,
+              "lang": "en"
+            },
+            {
+              "text": "respond and there almost are invariably",
+              "duration": 4.16,
+              "offset": 1285.84,
+              "lang": "en"
+            },
+            {
+              "text": "always strings attached. Okay. Anyway,",
+              "duration": 3.6,
+              "offset": 1288,
+              "lang": "en"
+            },
+            {
+              "text": "focus on a multi- channel approach with",
+              "duration": 3.6,
+              "offset": 1290,
+              "lang": "en"
+            },
+            {
+              "text": "that. Hit emails, hit LinkedIn. If you",
+              "duration": 4.16,
+              "offset": 1291.6,
+              "lang": "en"
+            },
+            {
+              "text": "can hit phones after getting positively",
+              "duration": 4.079,
+              "offset": 1293.6,
+              "lang": "en"
+            },
+            {
+              "text": "qualified over email and LinkedIn, then",
+              "duration": 3.12,
+              "offset": 1295.76,
+              "lang": "en"
+            },
+            {
+              "text": "people are a lot more likely to get back",
+              "duration": 3.561,
+              "offset": 1297.679,
+              "lang": "en"
+            },
+            {
+              "text": "to you. Finally, your mindset matters.",
+              "duration": 4.88,
+              "offset": 1298.88,
+              "lang": "en"
+            },
+            {
+              "text": "Okay, your capacity to find clients",
+              "duration": 3.96,
+              "offset": 1301.24,
+              "lang": "en"
+            },
+            {
+              "text": "matters more than your technical skills",
+              "duration": 3.039,
+              "offset": 1303.76,
+              "lang": "en"
+            },
+            {
+              "text": "in the beginning. That&amp;#39;s the bottleneck.",
+              "duration": 3.28,
+              "offset": 1305.2,
+              "lang": "en"
+            },
+            {
+              "text": "Trading time for money is necessary at",
+              "duration": 4.481,
+              "offset": 1306.799,
+              "lang": "en"
+            },
+            {
+              "text": "some level. If you want to grow faster,",
+              "duration": 4.24,
+              "offset": 1308.48,
+              "lang": "en"
+            },
+            {
+              "text": "okay, you&amp;#39;re going to have to invest",
+              "duration": 3.68,
+              "offset": 1311.28,
+              "lang": "en"
+            },
+            {
+              "text": "money in that growth. And when you",
+              "duration": 3.52,
+              "offset": 1312.72,
+              "lang": "en"
+            },
+            {
+              "text": "invest money in that growth, you&amp;#39;re",
+              "duration": 2.4,
+              "offset": 1314.96,
+              "lang": "en"
+            },
+            {
+              "text": "going to cut down the amount of time it",
+              "duration": 2.559,
+              "offset": 1316.24,
+              "lang": "en"
+            },
+            {
+              "text": "takes to do anything by leaps and",
+              "duration": 3.04,
+              "offset": 1317.36,
+              "lang": "en"
+            },
+            {
+              "text": "bounds. But at the beginning, you don&amp;#39;t",
+              "duration": 3.281,
+              "offset": 1318.799,
+              "lang": "en"
+            },
+            {
+              "text": "have the money. So what is your only",
+              "duration": 2.88,
+              "offset": 1320.4,
+              "lang": "en"
+            },
+            {
+              "text": "other piece of currency that you can",
+              "duration": 3.2,
+              "offset": 1322.08,
+              "lang": "en"
+            },
+            {
+              "text": "exchange with? It is time. So at the",
+              "duration": 3.44,
+              "offset": 1323.28,
+              "lang": "en"
+            },
+            {
+              "text": "beginning you might spend two to three",
+              "duration": 3.36,
+              "offset": 1325.28,
+              "lang": "en"
+            },
+            {
+              "text": "hours a day doing pretty boring annoying",
+              "duration": 3.12,
+              "offset": 1326.72,
+              "lang": "en"
+            },
+            {
+              "text": "things. That&amp;#39;s just the nature of",
+              "duration": 2.64,
+              "offset": 1328.64,
+              "lang": "en"
+            },
+            {
+              "text": "outbound and that&amp;#39;s the nature of this",
+              "duration": 2.88,
+              "offset": 1329.84,
+              "lang": "en"
+            },
+            {
+              "text": "AI automation business model. If you",
+              "duration": 2.639,
+              "offset": 1331.28,
+              "lang": "en"
+            },
+            {
+              "text": "want to grow you got to grow",
+              "duration": 3.76,
+              "offset": 1332.72,
+              "lang": "en"
+            },
+            {
+              "text": "consistently and reliably over time the",
+              "duration": 5.281,
+              "offset": 1333.919,
+              "lang": "en"
+            },
+            {
+              "text": "you know big swings that the other AI",
+              "duration": 4.64,
+              "offset": 1336.48,
+              "lang": "en"
+            },
+            {
+              "text": "gurus are going to be telling you do not",
+              "duration": 3.52,
+              "offset": 1339.2,
+              "lang": "en"
+            },
+            {
+              "text": "really happen in practice. Okay. And",
+              "duration": 2.88,
+              "offset": 1341.12,
+              "lang": "en"
+            },
+            {
+              "text": "then yeah embrace rejection. The way",
+              "duration": 2.319,
+              "offset": 1342.72,
+              "lang": "en"
+            },
+            {
+              "text": "that outbound works and you know",
+              "duration": 2.48,
+              "offset": 1344,
+              "lang": "en"
+            },
+            {
+              "text": "outbound is like a separate skill than",
+              "duration": 3.12,
+              "offset": 1345.039,
+              "lang": "en"
+            },
+            {
+              "text": "the AI and automation side of this",
+              "duration": 2.8,
+              "offset": 1346.48,
+              "lang": "en"
+            },
+            {
+              "text": "business. But more generally, the way",
+              "duration": 2.481,
+              "offset": 1348.159,
+              "lang": "en"
+            },
+            {
+              "text": "that outbound works is every time you",
+              "duration": 2.399,
+              "offset": 1349.28,
+              "lang": "en"
+            },
+            {
+              "text": "get a no, it just brings you a little",
+              "duration": 2.56,
+              "offset": 1350.64,
+              "lang": "en"
+            },
+            {
+              "text": "bit closer to yes, provide some valuable",
+              "duration": 4.161,
+              "offset": 1351.679,
+              "lang": "en"
+            },
+            {
+              "text": "feedback. Okay, so know that we talked",
+              "duration": 4.08,
+              "offset": 1353.2,
+              "lang": "en"
+            },
+            {
+              "text": "about a lot in this video. Just wanted",
+              "duration": 3.199,
+              "offset": 1355.84,
+              "lang": "en"
+            },
+            {
+              "text": "to fill your head with as many positive",
+              "duration": 4.08,
+              "offset": 1357.28,
+              "lang": "en"
+            },
+            {
+              "text": "concepts as humanly possible to try and",
+              "duration": 4.081,
+              "offset": 1359.039,
+              "lang": "en"
+            },
+            {
+              "text": "outdo or undo some of the more negative",
+              "duration": 3.76,
+              "offset": 1361.36,
+              "lang": "en"
+            },
+            {
+              "text": "ones that I&amp;#39;ve seen recently. That&amp;#39;s how",
+              "duration": 3.679,
+              "offset": 1363.12,
+              "lang": "en"
+            },
+            {
+              "text": "you actually make your first thousand",
+              "duration": 3.6,
+              "offset": 1365.12,
+              "lang": "en"
+            },
+            {
+              "text": "online using artificial intelligence.",
+              "duration": 3.76,
+              "offset": 1366.799,
+              "lang": "en"
+            },
+            {
+              "text": "Artificial intelligence is not the focus",
+              "duration": 3.839,
+              "offset": 1368.72,
+              "lang": "en"
+            },
+            {
+              "text": "of the business model. Although it&amp;#39;s",
+              "duration": 3.681,
+              "offset": 1370.559,
+              "lang": "en"
+            },
+            {
+              "text": "called AI automation, you know, it&amp;#39;s not",
+              "duration": 3.36,
+              "offset": 1372.559,
+              "lang": "en"
+            },
+            {
+              "text": "AI that is doing the selling. It is you",
+              "duration": 3.439,
+              "offset": 1374.24,
+              "lang": "en"
+            },
+            {
+              "text": "that is doing the selling. You can&amp;#39;t",
+              "duration": 3.441,
+              "offset": 1375.919,
+              "lang": "en"
+            },
+            {
+              "text": "just build something with AI and just",
+              "duration": 3.12,
+              "offset": 1377.679,
+              "lang": "en"
+            },
+            {
+              "text": "expect people to come. What you have to",
+              "duration": 2.72,
+              "offset": 1379.36,
+              "lang": "en"
+            },
+            {
+              "text": "do is you have to get in front of a ton",
+              "duration": 2.561,
+              "offset": 1380.799,
+              "lang": "en"
+            },
+            {
+              "text": "of people, have them tell you what they",
+              "duration": 2.64,
+              "offset": 1382.08,
+              "lang": "en"
+            },
+            {
+              "text": "want, and then ultimately build that",
+              "duration": 2.96,
+              "offset": 1383.36,
+              "lang": "en"
+            },
+            {
+              "text": "thing for them afterwards. Earn while",
+              "duration": 3.199,
+              "offset": 1384.72,
+              "lang": "en"
+            },
+            {
+              "text": "you learn. That&amp;#39;s the whole idea of",
+              "duration": 2.88,
+              "offset": 1386.32,
+              "lang": "en"
+            },
+            {
+              "text": "services over digital product",
+              "duration": 2.64,
+              "offset": 1387.919,
+              "lang": "en"
+            },
+            {
+              "text": "businesses. And then anytime that",
+              "duration": 2.64,
+              "offset": 1389.2,
+              "lang": "en"
+            },
+            {
+              "text": "somebody tries to sell you a passive",
+              "duration": 3.6,
+              "offset": 1390.559,
+              "lang": "en"
+            },
+            {
+              "text": "investment dream that allows you to earn",
+              "duration": 4.16,
+              "offset": 1391.84,
+              "lang": "en"
+            },
+            {
+              "text": "completely while you sleep and not have",
+              "duration": 3.441,
+              "offset": 1394.159,
+              "lang": "en"
+            },
+            {
+              "text": "to put any time or energy in and it&amp;#39;s",
+              "duration": 3.12,
+              "offset": 1396,
+              "lang": "en"
+            },
+            {
+              "text": "the secret method that everybody&amp;#39;s using",
+              "duration": 3.439,
+              "offset": 1397.6,
+              "lang": "en"
+            },
+            {
+              "text": "to make a billion dollars, obviously be",
+              "duration": 3.919,
+              "offset": 1399.12,
+              "lang": "en"
+            },
+            {
+              "text": "understandably wary of it. If I&amp;#39;m being",
+              "duration": 4,
+              "offset": 1401.039,
+              "lang": "en"
+            },
+            {
+              "text": "totally pragmatic and realistic with you",
+              "duration": 3.921,
+              "offset": 1403.039,
+              "lang": "en"
+            },
+            {
+              "text": "and automation is a business model just",
+              "duration": 3.841,
+              "offset": 1405.039,
+              "lang": "en"
+            },
+            {
+              "text": "like virtually any other business model.",
+              "duration": 3.36,
+              "offset": 1406.96,
+              "lang": "en"
+            },
+            {
+              "text": "There&amp;#39;s a reasonably short window of",
+              "duration": 2.88,
+              "offset": 1408.88,
+              "lang": "en"
+            },
+            {
+              "text": "opportunity where you can get outsized",
+              "duration": 3.52,
+              "offset": 1410.32,
+              "lang": "en"
+            },
+            {
+              "text": "returns with this business model. But if",
+              "duration": 3.68,
+              "offset": 1411.76,
+              "lang": "en"
+            },
+            {
+              "text": "you guys focus less on the specific",
+              "duration": 3.68,
+              "offset": 1413.84,
+              "lang": "en"
+            },
+            {
+              "text": "tactics, the specific, you know, base",
+              "duration": 4.32,
+              "offset": 1415.44,
+              "lang": "en"
+            },
+            {
+              "text": "level ways to do the thing and you focus",
+              "duration": 4.56,
+              "offset": 1417.52,
+              "lang": "en"
+            },
+            {
+              "text": "more on the strategies that underly a",
+              "duration": 4,
+              "offset": 1419.76,
+              "lang": "en"
+            },
+            {
+              "text": "business model like AI and automation,",
+              "duration": 3.36,
+              "offset": 1422.08,
+              "lang": "en"
+            },
+            {
+              "text": "then even if you miss the AI and",
+              "duration": 3.2,
+              "offset": 1423.76,
+              "lang": "en"
+            },
+            {
+              "text": "automation wave, you&amp;#39;ll be well",
+              "duration": 2.8,
+              "offset": 1425.44,
+              "lang": "en"
+            },
+            {
+              "text": "positioned for anything that comes",
+              "duration": 2.959,
+              "offset": 1426.96,
+              "lang": "en"
+            },
+            {
+              "text": "afterwards. If you guys like this sort",
+              "duration": 2.88,
+              "offset": 1428.24,
+              "lang": "en"
+            },
+            {
+              "text": "of stuff and you guys want to actually",
+              "duration": 3.041,
+              "offset": 1429.919,
+              "lang": "en"
+            },
+            {
+              "text": "start making money with AI and an even",
+              "duration": 3.2,
+              "offset": 1431.12,
+              "lang": "en"
+            },
+            {
+              "text": "simpler and straighter line path than",
+              "duration": 2.8,
+              "offset": 1432.96,
+              "lang": "en"
+            },
+            {
+              "text": "what I outlined in this video, check out",
+              "duration": 3.359,
+              "offset": 1434.32,
+              "lang": "en"
+            },
+            {
+              "text": "Maker School. It&amp;#39;s my 0ero to1 daily",
+              "duration": 3.6,
+              "offset": 1435.76,
+              "lang": "en"
+            },
+            {
+              "text": "accountability roadmap where I hold your",
+              "duration": 3.12,
+              "offset": 1437.679,
+              "lang": "en"
+            },
+            {
+              "text": "hand through the entire process of",
+              "duration": 3.28,
+              "offset": 1439.36,
+              "lang": "en"
+            },
+            {
+              "text": "starting then scaling an AI and",
+              "duration": 4.24,
+              "offset": 1440.799,
+              "lang": "en"
+            },
+            {
+              "text": "automation agency. We have over 2,400",
+              "duration": 4.24,
+              "offset": 1442.64,
+              "lang": "en"
+            },
+            {
+              "text": "members. I increase the price every 100",
+              "duration": 3.201,
+              "offset": 1445.039,
+              "lang": "en"
+            },
+            {
+              "text": "members or so just to reflect the",
+              "duration": 3.12,
+              "offset": 1446.88,
+              "lang": "en"
+            },
+            {
+              "text": "increased value of the recordings that",
+              "duration": 3.12,
+              "offset": 1448.24,
+              "lang": "en"
+            },
+            {
+              "text": "I&amp;#39;m adding, the templates, the",
+              "duration": 3.12,
+              "offset": 1450,
+              "lang": "en"
+            },
+            {
+              "text": "resources, and the discussions. So, if",
+              "duration": 3.12,
+              "offset": 1451.36,
+              "lang": "en"
+            },
+            {
+              "text": "you wanted to do this, get in now,",
+              "duration": 3.76,
+              "offset": 1453.12,
+              "lang": "en"
+            },
+            {
+              "text": "grandfather that in lock in your price.",
+              "duration": 3.6,
+              "offset": 1454.48,
+              "lang": "en"
+            },
+            {
+              "text": "Really appreciate everybody that makes",
+              "duration": 3.12,
+              "offset": 1456.88,
+              "lang": "en"
+            },
+            {
+              "text": "it to the end of my videos. Thanks so",
+              "duration": 3.199,
+              "offset": 1458.08,
+              "lang": "en"
+            },
+            {
+              "text": "much for watching. If you guys could do",
+              "duration": 2.799,
+              "offset": 1460,
+              "lang": "en"
+            },
+            {
+              "text": "me a big solid like, comment, subscribe,",
+              "duration": 2.721,
+              "offset": 1461.279,
+              "lang": "en"
+            },
+            {
+              "text": "do all the fun YouTube stuff to get me",
+              "duration": 2.641,
+              "offset": 1462.799,
+              "lang": "en"
+            },
+            {
+              "text": "to the top of the Aago. And I&amp;#39;ll catch",
+              "duration": 4.4,
+              "offset": 1464,
+              "lang": "en"
+            },
+            {
+              "text": "you all in the next video.",
+              "duration": 2.96,
+              "offset": 1465.44,
+              "lang": "en"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "meta": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-30T09:03:50.729Z",
+      "updatedAt": "2025-08-30T09:03:50.729Z",
+      "id": "R1msetYwbGJl0WQA",
+      "name": "youtube"
+    }
+  ]
+}
